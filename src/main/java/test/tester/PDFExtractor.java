@@ -26,7 +26,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
 public class PDFExtractor {
-
+	// TODO: get Title via extracting names then creating offset to them via
+	// first words
 	/**
 	 * PDF Extractor
 	 * 
@@ -77,7 +78,7 @@ public class PDFExtractor {
 					offset++;
 				}
 			}
-			System.out.print(counter);
+		//	System.out.print(counter);
 		}
 		return keywords;
 		
@@ -101,7 +102,6 @@ public class PDFExtractor {
 
 			_tokenizer = new TokenizerME(tokenModel);
 			tokens = _tokenizer.tokenize(parsedText);
-			System.out.println(tokens.length);
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
 		} finally {
