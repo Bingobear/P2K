@@ -11,6 +11,7 @@ public class LangDetect {
 
 	public String detect(String parsedText) throws LangDetectException {
 		// TODO Auto-generated method stub
+		String text = parsedText.substring(150);
 		try {
 			DetectorFactory.loadProfile("res/profiles");
 		} catch (LangDetectException e) {
@@ -18,7 +19,7 @@ public class LangDetect {
 			e.printStackTrace();
 		}
 		Detector detector = DetectorFactory.create();
-		detector.append(parsedText);
+		detector.append(text);
 		
 		String lang = detector.detect();
 		return lang;
