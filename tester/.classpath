@@ -23,5 +23,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/RWTH/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/webapps/ROOT/WEB-INF/lib/log4j.jar"/>
+	<classpathentry kind="lib" path="libs/libstemmer_snowball.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
