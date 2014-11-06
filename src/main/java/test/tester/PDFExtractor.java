@@ -7,9 +7,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
@@ -182,4 +185,51 @@ public class PDFExtractor {
 		}
 		return _sentenceDetector;
 	}
+
+	public ArrayList<String>  getToken(String parsedText) {
+		SentenceDetector sentdetector = sentencedetect();
+		String[] sentence = sentdetector.sentDetect(parsedText);
+		ArrayList<String> tokensA = new ArrayList<String>();
+		for (int ii = 0; ii < sentence.length; ii++) {
+			String[] tokenSen = generalToken(sentence[ii]);
+			for (int jj = 0; jj < tokenSen.length; jj++) {
+				tokensA.add(tokenSen[jj]);
+			}
+		}
+		return tokensA;		
+	}
+
+	public String[] posttags(String[] text) {
+		POSTaggerME posttagger = createposttagger();
+		String[] result =posttagger.tag(text);
+		return result;
+		
+	}
+
+	private POSTaggerME createposttagger() {
+		Tokenizer _tokenizer = null;
+
+		InputStream modelIn = null;
+		POSTaggerME _posTagger=null;
+		try {
+		   // Loading tokenizer model
+		   modelIn = getClass().getResourceAsStream("/en-pos-maxent.bin");
+		   final POSModel posModel = new POSModel(modelIn);
+		   modelIn.close();
+
+		   _posTagger = new POSTaggerME(posModel);
+
+		} catch (final IOException ioe) {
+		   ioe.printStackTrace();
+		} finally {
+		   if (modelIn != null) {
+		      try {
+		         modelIn.close();
+		      } catch (final IOException e) {} // oh well!
+		   }
+		}
+		return _posTagger;
+		
+	}
+
 }
