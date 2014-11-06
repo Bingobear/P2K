@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import org.tartarus.snowball.ext.englishStemmer;
 
+import com.cybozu.labs.langdetect.LangDetectException;
+
 import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.util.InvalidFormatException;
 
@@ -24,7 +26,9 @@ public class App {
 		try {
 
 			String parsedText = app.parsePdftoString();
-
+			LangDetect lang = new LangDetect();
+			lang.detect(parsedText);
+			//sentence detector -> tokenizer
 			ArrayList<String> tokenheaven =app.getToken(parsedText);
 			String[] tokenTest = new String[tokenheaven.size()];
 			for (int ii=0;ii<tokenheaven.size();ii++){
@@ -32,13 +36,15 @@ public class App {
 			}
 			String[] tokens = app.generalToken(parsedText);
 			ArrayList<String> keywords = app.getKeywordsfromPDF(tokens);
-			app.posttags(tokenTest);
-			// does not work like this
+			String[] filter = app.posttags(tokenTest);
+			//ArrayList<Integer> keys = app.filterNounVerb(filter);
+			ArrayList<String> keys = app.filterNoun(filter,tokens);
+
 			Stemmer stem = new Stemmer();
 			String[] stemtokens = stem.stem(tokens);
 
 			System.out.println("normal:" + tokens.length + ", stemmed"
-					+ stemtokens.length);
+					+ stemtokens.length+", optimiertNouns:"+keys.size());
 			// go go stemming
 			if (keywords.isEmpty()) {
 
@@ -50,6 +56,9 @@ public class App {
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} catch (LangDetectException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		try {

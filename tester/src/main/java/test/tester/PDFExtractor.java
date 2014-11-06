@@ -232,4 +232,34 @@ public class PDFExtractor {
 		
 	}
 
+	public ArrayList<String> filterNounVerb(String[] filter, String[] tokens) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		for(int ii=0;ii<filter.length;ii++){
+			if((filter[ii].contains("NN"))||(filter[ii].contains("VB"))){
+				result.add(ii);
+			}
+		}
+		ArrayList<String> words = new ArrayList<String>();
+		for(int ii=0;ii<result.size();ii++){
+			words.add(tokens[result.get(ii)]);
+		}
+		return words;
+		
+	}
+//TODO Delete references from PDF
+	
+	public ArrayList<String> filterNoun(String[] filter, String[] tokens) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		for(int ii=0;ii<filter.length;ii++){
+			if((filter[ii].contains("NN"))){
+				result.add(ii);
+			}
+		}
+		ArrayList<String> words = new ArrayList<String>();
+		for(int ii=0;ii<result.size();ii++){
+			words.add(tokens[result.get(ii)]);
+		}
+		return words;
+	}
+
 }
