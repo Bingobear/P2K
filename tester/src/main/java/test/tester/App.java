@@ -20,21 +20,19 @@ public class App {
 	public static void main(String[] args) {
 		// BasicConfigurator.configure();
 		PDFExtractor app = new PDFExtractor();
-		SentenceDetector test = app.sentencedetect();
+
 		try {
 
 			String parsedText = app.parsePdftoString();
-			String[] sentence = test.sentDetect(parsedText);
-			ArrayList<String> tokensA = new ArrayList<String>();
-			for (int ii = 0; ii < sentence.length; ii++) {
-				String[] tokenSen = app.generalToken(sentence[ii]);
-				for (int jj = 0; jj < tokenSen.length; jj++) {
-					tokensA.add(tokenSen[jj]);
-				}
+
+			ArrayList<String> tokenheaven =app.getToken(parsedText);
+			String[] tokenTest = new String[tokenheaven.size()];
+			for (int ii=0;ii<tokenheaven.size();ii++){
+				tokenTest[ii] = tokenheaven.get(ii);
 			}
 			String[] tokens = app.generalToken(parsedText);
 			ArrayList<String> keywords = app.getKeywordsfromPDF(tokens);
-
+			app.posttags(tokenTest);
 			// does not work like this
 			Stemmer stem = new Stemmer();
 			String[] stemtokens = stem.stem(tokens);
