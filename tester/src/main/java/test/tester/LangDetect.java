@@ -1,12 +1,15 @@
 package test.tester;
 
+import java.util.ArrayList;
+
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
+import com.cybozu.labs.langdetect.Language;
 
 public class LangDetect {
 
-	public void detect(String parsedText) throws LangDetectException {
+	public String detect(String parsedText) throws LangDetectException {
 		// TODO Auto-generated method stub
 		try {
 			DetectorFactory.loadProfile("res/profiles");
@@ -16,6 +19,9 @@ public class LangDetect {
 		}
 		Detector detector = DetectorFactory.create();
 		detector.append(parsedText);
+		
+		String lang = detector.detect();
+		return lang;
 	}
 
 }

@@ -27,7 +27,7 @@ public class App {
 
 			String parsedText = app.parsePdftoString();
 			LangDetect lang = new LangDetect();
-			lang.detect(parsedText);
+			System.out.println(lang.detect(parsedText));
 			//sentence detector -> tokenizer
 			ArrayList<String> tokenheaven =app.getToken(parsedText);
 			String[] tokenTest = new String[tokenheaven.size()];
