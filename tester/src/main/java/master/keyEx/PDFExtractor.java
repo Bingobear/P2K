@@ -71,7 +71,7 @@ public class PDFExtractor {
 
 	public ArrayList<String> getKeywordsfromPDF(String[] text) {
 		ArrayList<String> keywords = new ArrayList<String>();
-		ArrayList<String> textPDF = new ArrayList(Arrays.asList(text));
+		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(text));
 		if (textPDF.contains("Keywords")) {
 			int counter = textPDF.indexOf("Keywords");
 			counter++;
@@ -313,6 +313,7 @@ public class PDFExtractor {
 		return words;
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayList<WordOcc> keyOcc(ArrayList<Words> words) {
 		ArrayList<Words> keywords = new ArrayList<Words>();
 		keywords = (ArrayList<Words>) words.clone();
@@ -323,8 +324,8 @@ public class PDFExtractor {
 			Words current = keywords.get(0);
 			for (int ii = 0; ii < keywords.size(); ii++) {
 				Words compare = keywords.get(ii);
-				
-				//TODO:Question compare words or only stem with type
+
+				// TODO:Question compare words or only stem with type
 				if ((compare.getWord().contains(current.getWord()))
 						&& (compare.getStem().equals(current.getStem()))
 						&& (compare.getType().equals(current.getType()))) {
@@ -382,6 +383,13 @@ public class PDFExtractor {
 		return result;
 	}
 
+	/**
+	 * TODO: GET TITLE FROM FIRST SENTENCE - idea: use namefinder
+	 * 
+	 * @return
+	 * @throws LangDetectException
+	 * @throws IOException
+	 */
 	public ArrayList<Words> parsePDFtoKey() throws LangDetectException,
 			IOException {
 		ArrayList<Words> result = new ArrayList<Words>();
@@ -406,7 +414,7 @@ public class PDFExtractor {
 		for (int counter = 0; counter < pdDoc.getNumberOfPages(); counter += 5) {
 			String parsedText = parsePdftoString(pdfStripper, pdDoc, counter,
 					counter + 4);
-			int test = pdDoc.getNumberOfPages();
+//			int test = pdDoc.getNumberOfPages();
 			// Language detection
 			if (counter == 0) {
 				setLang(lang.detect(parsedText));
