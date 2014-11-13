@@ -37,7 +37,7 @@ public class PDFHandler {
 		ArrayList<Words> words = extractor.parsePDFtoKey();
 
 		ArrayList<WordOcc> occ = extractor.keyOcc(words);
-		createTextExport(occ);
+		//createTextExport(occ);
 
 		PDF pdf = new PDF(occ, extractor.getLang());
 
