@@ -1,4 +1,4 @@
-package master.keyEx;
+package master.keyEx.models;
 
 public class Words {
 	String word;
@@ -9,7 +9,7 @@ public class Words {
 		// TODO Auto-generated constructor stub
 	}
 	
-	Words(String word, String stem, String type) {
+	public Words(String word, String stem, String type) {
 		this.word = word;
 		this.stem = stem;
 		this.type = type;

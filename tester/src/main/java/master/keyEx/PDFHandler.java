@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
+
+
+import master.keyEx.models.WordOcc;
+import master.keyEx.models.Words;
+
 import com.cybozu.labs.langdetect.LangDetectException;
 
 
@@ -42,14 +47,14 @@ public class PDFHandler {
 
 		ArrayList<String> keywords = app.getKeywordsfromPDF(tokens);
 		String[] filter = app.posttags(tokens);
-		// ArrayList<Integer> keys = app.filterNounVerb(filter);
-		ArrayList<String> keys = app.filterNoun(filter, tokens);
 
-		ArrayList<Words> words = app.generateWords(filter,tokens); 
+
+		ArrayList<Words> words = app.generateWords(filter,tokens,0); 
+		ArrayList<WordOcc> occ = app.keyOcc(words);
 
 
 		System.out.println("normal:" + tokens.length + ", optimiertNouns:"
-				+ keys.size() );
+				+ words.size() );
 		// go go stemming
 
 		if (keywords.isEmpty()) {
