@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import master.keyEx.models.WordOcc;
+import master.keyEx.models.Words;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.postag.POSModel;
@@ -319,50 +321,68 @@ public class PDFExtractor {
 		return words;
 	}
 
-	public ArrayList<Keyword> keyOcc(ArrayList<String> keys) {
-		ArrayList<String> keywords = new ArrayList<String>();
-		keywords = (ArrayList<String>) keys.clone();
+	public ArrayList<WordOcc> keyOcc(ArrayList<Words> words) {
+		ArrayList<Words> keywords = new ArrayList<Words>();
+		keywords = (ArrayList<Words>) words.clone();
 		int arraySize = keywords.size();
-		ArrayList<Keyword> result = new ArrayList<Keyword>();
+		ArrayList<WordOcc> result = new ArrayList<WordOcc>();
 		while (arraySize > 0) {
 			int count = 0;
-			String current = keywords.get(0);
-			int index = 0;
-			while (index >= 0) {
-
-				index = keywords.indexOf(current);
-				if (index >= 0) {
+			Words current = keywords.get(0);
+			for(int ii=0;ii<keywords.size();ii++) {
+				if(keywords.get(ii).getWord().contains(current.getWord())){
+					keywords.remove(ii);
 					count++;
-					keywords.remove(index);
 					arraySize--;
 				}
+//				index = keywords.indexOf(current);
+//				if (index >= 0) {
+//					count++;
+//					keywords.remove(index);
+//					arraySize--;
+//				}
 			}
-			result.add(new Keyword(count, current));
+			result.add(new WordOcc(current, count));
 		}
 		return result;
 	}
 
 	/**
-	 * Generate Word ArrayList TODO - modes - what to filter for now only look
-	 * at nouns
-	 * 
+	 * Generate Word ArrayList 	  
 	 * @param filter
 	 * @param tokens
+	 * @param modes: 0-Noun, 1-Noun&Verb, 2-Noun&Adjective
 	 * @return
 	 */
-	public ArrayList<Words> generateWords(String[] filter, String[] tokens) {
+	public ArrayList<Words> generateWords(String[] filter, String[] tokens,
+			int mode) {
 		// ArrayList<Integer> result = new ArrayList<Integer>();
+
 		ArrayList<Words> result = new ArrayList<Words>();
 		// for eng and german
 		Stemmer stem = new Stemmer();
-		String[] stemmedW = stem.stem(tokens,this.getLang());
-		for (int ii = 0; ii < filter.length; ii++) {
+		String[] stemmedW = stem.stem(tokens, this.getLang());
 
-			if ((filter[ii].contains("NN"))) {
-
-				Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
-				result.add(word);
-
+		if (mode == 0) {
+			for (int ii = 0; ii < filter.length; ii++) {
+				if ((filter[ii].contains("NN"))) {
+					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
+					result.add(word);
+				}
+			}
+		}else if (mode==1){
+			for (int ii = 0; ii < filter.length; ii++) {
+				if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
+					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
+					result.add(word);
+				}
+			}
+		}else if (mode==2){
+			for (int ii = 0; ii < filter.length; ii++) {
+				if ((filter[ii].contains("NN")) || (filter[ii].contains("JJ"))) {
+					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
+					result.add(word);
+				}
 			}
 		}
 
