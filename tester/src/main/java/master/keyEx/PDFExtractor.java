@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 import master.keyEx.models.WordOcc;
 import master.keyEx.models.Words;
@@ -35,6 +33,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFExtractor {
 	// TODO: get Title via extracting names then creating offset to them via
+	// TODO:Change language to PDF object
 	// first words
 	/**
 	 * PDF Extractor
@@ -60,22 +59,13 @@ public class PDFExtractor {
 		return this.language;
 	}
 
-	public String parsePdftoString() throws IOException {
-		PDFTextStripper pdfStripper = null;
-		PDDocument pdDoc = null;
-		COSDocument cosDoc = null;
-		URL url = getClass().getResource("/text/test.pdf");
-		File file = new File(url.getPath());
+	public String parsePdftoString(PDFTextStripper pdfStripper,
+			PDDocument pdDoc, int start, int end) throws IOException {
 
-		PDFParser parser = new PDFParser(new FileInputStream(file));
-		parser.parse();
-		cosDoc = parser.getDocument();
-		pdfStripper = new PDFTextStripper();
-		pdDoc = new PDDocument(cosDoc);
-		pdfStripper.setStartPage(1);
-		pdfStripper.setEndPage(97);
+		pdfStripper.setStartPage(start);
+		pdfStripper.setEndPage(end);
 		String parsedText = pdfStripper.getText(pdDoc);
-		// System.out.println(parsedText);
+		System.out.println("pages: " + start + "-" + end + " parsed");
 		return parsedText;
 	}
 
@@ -331,8 +321,13 @@ public class PDFExtractor {
 		while (arraySize > 0) {
 			int count = 0;
 			Words current = keywords.get(0);
-			for(int ii=0;ii<keywords.size();ii++) {
-				if(keywords.get(ii).getWord().contains(current.getWord())){
+			for (int ii = 0; ii < keywords.size(); ii++) {
+				Words compare = keywords.get(ii);
+				
+				//TODO:Question compare words or only stem with type
+				if ((compare.getWord().contains(current.getWord()))
+						&& (compare.getStem().equals(current.getStem()))
+						&& (compare.getType().equals(current.getType()))) {
 					keywords.remove(ii);
 					count++;
 					arraySize--;
@@ -344,10 +339,12 @@ public class PDFExtractor {
 	}
 
 	/**
-	 * Generate Word ArrayList 	  
+	 * Generate Word ArrayList
+	 * 
 	 * @param filter
 	 * @param tokens
-	 * @param modes: 0-Noun, 1-Noun&Verb, 2-Noun&Adjective
+	 * @param modes
+	 *            : 0-Noun, 1-Noun&Verb, 2-Noun&Adjective
 	 * @return
 	 */
 	public ArrayList<Words> generateWords(String[] filter, String[] tokens,
@@ -366,14 +363,14 @@ public class PDFExtractor {
 					result.add(word);
 				}
 			}
-		}else if (mode==1){
+		} else if (mode == 1) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
 					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
 					result.add(word);
 				}
 			}
-		}else if (mode==2){
+		} else if (mode == 2) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("JJ"))) {
 					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
@@ -385,29 +382,58 @@ public class PDFExtractor {
 		return result;
 	}
 
-	public ArrayList<Words> parsePDFtoKey() throws LangDetectException, IOException {
-		String parsedText = parsePdftoString();
+	public ArrayList<Words> parsePDFtoKey() throws LangDetectException,
+			IOException {
+		ArrayList<Words> result = new ArrayList<Words>();
+
+		PDFTextStripper pdfStripper = null;
+		PDDocument pdDoc = null;
+		COSDocument cosDoc = null;
+		// TODO:Move to input
+		// antrag big, test small
+		URL url = getClass().getResource("/text/test.pdf");
+		File file = new File(url.getPath());
+
+		PDFParser parser = new PDFParser(new FileInputStream(file));
+		parser.parse();
+		cosDoc = parser.getDocument();
+		pdfStripper = new PDFTextStripper();
+
+		pdDoc = new PDDocument(cosDoc);
 
 		LangDetect lang = new LangDetect();
-		setLang(lang.detect(parsedText));
-		System.out.println(getLang());
-		// sentence detector -> tokenizer
-		String[] tokens = getToken(parsedText);
 
-		ArrayList<String> keywords = getKeywordsfromPDF(tokens);
-		String[] filter = posttags(tokens);
+		for (int counter = 0; counter < pdDoc.getNumberOfPages(); counter += 5) {
+			String parsedText = parsePdftoString(pdfStripper, pdDoc, counter,
+					counter + 4);
+			int test = pdDoc.getNumberOfPages();
+			// Language detection
+			if (counter == 0) {
+				setLang(lang.detect(parsedText));
+				System.out.println(getLang());
+			}
+			// sentence detector -> tokenizer
+			String[] tokens = getToken(parsedText);
+			String[] filter = posttags(tokens);
 
-		if (keywords.isEmpty()) {
+			// TODO:MOVE KEYWORDS TO PDF OBJECT
+			ArrayList<String> keywords = getKeywordsfromPDF(tokens);
 
-			// empty - could not directly extract keywords
-		} else {
-			// use extracted keywords as ref. elements
+			if (keywords.isEmpty()) {
+
+				// empty - could not directly extract keywords
+			} else {
+				// use extracted keywords as ref. elements
+			}
+
+			ArrayList<Words> words = generateWords(filter, tokens, 0);
+			result.addAll(words);
+			System.out.println("normal:" + tokens.length + ", optimiertNouns:"
+					+ words.size());
+			System.out.println("");
 		}
-
-		ArrayList<Words> words = generateWords(filter,tokens,0); 
-		System.out.println("normal:" + tokens.length + ", optimiertNouns:"
-				+ words.size() );
-		return words;
+		System.out.println("FINAL RESULT:optimiertNouns:" + result.size());
+		return result;
 	}
 
 }

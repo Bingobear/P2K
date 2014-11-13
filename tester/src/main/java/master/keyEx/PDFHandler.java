@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 
 
+
+
+import master.keyEx.models.PDF;
 import master.keyEx.models.WordOcc;
 import master.keyEx.models.Words;
 
@@ -35,11 +38,10 @@ public class PDFHandler {
 		ArrayList<Words> words = extractor.parsePDFtoKey();
 
 		ArrayList<WordOcc> occ = extractor.keyOcc(words);
+		
+		
+		PDF pdf = new PDF(occ,extractor.getLang());
 
-		// go go stemming
-
-
-		// app.token();
 
 	}
 
