@@ -31,6 +31,8 @@ import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
+import com.cybozu.labs.langdetect.LangDetectException;
+
 public class PDFExtractor {
 	// TODO: get Title via extracting names then creating offset to them via
 	// first words
@@ -335,12 +337,6 @@ public class PDFExtractor {
 					count++;
 					arraySize--;
 				}
-//				index = keywords.indexOf(current);
-//				if (index >= 0) {
-//					count++;
-//					keywords.remove(index);
-//					arraySize--;
-//				}
 			}
 			result.add(new WordOcc(current, count));
 		}
@@ -387,6 +383,31 @@ public class PDFExtractor {
 		}
 
 		return result;
+	}
+
+	public ArrayList<Words> parsePDFtoKey() throws LangDetectException, IOException {
+		String parsedText = parsePdftoString();
+
+		LangDetect lang = new LangDetect();
+		setLang(lang.detect(parsedText));
+		System.out.println(getLang());
+		// sentence detector -> tokenizer
+		String[] tokens = getToken(parsedText);
+
+		ArrayList<String> keywords = getKeywordsfromPDF(tokens);
+		String[] filter = posttags(tokens);
+
+		if (keywords.isEmpty()) {
+
+			// empty - could not directly extract keywords
+		} else {
+			// use extracted keywords as ref. elements
+		}
+
+		ArrayList<Words> words = generateWords(filter,tokens,0); 
+		System.out.println("normal:" + tokens.length + ", optimiertNouns:"
+				+ words.size() );
+		return words;
 	}
 
 }
