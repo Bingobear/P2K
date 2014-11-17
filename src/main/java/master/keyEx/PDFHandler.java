@@ -7,10 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
-import master.keyEx.models.PDF;
-import master.keyEx.models.WordOcc;
-import master.keyEx.models.Words;
-
+import master.keyEx.models.*;
 import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
