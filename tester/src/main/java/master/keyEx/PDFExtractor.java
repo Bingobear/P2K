@@ -8,8 +8,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import master.keyEx.models.WordOcc;
-import master.keyEx.models.Words;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.postag.POSModel;
@@ -28,6 +26,8 @@ import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
+
+import master.keyEx.models.*;
 
 import com.cybozu.labs.langdetect.LangDetectException;
 
