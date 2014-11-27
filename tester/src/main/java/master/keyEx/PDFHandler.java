@@ -10,12 +10,13 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import master.keyEx.models.*;
+import Database.Database;
 
 import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
-	static boolean debug = false;
-	static boolean debug_db = false;
+	static boolean debug = true;
+	static boolean debug_db = true;
 	static String title = "";
 
 	public PDFHandler() {
