@@ -3,7 +3,7 @@ package master.keyEx.models;
 
 
 
-import java.io.Closeable;
+import java.lang.AutoCloseable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -26,7 +26,7 @@ public void readDataBase() throws Exception {
       // setup the connection with the DB.
       connect = DriverManager
           .getConnection("jdbc:mysql://localhost/feedback?"
-              + "user=sqluser&password=sqluserpw");
+              + "user=test&password=test");
 
       // statements allow to issue SQL queries to the database
       statement = connect.createStatement();
@@ -102,11 +102,11 @@ public void readDataBase() throws Exception {
 
   // you need to close all three to make sure
   private void close() {
-    close((Closeable) resultSet);
-    close((Closeable) statement);
-    close((Closeable) connect);
+	    close(resultSet);
+	    close(statement);
+	    close(connect);
   }
-  private void close(Closeable c) {
+  private void close(AutoCloseable c) {
     try {
       if (c != null) {
         c.close();
