@@ -3,7 +3,16 @@ package master.keyEx.models;
 public class Keyword {
 	private int score;
 	private String word;
+	private Category cat;
 	
+	public Category getCat() {
+		return cat;
+	}
+
+	public void setCat(Category cat) {
+		this.cat = cat;
+	}
+
 	public Keyword() {
 
 	}
