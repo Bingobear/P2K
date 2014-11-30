@@ -4,7 +4,16 @@ public class Keyword {
 	private int score;
 	private String word;
 	private Category cat;
+	private PDF pdf;
 	
+	public PDF getPdf() {
+		return pdf;
+	}
+
+	public void setPdf(PDF pdf) {
+		this.pdf = pdf;
+	}
+
 	public Category getCat() {
 		return cat;
 	}
