@@ -43,6 +43,12 @@ public class PDFExtractor {
 	private String title;
 
 	private String language;
+	
+	private int wordcount=0;
+
+	public int getWordcount() {
+		return wordcount;
+	}
 
 	PDFExtractor() {
 
@@ -145,8 +151,8 @@ public class PDFExtractor {
 	 * 
 	 */
 
-	public ArrayList<String> NameFinder(String[] sentences) throws InvalidFormatException,
-			IOException {
+	public ArrayList<String> NameFinder(String[] sentences)
+			throws InvalidFormatException, IOException {
 		// TEST STUFF
 		// String[] sentences = {
 		// "If President John F. Kennedy, after visiting France in 1961 with his immensely popular wife,"
@@ -184,8 +190,8 @@ public class PDFExtractor {
 
 			// Print the names extracted from the tokens using the Span data
 			String[] helper = null;
-			helper = Span.spansToStrings(nameSpans,tokens);
-			for(int ii=0;ii<helper.length;ii++){
+			helper = Span.spansToStrings(nameSpans, tokens);
+			for (int ii = 0; ii < helper.length; ii++) {
 				result.add(helper[ii]);
 			}
 
@@ -339,10 +345,8 @@ public class PDFExtractor {
 			int count = 0;
 			Words current = keywords.get(0);
 
-
 			for (int ii = 0; ii < keywords.size(); ii++) {
 				Words compare = keywords.get(ii);
-
 
 				// TODO:Question compare words or only stem with type
 				// Lower Border
@@ -517,29 +521,30 @@ public class PDFExtractor {
 					counter + 4);
 
 
-			if (first) {
-				setLang(lang.detect(parsedText));
-				System.out.println(getLang());
-			}
+				setLang(lang.detect(parsedText,first));
+
+
 			if (counter == 0) {
-				 String titlePage = parsePdftoString(pdfStripper, pdDoc, counter,
-						counter+1);
+				System.out.println(getLang());
+				String titlePage = parsePdftoString(pdfStripper, pdDoc,
+						counter, counter + 1);
 				String title = extractTitle(titlePage);
 			}
 			parsedText = parsedText.toLowerCase();
-			
+
 			// sentence detector -> tokenizer
 			String[] tokens = getToken(parsedText);
 			String[] filter = posttags(tokens);
 
 			// TODO:MOVE KEYWORDS TO PDF OBJECT
-			ArrayList<String> keywords = getKeywordsfromPDF(tokens);
+			if (counter == 0) {
+				ArrayList<String> keywords = getKeywordsfromPDF(tokens);
+				if (keywords.isEmpty()) {
 
-			if (keywords.isEmpty()) {
-
-				// empty - could not directly extract keywords
-			} else {
-				// use extracted keywords as ref. elements
+					// empty - could not directly extract keywords
+				} else {
+					// use extracted keywords as ref. elements
+				}
 			}
 
 			ArrayList<Words> words = generateWords(filter, tokens, 0);
@@ -547,6 +552,7 @@ public class PDFExtractor {
 			System.out.println("normal:" + tokens.length + ", optimiertNouns:"
 					+ words.size());
 			System.out.println("");
+			wordcount = wordcount+ tokens.length;
 		}
 		System.out.println("FINAL RESULT:optimiertNouns:" + result.size());
 		return result;

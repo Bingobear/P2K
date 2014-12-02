@@ -15,8 +15,9 @@ import Database.Database;
 import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
-	static boolean debug = true;
-	static boolean debug_db = true;
+	static boolean debug_extractor = true;
+	static boolean debug_db = false;
+	static boolean debug_img = false;
 	static String title = "";
 
 	public PDFHandler() {
@@ -35,7 +36,7 @@ public class PDFHandler {
 			}
 		}
 		PDFHandler app = new PDFHandler();
-		if (!debug) {
+		if (debug_extractor) {
 			try {
 				app.parsePDFtoKey();
 			} catch (LangDetectException e) {
@@ -58,6 +59,8 @@ public class PDFHandler {
 		URL url = getClass().getResource("/data/pdf/");
 		File folder = new File(url.getPath());
 		boolean first = true;
+		ArrayList<PDF> pdfList = new ArrayList<PDF>();
+		Corpus corpus = new Corpus();
 		for (final File fileEntry : folder.listFiles()) {
 			if (fileEntry.isFile()) {
 
@@ -78,16 +81,35 @@ public class PDFHandler {
 				}
 				ArrayList<WordOcc> occ = extractor.keyOcc(words);
 				// createTextExport(occ);
-				createTextExport(occ, key, title);
-				if ((title
-						.substring(title.lastIndexOf('.') + 1, title.length())
-						.toLowerCase()).equals("txt"))
-					System.out.println("File= " + folder.getAbsolutePath()
-							+ "\\" + fileEntry.getName());
-				WordCramGen wcg = new WordCramGen();
+				// TODO add publication id!
+				PDF pdf = new PDF(occ, extractor.getLang(),
+						extractor.getWordcount());
+				pdfList.add(pdf);
+				corpus.incDocN();
+				if (debug_img) {
+					createTextExport(occ, key, title);
+					if ((title.substring(title.lastIndexOf('.') + 1,
+							title.length()).toLowerCase()).equals("txt"))
+						System.out.println("File= " + folder.getAbsolutePath()
+								+ "\\" + fileEntry.getName());
+					WordCramGen wcg = new WordCramGen();
 
-				wcg.generate(home + "/export/", export, title);
+					wcg.generate(home + "/export/", export, title);
+				}
 			}
+		}
+		corpus.setPdfList(pdfList);
+		corpus.calculateIdf();
+		for (int ii = 0; ii < pdfList.size(); ii++) {
+			pdfList.get(ii).calculateTF_IDF();
+			System.out.println(ii);
+			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
+			for (int jj = 0; jj < words.size(); jj++) {
+				System.out.println(words.get(jj).getTfidf() + ":"
+						+ words.get(jj).getWord().getWord());
+			}
+			System.out
+					.println("______________________________________________________________");
 		}
 		// PDFExtractor extractor = new PDFExtractor();
 		// ArrayList<Words> words = extractor.parsePDFtoKey();
@@ -95,7 +117,6 @@ public class PDFHandler {
 		// ArrayList<WordOcc> occ = extractor.keyOcc(words);
 		// //createTextExport(occ);
 		//
-		// PDF pdf = new PDF(occ, extractor.getLang());
 
 	}
 
