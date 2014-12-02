@@ -5,14 +5,29 @@ import java.util.ArrayList;
 public class PDF {
 	private ArrayList<WordOcc> wordOcc;
 	private String language;
+	private int wordcount;
 	private ArrayList<String> genericKeywords;
+
+
+	
+	public void calculateTF_IDF(){
+		WordOcc word=null;
+		for(int ii=0;ii<wordOcc.size();ii++){
+			word=wordOcc.get(ii);
+			double tf = (double)word.getOcc()/(double)wordcount;
+			word.setTf(tf);
+			double tfidf=(double)tf*(double)word.getIdf();
+			word.setTfidf(tfidf);
+		}
+	}
 
 	public PDF() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public PDF(ArrayList<WordOcc> words, String language) {
+	public PDF(ArrayList<WordOcc> words, String language, int wordcount) {
 		this.wordOcc = words;
+		this.wordcount = wordcount;
 		this.language = language;
 	}
 

@@ -9,18 +9,21 @@ import com.cybozu.labs.langdetect.Language;
 
 public class LangDetect {
 
-	public String detect(String parsedText) throws LangDetectException {
+	public String detect(String parsedText, boolean first)
+			throws LangDetectException {
 		// TODO Auto-generated method stub
 		String text = parsedText.substring(150);
-		try {
-			DetectorFactory.loadProfile("res/profiles");
-		} catch (LangDetectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (first) {
+			try {
+				DetectorFactory.loadProfile("res/profiles");
+			} catch (LangDetectException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		Detector detector = DetectorFactory.create();
 		detector.append(text);
-		
+
 		String lang = detector.detect();
 		return lang;
 	}

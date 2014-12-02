@@ -5,6 +5,10 @@ import master.keyEx.models.Words;
 public class WordOcc {
 	private Words word;
 	private int occ;
+	private double tf=0;
+	private double tfidf = 0;
+	private double idf=0;
+	private int keyinPDF=0;
 	
 	WordOcc() {
 
@@ -29,5 +33,41 @@ public class WordOcc {
 
 	public void setOcc(int occ) {
 		this.occ = occ;
+	}
+
+	public double getTf() {
+		return tf;
+	}
+
+	public void setTf(double tf) {
+		this.tf = tf;
+	}
+
+	public double getTfidf() {
+		return tfidf;
+	}
+
+	public void setTfidf(double tfidf) {
+		this.tfidf = tfidf;
+	}
+
+	public int getKeyinPDF() {
+		return keyinPDF;
+	}
+
+	public void incKeyinPDF() {
+		this.keyinPDF++;
+	}
+	
+	public void setKeyinPDF(int keyinPDF) {
+		this.keyinPDF = keyinPDF;
+	}
+
+	public double getIdf() {
+		return idf;
+	}
+
+	public void setIdf(double idf) {
+		this.idf = idf;
 	}
 }
