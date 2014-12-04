@@ -6,7 +6,18 @@ public class PDF {
 	private ArrayList<WordOcc> wordOcc;
 	private String language;
 	private int wordcount;
+	
+	public int getWordcount() {
+		return wordcount;
+	}
+
+	public void setWordcount(int wordcount) {
+		this.wordcount = wordcount;
+	}
+
 	private ArrayList<String> genericKeywords;
+	private String firstPage;
+	private int publicationID;
 
 
 	
@@ -29,6 +40,14 @@ public class PDF {
 		this.wordOcc = words;
 		this.wordcount = wordcount;
 		this.language = language;
+	}
+
+	public PDF(ArrayList<WordOcc> words, String lang, int wordcount,
+			String titlePage) {
+		this.wordOcc = words;
+		this.wordcount = wordcount;
+		this.language = lang;
+		this.firstPage = titlePage;
 	}
 
 	public ArrayList<WordOcc> getWordOccList() {
@@ -66,6 +85,22 @@ public class PDF {
 
 	public void setGenericKeywords(ArrayList<String> genericKeywords) {
 		this.genericKeywords = genericKeywords;
+	}
+
+	public String getFirstPage() {
+		return firstPage;
+	}
+
+	public void setFirstPage(String firstPage) {
+		this.firstPage = firstPage;
+	}
+
+	public int getPublicationID() {
+		return publicationID;
+	}
+
+	public void setPublicationID(int publicationID) {
+		this.publicationID = publicationID;
 	}
 
 }
