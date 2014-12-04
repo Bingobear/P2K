@@ -88,6 +88,7 @@ public class PDFHandler {
 					// TODO add publication id!
 					PDF pdf = new PDF(occ, extractor.getLang(),
 							extractor.getWordcount(), extractor.getTitlePage());
+					pdf.setGenericKeywords(extractor.getKeywords());
 					pdfList.add(pdf);
 					corpus.incDocN();
 

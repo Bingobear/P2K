@@ -43,7 +43,16 @@ public class PDFExtractor {
 	private String titlePage;
 
 	private String language;
+	private ArrayList<String> keywords = new ArrayList<String>();
 	
+	public ArrayList<String> getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(ArrayList<String> keywords) {
+		this.keywords = keywords;
+	}
+
 	private int wordcount=0;
 
 	public int getWordcount() {
@@ -546,7 +555,7 @@ public class PDFExtractor {
 
 					// empty - could not directly extract keywords
 				} else {
-					// use extracted keywords as ref. elements
+					this.setKeywords(keywords);
 				}
 			}
 
