@@ -44,7 +44,7 @@ public class PDFExtractor {
 
 	private String language;
 	private ArrayList<String> keywords = new ArrayList<String>();
-	
+
 	public ArrayList<String> getKeywords() {
 		return keywords;
 	}
@@ -53,7 +53,7 @@ public class PDFExtractor {
 		this.keywords = keywords;
 	}
 
-	private int wordcount=0;
+	private int wordcount = 0;
 
 	public int getWordcount() {
 		return wordcount;
@@ -210,7 +210,7 @@ public class PDFExtractor {
 	}
 
 	public SentenceDetector sentencedetect() {
-		// TODO Auto-generated method stub
+
 		SentenceDetector _sentenceDetector = null;
 
 		InputStream modelIn = null;
@@ -240,6 +240,24 @@ public class PDFExtractor {
 		return _sentenceDetector;
 	}
 
+	public String[] getTokenPM(String parsedText) {
+		SentenceDetector sentdetector = sentencedetect();
+		String[] sentence = sentdetector.sentDetect(parsedText);
+		ArrayList<String> tokensA = new ArrayList<String>();
+		for (int ii = 0; ii < sentence.length; ii++) {
+			String[] tokenSen = generalToken(sentence[ii]);
+			for (int jj = 0; jj < tokenSen.length; jj++) {
+				tokensA.add(tokenSen[jj]);
+			}
+		}
+		String[] tokens = new String[tokensA.size()];
+		for (int ii = 0; ii < tokensA.size(); ii++) {
+			tokens[ii] = tokensA.get(ii);
+
+		}
+		return tokens;
+	}
+
 	public String[] getToken(String parsedText) {
 		SentenceDetector sentdetector = sentencedetect();
 		String[] sentence = sentdetector.sentDetect(parsedText);
@@ -247,10 +265,9 @@ public class PDFExtractor {
 		for (int ii = 0; ii < sentence.length; ii++) {
 			String[] tokenSen = generalToken(sentence[ii]);
 			for (int jj = 0; jj < tokenSen.length; jj++) {
-				// Extracts Punctuation chunks TODO
 				if (!tokenSen[jj].replaceAll("\\W", "").isEmpty()) {
 					// tokenSen[jj]
-					// TODO optimization with no funny letters
+					// TODO Improve word recognition
 					tokensA.add(tokenSen[jj].replaceAll("\\W", ""));
 				}
 
@@ -304,43 +321,44 @@ public class PDFExtractor {
 
 	}
 
-	/**
-	 * TODO - change to index return
-	 * 
-	 * @param filter
-	 * @param tokens
-	 * @return
-	 */
-	public ArrayList<String> filterNounVerb(String[] filter, String[] tokens) {
-		ArrayList<Integer> result = new ArrayList<Integer>();
-		for (int ii = 0; ii < filter.length; ii++) {
-			if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
-				result.add(ii);
-			}
-		}
-		ArrayList<String> words = new ArrayList<String>();
-		for (int ii = 0; ii < result.size(); ii++) {
-			words.add(tokens[result.get(ii)]);
-		}
-		return words;
-
-	}
-
-	// TODO Delete references from PDF
-
-	public ArrayList<String> filterNoun(String[] filter, String[] tokens) {
-		ArrayList<Integer> result = new ArrayList<Integer>();
-		for (int ii = 0; ii < filter.length; ii++) {
-			if ((filter[ii].contains("NN"))) {
-				result.add(ii);
-			}
-		}
-		ArrayList<String> words = new ArrayList<String>();
-		for (int ii = 0; ii < result.size(); ii++) {
-			words.add(tokens[result.get(ii)]);
-		}
-		return words;
-	}
+	// /**
+	// * - change to index return
+	// *
+	// * @param filter
+	// * @param tokens
+	// * @return
+	// */
+	// public ArrayList<String> filterNounVerb(String[] filter, String[] tokens)
+	// {
+	// ArrayList<Integer> result = new ArrayList<Integer>();
+	// for (int ii = 0; ii < filter.length; ii++) {
+	// if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
+	// result.add(ii);
+	// }
+	// }
+	// ArrayList<String> words = new ArrayList<String>();
+	// for (int ii = 0; ii < result.size(); ii++) {
+	// words.add(tokens[result.get(ii)]);
+	// }
+	// return words;
+	//
+	// }
+	//
+	// // Delete references from PDF
+	//
+	// public ArrayList<String> filterNoun(String[] filter, String[] tokens) {
+	// ArrayList<Integer> result = new ArrayList<Integer>();
+	// for (int ii = 0; ii < filter.length; ii++) {
+	// if ((filter[ii].contains("NN"))) {
+	// result.add(ii);
+	// }
+	// }
+	// ArrayList<String> words = new ArrayList<String>();
+	// for (int ii = 0; ii < result.size(); ii++) {
+	// words.add(tokens[result.get(ii)]);
+	// }
+	// return words;
+	// }
 
 	@SuppressWarnings("unchecked")
 	public ArrayList<WordOcc> keyOcc(ArrayList<Words> words) {
@@ -406,9 +424,7 @@ public class PDFExtractor {
 		if (mode == 0) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN"))) {
-					if (tokens[ii].equals("`")) {
-						String test = "what";
-					}
+
 					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
 					result.add(word);
 				}
@@ -529,27 +545,17 @@ public class PDFExtractor {
 			String parsedText = parsePdftoString(pdfStripper, pdDoc, counter,
 					counter + 4);
 
-
-				setLang(lang.detect(parsedText,first));
-
+			setLang(lang.detect(parsedText, first));
 
 			if (counter == 0) {
 				System.out.println(getLang());
 				if (first) {
 					first = false;
 				}
-				this.setTitlePage(parsePdftoString(pdfStripper, pdDoc,
-						counter, counter+1));
-				
-			}
-			parsedText = parsedText.toLowerCase();
-
-			// sentence detector -> tokenizer
-			String[] tokens = getToken(parsedText);
-			String[] filter = posttags(tokens);
-
-			// TODO:MOVE KEYWORDS TO PDF OBJECT
-			if (counter == 0) {
+				this.setTitlePage(parsePdftoString(pdfStripper, pdDoc, counter,
+						counter + 1)); // TODO:MOVE KEYWORDS TO PDF OBJECT
+				String[] tokens = getTokenPM(parsedText);
+				// TODO create regEx for identifying keyword - area
 				ArrayList<String> keywords = getKeywordsfromPDF(tokens);
 				if (keywords.isEmpty()) {
 
@@ -557,14 +563,21 @@ public class PDFExtractor {
 				} else {
 					this.setKeywords(keywords);
 				}
+
 			}
+
+			parsedText = parsedText.toLowerCase();
+
+			// sentence detector -> tokenizer
+			String[] tokens = getToken(parsedText);
+			String[] filter = posttags(tokens);
 
 			ArrayList<Words> words = generateWords(filter, tokens, 0);
 			result.addAll(words);
 			System.out.println("normal:" + tokens.length + ", optimiertNouns:"
 					+ words.size());
 			System.out.println("");
-			wordcount = wordcount+ tokens.length;
+			wordcount = wordcount + tokens.length;
 		}
 		System.out.println("FINAL RESULT:optimiertNouns:" + result.size());
 		return result;
@@ -576,10 +589,10 @@ public class PDFExtractor {
 		try {
 			NameFinder(sentence);
 		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
+			//
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			//
 			e.printStackTrace();
 		}
 		return null;
