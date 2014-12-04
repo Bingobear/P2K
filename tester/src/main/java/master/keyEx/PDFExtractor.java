@@ -40,7 +40,7 @@ public class PDFExtractor {
 	 * 
 	 * @throws IOException
 	 */
-	private String title;
+	private String titlePage;
 
 	private String language;
 	
@@ -501,7 +501,7 @@ public class PDFExtractor {
 		PDFTextStripper pdfStripper = null;
 		PDDocument pdDoc = null;
 		COSDocument cosDoc = null;
-		title = fileEntry.getName();
+		setTitlePage(fileEntry.getName());
 		// TODO:Move to input
 		// antrag big, test small
 		// URL url = getClass().getResource("/text/test.pdf");
@@ -526,9 +526,12 @@ public class PDFExtractor {
 
 			if (counter == 0) {
 				System.out.println(getLang());
-				String titlePage = parsePdftoString(pdfStripper, pdDoc,
-						counter, counter + 1);
-				String title = extractTitle(titlePage);
+				if (first) {
+					first = false;
+				}
+				this.setTitlePage(parsePdftoString(pdfStripper, pdDoc,
+						counter, counter+1));
+				
 			}
 			parsedText = parsedText.toLowerCase();
 
@@ -571,6 +574,14 @@ public class PDFExtractor {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public String getTitlePage() {
+		return titlePage;
+	}
+
+	public void setTitlePage(String titlePage) {
+		this.titlePage = titlePage;
 	}
 
 }

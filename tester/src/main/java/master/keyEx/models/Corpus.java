@@ -53,4 +53,20 @@ public class Corpus {
 	public void setPdfList(ArrayList<PDF> pdfList) {
 		this.pdfList = pdfList;
 	}
+
+	public ArrayList<PDF> calculateTD_IDF(ArrayList<PDF> pdfList) {
+		for (int ii = 0; ii < pdfList.size(); ii++) {
+			pdfList.get(ii).calculateTF_IDF();
+			System.out.println(ii);
+			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
+			for (int jj = 0; jj < words.size(); jj++) {
+				System.out.println(words.get(jj).getTfidf() + ":"
+						+ words.get(jj).getWord().getWord());
+			}
+			System.out
+					.println("______________________________________________________________");
+		}
+		return pdfList;
+		
+	}
 }
