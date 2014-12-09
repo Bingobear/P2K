@@ -6,7 +6,10 @@ public class PDF {
 	private ArrayList<WordOcc> wordOcc;
 	private String language;
 	private int wordcount;
-	
+	private ArrayList<String> genericKeywords;
+	private String firstPage;
+	private int publicationID;
+
 	public int getWordcount() {
 		return wordcount;
 	}
@@ -15,19 +18,14 @@ public class PDF {
 		this.wordcount = wordcount;
 	}
 
-	private ArrayList<String> genericKeywords;
-	private String firstPage;
-	private int publicationID;
-
-
-	
-	public void calculateTF_IDF(){
-		WordOcc word=null;
-		for(int ii=0;ii<wordOcc.size();ii++){
-			word=wordOcc.get(ii);
-			double tf = (double)word.getOcc()/(double)wordcount;
+	public void calculateTF_IDF() {
+		WordOcc word = null;
+		for (int ii = 0; ii < wordOcc.size(); ii++) {
+			word = wordOcc.get(ii);
+			double tf = TFIDF
+					.calcTF((double) word.getOcc(), (double) wordcount);
 			word.setTf(tf);
-			double tfidf=(double)tf*(double)word.getIdf();
+			double tfidf = TFIDF.calcTFIDF(tf, (double) word.getIdf());
 			word.setTfidf(tfidf);
 		}
 	}

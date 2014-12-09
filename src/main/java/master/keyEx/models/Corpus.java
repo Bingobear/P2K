@@ -28,7 +28,7 @@ public class Corpus {
 	    for(PDF doc : pdfList){
 	    	words = doc.getWordOccList();
 	    	for(WordOcc word:words){
-	    		word.setIdf(Math.log10((double)docN/(double)word.getKeyinPDF()));
+	    		word.setIdf(TFIDF.calcIDF((double)docN,(double)word.getKeyinPDF()));
 	    	}
 	    }
 		//this.idf = Math.log10(docN/pdfList);
@@ -68,5 +68,20 @@ public class Corpus {
 		}
 		return pdfList;
 		
+	}
+
+	public ArrayList<PDF> filterPDFTDIDF(ArrayList<PDF> pdfList2,double level) {
+		for (int ii = 0; ii < pdfList.size(); ii++) {
+			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
+			for (int jj = 0; jj < words.size(); jj++) {
+				ArrayList<WordOcc> filtwords = new ArrayList<WordOcc>();
+				if(words.get(jj).getTfidf()>level){
+					filtwords.add(words.get(jj));
+				}
+				System.out.println(filtwords.get(jj));
+				pdfList.get(ii).setWordOcc(filtwords);
+			}
+		}
+		return pdfList;
 	}
 }
