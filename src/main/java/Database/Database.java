@@ -182,184 +182,24 @@ public class Database {
 	private void fillTDB(PDF pdf, int idPub, Corpus corpus) throws SQLException {
 		long pdfID = -1;
 		long corpID = -1;
+		corpID = addCorpus(corpus);
 
-		if (corpus != null) {
-			Statement stmt = connect.createStatement();
-			String sqlT = "SELECT id FROM corpus.corpus";
-			ResultSet rsT = stmt.executeQuery(sqlT);
-			if (rsT.next()) {
-				corpID = rsT.getLong(1);
-			} else {
-				preparedStatement = connect.prepareStatement(
-						"insert into  CORPUS.CORPUS values (?, ?)"
-								+ " ON DUPLICATE KEY update id=?",
-						Statement.RETURN_GENERATED_KEYS);
-				preparedStatement.setInt(1, 1);
-				preparedStatement.setInt(2, corpus.getDocN());
-				try {
-					preparedStatement.executeUpdate();
-				} catch (Exception e) {
-					System.out.println(corpus.getDocN());
-					e.printStackTrace();
-				}
-				ResultSet rs = null;
-
-				try {
-					rs = preparedStatement.getGeneratedKeys();
-					if (rs.next()) {
-						corpID = rs.getLong(1);
-					}
-				} finally {
-					// ... cleanup that will execute whether or not an error
-					// occurred ...
-				}
-			}
-			// if (corpID == -1) {
-			// String sql = "SELECT idAuthor,name FROM corpus.Author";
-			// ResultSet rst = preparedStatement.executeQuery(sql);
-			// if (rs.next()) {
-			// corpID = rs.getLong(1);
-			// }
-			// }
-		}
 		if (pdf != null) {
+			pdfID = addTPDF(corpID, idPub, pdf);
 
-			preparedStatement = connect.prepareStatement(
-					"insert into  CORPUS.PDF values (default, ?,?, ?,?,?)"
-							+ " ON DUPLICATE KEY update wordcount=?",
-					Statement.RETURN_GENERATED_KEYS);
-			preparedStatement.setInt(1, (int) corpID);
-			preparedStatement.setInt(2, (int) idPub);
-			preparedStatement
-					.setString(2, pdf.getFirstPage().substring(0, 200));
-			preparedStatement.setInt(3, pdf.getWordcount());
-			preparedStatement.setString(4, pdf.getLanguage());
-			preparedStatement.executeUpdate();
+			if (pdfID > 0) {
+				if (!pdf.getWordOccList().isEmpty()) {
+					ArrayList<Integer> defKeys = addCategory(pdf, pdfID);
 
-			ResultSet rs = null;
+					ArrayList<WordOcc> words = pdf.getWordOccList();
+					ArrayList<Integer> genKeys = addKeywords(words, corpID,
+							pdfID);
 
-			try {
-				rs = preparedStatement.getGeneratedKeys();
-				if (rs.next()) {
-					pdfID = rs.getLong(1);
-				}
-			} finally {
-				// ... cleanup that will execute whether or not an error
-				// occurred ...
-			}
-
-			if (!pdf.getWordOccList().isEmpty()) {
-				// ArrayList<Long> keyIDs = new ArrayList<Long>();
-				ArrayList<Integer> defKeys = new ArrayList<Integer>();
-				ArrayList<Integer> genKeys = new ArrayList<Integer>();
-				if (!pdf.getGenericKeywords().isEmpty()) {
-					for (int count = 0; count < pdf.getGenericKeywords().size(); count++) {
-						preparedStatement = connect.prepareStatement(
-								"insert into  CORPUS.CATEGORY values (default,?)"
-										+ " ON DUPLICATE KEY update name=?",
-								Statement.RETURN_GENERATED_KEYS);
-						preparedStatement.setString(1, pdf.getGenericKeywords()
-								.get(count));
-
-						try {
-							preparedStatement.executeUpdate();
-
-						} catch (Exception e) {
-							System.out.println(pdfID);
-							e.printStackTrace();
-						}
-						rs = null;
-						try {
-							rs = preparedStatement.getGeneratedKeys();
-							if (rs.next()) {
-								defKeys.add((int) rs.getLong(1));
-							}
-						} finally {
-							// ... cleanup that will execute whether or not an
-							// error
-							// occurred ...
-						}
-					}
-				}
-				ArrayList<WordOcc> words = pdf.getWordOccList();
-				for (int ii = 0; ii < words.size(); ii++) {
-					preparedStatement = connect
-							.prepareStatement(
-									"insert into  CORPUS.Keyword values (default,?, ?,?,?,?,?,?)",
-									Statement.RETURN_GENERATED_KEYS);
-					preparedStatement.setInt(1, (int) corpID);
-					preparedStatement.setInt(2, (int) pdfID);
-
-					preparedStatement.setString(3, words.get(ii).getWord()
-							.getWord());
-					preparedStatement.setInt(4, words.get(ii).getOcc());
-					preparedStatement.setDouble(5, words.get(ii).getTfidf());
-					preparedStatement.setDouble(6, words.get(ii).getIdf());
-					preparedStatement.setDouble(7, words.get(ii).getTf());
-					preparedStatement.executeUpdate();
-
-					rs = null;
-					try {
-						rs = preparedStatement.getGeneratedKeys();
-						if (rs.next()) {
-							genKeys.add((int) rs.getLong(1));
-						}
-					} finally {
-						// ... cleanup that will execute whether or not an error
-						// occurred ...
-					}
+					addCathasKeys(defKeys, genKeys, pdfID);
 				}
 
-				for (int ii = 0; ii < defKeys.size(); ii++) {
-					for (int jj = 0; jj < genKeys.size(); jj++) {
-						preparedStatement = connect
-								.prepareStatement(
-										"insert into  CORPUS.KEYWORDS_has_Category values (?, ?)",
-										Statement.RETURN_GENERATED_KEYS);
-						preparedStatement.setInt(1, defKeys.get(ii));
-						preparedStatement.setInt(2, genKeys.get(jj));
-						preparedStatement.executeUpdate();
-						try {
-							preparedStatement.executeUpdate();
-
-						} catch (Exception e) {
-							System.out.println(pdfID);
-							e.printStackTrace();
-						}
-					}
-				}
 			}
 		}
-		// if (!pdf.getWordOccList().isEmpty()) {
-		// ArrayList<Long> keyIDs = new ArrayList<Long>();
-		// ArrayList<WordOcc> words = pdf.getWordOccList();
-		// for (int ii = 0; ii < words.size(); ii++) {
-		// preparedStatement = connect
-		// .prepareStatement("insert into  CORPUS.Keyword values (default,?, ?,?,?,?,?,?,?)");
-		// preparedStatement.setInt(1, (int) corpID);
-		// preparedStatement.setInt(2, (int) pdfID);
-		// preparedStatement.setNull(3, java.sql.Types.INTEGER);
-		// preparedStatement.setString(4, words.get(ii).getWord()
-		// .getWord());
-		// preparedStatement.setInt(5, words.get(ii).getOcc());
-		// preparedStatement.setDouble(6, words.get(ii).getTfidf());
-		// preparedStatement.setDouble(7, words.get(ii).getIdf());
-		// preparedStatement.setDouble(8, words.get(ii).getTf());
-		// preparedStatement.executeUpdate();
-		//
-		// ResultSet rs = null;
-		//
-		// try {
-		// rs = preparedStatement.getGeneratedKeys();
-		// if (rs.next()) {
-		// keyIDs.add(rs.getLong(1));
-		// }
-		// } finally {
-		// // ... cleanup that will execute whether or not an error
-		// // occurred ...
-		// }
-		// }
-		// }
 
 	}
 
@@ -367,14 +207,244 @@ public class Database {
 			throws SQLException {
 		long pdfID = 0;
 		long corpID = 0;
+		corpID = addCorpus(corpus);
 
+		if (pdf != null) {
+			pdfID = addPDF(corpID, pdf);
+
+			if (pdfID > 0) {
+				// TODO Author duplicates care
+				addPDFhasAuth(authors, pdfID);
+
+				if (!pdf.getWordOccList().isEmpty()) {
+					// TODO CHANGE UNIQUE CATEGORIES
+					// ArrayList<Long> keyIDs = new ArrayList<Long>();
+					ArrayList<Integer> defKeys = addCategory(pdf, pdfID);
+
+					ArrayList<WordOcc> words = pdf.getWordOccList();
+					ArrayList<Integer> genKeys = addKeywords(words, corpID,
+							pdfID);
+
+					addCathasKeys(defKeys, genKeys, pdfID);
+
+				}
+			}
+		}
+
+	}
+
+	private void addCathasKeys(ArrayList<Integer> defKeys,
+			ArrayList<Integer> genKeys, long pdfID) throws SQLException {
+		for (int ii = 0; ii < defKeys.size(); ii++) {
+			for (int jj = 0; jj < genKeys.size(); jj++) {
+				// TODO duplicate!!!
+				preparedStatement = connect
+						.prepareStatement(
+								"insert into  CORPUS.KEYWORD_has_Category values (?, ?)",
+								Statement.RETURN_GENERATED_KEYS);
+				if (ii == 3) {
+					System.out.println(jj);
+				}
+				if (defKeys.isEmpty()) {
+					preparedStatement.setInt(1, genKeys.get(jj));
+					preparedStatement.setNull(2, java.sql.Types.INTEGER);
+
+				} else {
+					preparedStatement.setInt(1, genKeys.get(jj));
+					preparedStatement.setInt(2, defKeys.get(ii));
+
+				}
+				try {
+					preparedStatement.executeUpdate();
+
+				} catch (Exception e) {
+					System.out.println(pdfID);
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+
+	private ArrayList<Integer> addKeywords(ArrayList<WordOcc> words,
+			long corpID, long pdfID) throws SQLException {
+		ArrayList<Integer> genKeys = new ArrayList<Integer>();
+		for (int ii = 0; ii < words.size(); ii++) {
+			preparedStatement = connect
+					.prepareStatement(
+							"insert into  CORPUS.Keyword values (default,?, ?,?,?,?,?,?)",
+							Statement.RETURN_GENERATED_KEYS);
+			preparedStatement.setInt(1, (int) corpID);
+			preparedStatement.setInt(2, (int) pdfID);
+
+			preparedStatement.setString(3, words.get(ii).getWord().getWord());
+			preparedStatement.setInt(4, words.get(ii).getOcc());
+			preparedStatement.setDouble(5, words.get(ii).getTfidf());
+			preparedStatement.setDouble(6, words.get(ii).getIdf());
+			preparedStatement.setDouble(7, words.get(ii).getTf());
+			preparedStatement.executeUpdate();
+
+			ResultSet rs = null;
+			try {
+				rs = preparedStatement.getGeneratedKeys();
+				if (rs.next()) {
+					genKeys.add((int) rs.getLong(1));
+				}
+				rs.close();
+			} finally {
+				// ... cleanup that will execute whether or not an
+				// error
+				// occurred ...
+			}
+
+		}
+
+		return genKeys;
+	}
+
+	private ArrayList<Integer> addCategory(PDF pdf, long pdfID)
+			throws SQLException {
+		ArrayList<Integer> defKeys = new ArrayList<Integer>();
+		if (!pdf.getGenericKeywords().isEmpty()) {
+			for (int count = 0; count < pdf.getGenericKeywords().size(); count++) {
+				int idDef = -1;
+				String sqlT = "SELECT idCategory,name FROM corpus.Category";
+				Statement stmt = connect.createStatement();
+				ResultSet rsT = stmt.executeQuery(sqlT);
+				while (rsT.next()) {
+					int id = rsT.getInt("idCategory");
+					String title = rsT.getString("name");
+					if (pdf.getGenericKeywords().get(count).contains(title)) {
+						idDef = id;
+						System.out.println("FOUND Category - " + title);
+						break;
+					}
+				}
+				rsT.close();
+				if (idDef < 0) {
+					preparedStatement = connect.prepareStatement(
+							"insert into  CORPUS.CATEGORY values (default,?)",
+							Statement.RETURN_GENERATED_KEYS);
+					preparedStatement.setString(1, pdf.getGenericKeywords()
+							.get(count));
+					try {
+						preparedStatement.executeUpdate();
+
+					} catch (Exception e) {
+						System.out.println(pdfID);
+						e.printStackTrace();
+					}
+					ResultSet rs = null;
+					try {
+						rs = preparedStatement.getGeneratedKeys();
+						if (rs.next()) {
+							defKeys.add((int) rs.getLong(1));
+						}
+						rs.close();
+					} finally {
+						// ... cleanup that will execute whether or
+						// not
+						// an
+						// error
+						// occurred ...
+					}
+				} else {
+					defKeys.add(idDef);
+				}
+			}
+		}
+		return defKeys;
+	}
+
+	private long addTPDF(long corpID, int idPub, PDF pdf) throws SQLException {
+		int pdfID = -1;
+		preparedStatement = connect.prepareStatement(
+				"insert into  CORPUS.PDF values (default, ?,?, ?,?,?)"
+						+ " ON DUPLICATE KEY update wordcount=?",
+				Statement.RETURN_GENERATED_KEYS);
+		preparedStatement.setInt(1, (int) corpID);
+		preparedStatement.setInt(2, (int) idPub);
+		preparedStatement.setString(2, pdf.getFirstPage().substring(0, 200));
+		preparedStatement.setInt(3, pdf.getWordcount());
+		preparedStatement.setString(4, pdf.getLanguage());
+		preparedStatement.executeUpdate();
+
+		ResultSet rs = null;
+
+		try {
+			rs = preparedStatement.getGeneratedKeys();
+			if (rs.next()) {
+				pdfID = (int) rs.getLong(1);
+			}
+			rs.close();
+		} finally {
+			// ... cleanup that will execute whether or not an error
+			// occurred ...
+		}
+		return pdfID;
+	}
+
+	private void addPDFhasAuth(ArrayList<Integer> authors, long pdfID)
+			throws SQLException {
+
+		for (int jj = 0; jj < authors.size(); jj++) {
+			// on Duplicate ?
+			preparedStatement = connect.prepareStatement(
+					"insert into  CORPUS.PDF_has_Author values (?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
+			preparedStatement.setInt(1, (int) pdfID);
+			preparedStatement.setInt(2, authors.get(jj));
+
+			try {
+				preparedStatement.executeUpdate();
+
+			} catch (Exception e) {
+				System.out.println(pdfID);
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	private long addPDF(long corpID, PDF pdf) throws SQLException {
+		int pdfID = -1;
+		preparedStatement = connect.prepareStatement(
+				"insert into  CORPUS.PDF values (default,?, ?, ?,?,?)"
+						+ " ON DUPLICATE KEY update wordcount=?",
+				Statement.RETURN_GENERATED_KEYS);
+		preparedStatement.setInt(1, (int) corpID);
+		// TODO setNULL
+		preparedStatement.setNull(2, java.sql.Types.INTEGER);
+		preparedStatement.setString(3, pdf.getFirstPage().substring(0, 100));
+		preparedStatement.setInt(4, pdf.getWordcount());
+		preparedStatement.setString(5, pdf.getLanguage());
+		preparedStatement.setInt(6, pdf.getWordcount());
+		try {
+			preparedStatement.executeUpdate();
+			ResultSet rs = null;
+			rs = preparedStatement.getGeneratedKeys();
+			if (rs.next()) {
+				pdfID = (int) rs.getLong(1);
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		return pdfID;
+	}
+
+	private long addCorpus(Corpus corpus) throws SQLException {
+		int corpID = -1;
 		if (corpus != null) {
 
 			Statement stmt = connect.createStatement();
 			String sqlT = "SELECT id FROM corpus.corpus";
 			ResultSet rsT = stmt.executeQuery(sqlT);
+
 			if (rsT.next()) {
-				corpID = rsT.getLong(1);
+				corpID = (int) rsT.getLong(1);
 			} else {
 				preparedStatement = connect.prepareStatement(
 						"insert into  CORPUS.CORPUS values (default,?, ?)"
@@ -388,7 +458,7 @@ public class Database {
 					preparedStatement.executeUpdate();
 					ResultSet rs = preparedStatement.getGeneratedKeys();
 					if (rs.next()) {
-						corpID = rs.getLong(1);
+						corpID = (int) rs.getLong(1);
 					}
 				} catch (Exception e) {
 					System.out.println(corpus.getDocN());
@@ -396,140 +466,6 @@ public class Database {
 				}
 			}
 		}
-		if (pdf != null) {
-			preparedStatement = connect.prepareStatement(
-					"insert into  CORPUS.PDF values (default,?, ?, ?,?,?)"
-							+ " ON DUPLICATE KEY update wordcount=?",
-					Statement.RETURN_GENERATED_KEYS);
-			preparedStatement.setInt(1, (int) corpID);
-			// TODO setNULL
-			preparedStatement.setNull(2, java.sql.Types.INTEGER);
-			preparedStatement
-					.setString(3, pdf.getFirstPage().substring(0, 100));
-			preparedStatement.setInt(4, pdf.getWordcount());
-			preparedStatement.setString(5, pdf.getLanguage());
-			preparedStatement.setInt(6, pdf.getWordcount());
-			try {
-				preparedStatement.executeUpdate();
-				ResultSet rs = null;
-				rs = preparedStatement.getGeneratedKeys();
-				if (rs.next()) {
-					pdfID = rs.getLong(1);
-				}
-
-			} catch (Exception e) {
-
-				e.printStackTrace();
-			}
-
-			// TODO Author duplicates care
-			for (int jj = 0; jj < authors.size(); jj++) {
-				// on Duplicate ?
-				preparedStatement = connect.prepareStatement(
-						"insert into  CORPUS.PDF_has_Author values (?, ?)",
-						Statement.RETURN_GENERATED_KEYS);
-				preparedStatement.setInt(1, (int) pdfID);
-				preparedStatement.setInt(2, authors.get(jj));
-
-				try {
-					preparedStatement.executeUpdate();
-
-				} catch (Exception e) {
-					System.out.println(pdfID);
-					e.printStackTrace();
-				}
-
-			}
-			if (!pdf.getWordOccList().isEmpty()) {
-				// TODO CHANGE UNIQUE CATEGORIES
-				// ArrayList<Long> keyIDs = new ArrayList<Long>();
-				ArrayList<Integer> defKeys = new ArrayList<Integer>();
-				ArrayList<Integer> genKeys = new ArrayList<Integer>();
-				if (pdf.getGenericKeywords() != null) {
-					if (!pdf.getGenericKeywords().isEmpty()) {
-						for (int count = 0; count < pdf.getGenericKeywords()
-								.size(); count++) {
-							preparedStatement = connect
-									.prepareStatement(
-											"insert into  CORPUS.CATEGORY values (default,?)"
-													+ " ON DUPLICATE KEY update name=?",
-											Statement.RETURN_GENERATED_KEYS);
-							preparedStatement.setString(1, pdf
-									.getGenericKeywords().get(count));
-							preparedStatement.setString(2, pdf
-									.getGenericKeywords().get(count));
-
-							try {
-								preparedStatement.executeUpdate();
-
-							} catch (Exception e) {
-								System.out.println(pdfID);
-								e.printStackTrace();
-							}
-							ResultSet rs = null;
-							try {
-								rs = preparedStatement.getGeneratedKeys();
-								if (rs.next()) {
-									defKeys.add((int) rs.getLong(1));
-								}
-							} finally {
-								// ... cleanup that will execute whether or not
-								// an
-								// error
-								// occurred ...
-							}
-						}
-					}
-				}
-				ArrayList<WordOcc> words = pdf.getWordOccList();
-				for (int ii = 0; ii < words.size(); ii++) {
-					preparedStatement = connect
-							.prepareStatement(
-									"insert into  CORPUS.Keyword values (default,?, ?,?,?,?,?,?)",
-									Statement.RETURN_GENERATED_KEYS);
-					preparedStatement.setInt(1, (int) corpID);
-					preparedStatement.setInt(2, (int) pdfID);
-
-					preparedStatement.setString(3, words.get(ii).getWord()
-							.getWord());
-					preparedStatement.setInt(4, words.get(ii).getOcc());
-					preparedStatement.setDouble(5, words.get(ii).getTfidf());
-					preparedStatement.setDouble(6, words.get(ii).getIdf());
-					preparedStatement.setDouble(7, words.get(ii).getTf());
-					preparedStatement.executeUpdate();
-
-					ResultSet rs = null;
-					try {
-						rs = preparedStatement.getGeneratedKeys();
-						if (rs.next()) {
-							genKeys.add((int) rs.getLong(1));
-						}
-					} finally {
-						// ... cleanup that will execute whether or not an error
-						// occurred ...
-					}
-				}
-
-				for (int ii = 0; ii < defKeys.size(); ii++) {
-					for (int jj = 0; jj < genKeys.size(); jj++) {
-						preparedStatement = connect
-								.prepareStatement(
-										"insert into  CORPUS.KEYWORDS_has_Category values (?, ?)",
-										Statement.RETURN_GENERATED_KEYS);
-						preparedStatement.setInt(1, defKeys.get(ii));
-						preparedStatement.setInt(2, genKeys.get(jj));
-						preparedStatement.executeUpdate();
-						try {
-							preparedStatement.executeUpdate();
-
-						} catch (Exception e) {
-							System.out.println(pdfID);
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
-
+		return corpID;
 	}
 }
