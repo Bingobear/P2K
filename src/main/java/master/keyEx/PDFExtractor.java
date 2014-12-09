@@ -84,35 +84,42 @@ public class PDFExtractor {
 		System.out.println("pages: " + start + "-" + end + " parsed");
 		return parsedText;
 	}
-
+	//TODO versuch größere menge zu bekommen
 	public ArrayList<String> getKeywordsfromPDF(String[] text) {
 		ArrayList<String> keywords = new ArrayList<String>();
 		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(text));
+		int counter = 0;
 		if (textPDF.contains("Keywords")) {
-			int counter = textPDF.indexOf("Keywords");
-			counter++;
-			int offset = 0;
-			while (counter != 0) {
-				if ((textPDF.get(counter).equals(",") && (offset != 0))) {
-					String currkey = "";
-					for (int ii = counter - offset; ii < counter; ii++) {
-						currkey = currkey + textPDF.get(ii);
-						if (!textPDF.get(ii + 1).equals(",")) {
-							currkey = currkey + " ";
-						}
-					}
-					counter++;
-					keywords.add(currkey);
-					offset = 0;
-				} else if (offset > 4) {
-					counter = 0;
-				} else {
-					counter++;
-					offset++;
-				}
-			}
-			// System.out.print(counter);
+			counter = textPDF.indexOf("Keywords");
+		} else if (textPDF.contains("key")) {
+			counter = textPDF.indexOf("key");
+
+		} else if (textPDF.contains("word")) {
+			counter = textPDF.indexOf("word");
 		}
+		counter++;
+		int offset = 0;
+		while (counter != 0) {
+			if ((textPDF.get(counter).equals(",") && (offset != 0))) {
+				String currkey = "";
+				for (int ii = counter - offset; ii < counter; ii++) {
+					currkey = currkey + textPDF.get(ii);
+					if (!textPDF.get(ii + 1).equals(",")) {
+						currkey = currkey.replaceAll("\\W", "") + " ";
+					}
+				}
+				counter++;
+				keywords.add(currkey);
+				offset = 0;
+			} else if (offset > 4) {
+				counter = 0;
+			} else {
+				counter++;
+				offset++;
+			}
+		}
+		// System.out.print(counter);
+
 		return keywords;
 
 	}
