@@ -104,10 +104,13 @@ public class PDFHandler {
 		corpus.setPdfList(pdfList);
 		corpus.calculateIdf();
 		pdfList = corpus.calculateTD_IDF(pdfList);
+		//SAVE FILTER LEVEL
+		//pdfList = corpus.filterPDFTDIDF(pdfList,0.0001);
 		corpus.setPdfList(pdfList);
 		return corpus;
 
 	}
+
 
 	private void createImgText(File fileEntry, ArrayList<WordOcc> occ,
 			String key, String img, String export, String home) {

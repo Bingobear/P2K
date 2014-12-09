@@ -232,7 +232,7 @@ public class Database {
 		}
 
 	}
-
+//TODO for some reason not all cats are added
 	private void addCathasKeys(ArrayList<Integer> defKeys,
 			ArrayList<Integer> genKeys, long pdfID) throws SQLException {
 		for (int ii = 0; ii < defKeys.size(); ii++) {
