@@ -41,15 +41,16 @@ public class PDFExtractor {
 	 * @throws IOException
 	 */
 	private String titlePage;
+	private int catnumb;
 
 	private String language;
-	private ArrayList<String> keywords = new ArrayList<String>();
+	private ArrayList<Category> keywords = new ArrayList<Category>();
 
-	public ArrayList<String> getKeywords() {
+	public ArrayList<Category> getKeywords() {
 		return keywords;
 	}
 
-	public void setKeywords(ArrayList<String> keywords) {
+	public void setKeywords(ArrayList<Category> keywords) {
 		this.keywords = keywords;
 	}
 
@@ -84,9 +85,10 @@ public class PDFExtractor {
 		System.out.println("pages: " + start + "-" + end + " parsed");
 		return parsedText;
 	}
-	//TODO versuch größere menge zu bekommen
-	public ArrayList<String> getKeywordsfromPDF(String[] text) {
-		ArrayList<String> keywords = new ArrayList<String>();
+
+	// TODO versuch größere menge zu bekommen
+	public ArrayList<Category> getKeywordsfromPDF(String[] text) {
+		ArrayList<Category> keywords = new ArrayList<Category>();
 		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(text));
 		int counter = 0;
 		if (textPDF.contains("Keywords")) {
@@ -100,16 +102,22 @@ public class PDFExtractor {
 		counter++;
 		int offset = 0;
 		while (counter != 0) {
-			if ((textPDF.get(counter).equals(",") && (offset != 0))) {
+			if (((textPDF.get(counter).equals(",") || (textPDF.get(counter)
+					.equals(".") ^ ((textPDF.get(counter).matches("\\d+"))))) && (offset != 0))) {
 				String currkey = "";
 				for (int ii = counter - offset; ii < counter; ii++) {
 					currkey = currkey + textPDF.get(ii);
-					if (!textPDF.get(ii + 1).equals(",")) {
+					if (!(textPDF.get(ii + 1).equals(",") || (textPDF.get(
+							ii + 1).equals(".") ^ (textPDF.get(ii + 1)
+							.matches("\\d+"))))) {
 						currkey = currkey.replaceAll("\\W", "") + " ";
 					}
 				}
+				if (!currkey.matches("\\d+")) {
+					Category category = new Category(currkey);
+					keywords.add(category);
+				}
 				counter++;
-				keywords.add(currkey);
 				offset = 0;
 			} else if (offset > 4) {
 				counter = 0;
@@ -119,7 +127,7 @@ public class PDFExtractor {
 			}
 		}
 		// System.out.print(counter);
-
+		setCatnumb(keywords.size());
 		return keywords;
 
 	}
@@ -551,40 +559,45 @@ public class PDFExtractor {
 		for (int counter = 0; counter < pdDoc.getNumberOfPages(); counter += 5) {
 			String parsedText = parsePdftoString(pdfStripper, pdDoc, counter,
 					counter + 4);
+			if (!((counter == 0) && (parsedText.length() < 50))) {
+				setLang(lang.detect(parsedText, first));
 
-			setLang(lang.detect(parsedText, first));
+				if (counter == 0) {
+					System.out.println(getLang());
+					if (first) {
+						first = false;
+					}
+					this.setTitlePage(parsePdftoString(pdfStripper, pdDoc,
+							counter, counter + 1)); // TODO:MOVE KEYWORDS TO PDF
+													// OBJECT
+					String[] tokens = getTokenPM(parsedText);
+					// TODO create regEx for identifying keyword - area
+					ArrayList<Category> keywords = getKeywordsfromPDF(tokens);
+					if (keywords.isEmpty()) {
 
-			if (counter == 0) {
-				System.out.println(getLang());
-				if (first) {
-					first = false;
+						// empty - could not directly extract keywords
+					} else {
+						this.setKeywords(keywords);
+					}
+
 				}
-				this.setTitlePage(parsePdftoString(pdfStripper, pdDoc, counter,
-						counter + 1)); // TODO:MOVE KEYWORDS TO PDF OBJECT
-				String[] tokens = getTokenPM(parsedText);
-				// TODO create regEx for identifying keyword - area
-				ArrayList<String> keywords = getKeywordsfromPDF(tokens);
-				if (keywords.isEmpty()) {
 
-					// empty - could not directly extract keywords
-				} else {
-					this.setKeywords(keywords);
-				}
+				parsedText = parsedText.toLowerCase();
 
+				// sentence detector -> tokenizer
+				String[] tokens = getToken(parsedText);
+				String[] filter = posttags(tokens);
+
+				ArrayList<Words> words = generateWords(filter, tokens, 0);
+				result.addAll(words);
+				System.out.println("normal:" + tokens.length
+						+ ", optimiertNouns:" + words.size());
+				System.out.println("");
+				wordcount = wordcount + tokens.length;
+			} else {
+				System.out.println("Bad Paper or Presentation");
+				break;
 			}
-
-			parsedText = parsedText.toLowerCase();
-
-			// sentence detector -> tokenizer
-			String[] tokens = getToken(parsedText);
-			String[] filter = posttags(tokens);
-
-			ArrayList<Words> words = generateWords(filter, tokens, 0);
-			result.addAll(words);
-			System.out.println("normal:" + tokens.length + ", optimiertNouns:"
-					+ words.size());
-			System.out.println("");
-			wordcount = wordcount + tokens.length;
 		}
 		System.out.println("FINAL RESULT:optimiertNouns:" + result.size());
 		return result;
@@ -611,6 +624,14 @@ public class PDFExtractor {
 
 	public void setTitlePage(String titlePage) {
 		this.titlePage = titlePage;
+	}
+
+	public int getCatnumb() {
+		return catnumb;
+	}
+
+	public void setCatnumb(int catnumb) {
+		this.catnumb = catnumb;
 	}
 
 }

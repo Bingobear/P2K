@@ -6,7 +6,9 @@ public class PDF {
 	private ArrayList<WordOcc> wordOcc;
 	private String language;
 	private int wordcount;
-	private ArrayList<String> genericKeywords;
+	private ArrayList<Category> genericKeywords;
+	//TODDO cat -> scoring optimized
+	private int catnumb;
 	private String firstPage;
 	private int publicationID;
 
@@ -77,11 +79,11 @@ public class PDF {
 		this.language = language;
 	}
 
-	public ArrayList<String> getGenericKeywords() {
+	public ArrayList<Category> getGenericKeywords() {
 		return genericKeywords;
 	}
 
-	public void setGenericKeywords(ArrayList<String> genericKeywords) {
+	public void setGenericKeywords(ArrayList<Category> genericKeywords) {
 		this.genericKeywords = genericKeywords;
 	}
 
@@ -99,6 +101,14 @@ public class PDF {
 
 	public void setPublicationID(int publicationID) {
 		this.publicationID = publicationID;
+	}
+
+	public int getCatnumb() {
+		return catnumb;
+	}
+
+	public void setCatnumb(int catnumb) {
+		this.catnumb = catnumb;
 	}
 
 }
