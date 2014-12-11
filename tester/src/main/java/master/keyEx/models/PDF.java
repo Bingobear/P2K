@@ -11,6 +11,7 @@ public class PDF {
 	private int catnumb;
 	private String firstPage;
 	private int publicationID;
+	private String title;
 
 	public int getWordcount() {
 		return wordcount;
@@ -109,6 +110,14 @@ public class PDF {
 
 	public void setCatnumb(int catnumb) {
 		this.catnumb = catnumb;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }
