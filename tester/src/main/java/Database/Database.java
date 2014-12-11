@@ -302,6 +302,7 @@ public class Database {
 		return genKeys;
 	}
 
+	//TODO EXTEND CATEGORY AND RELEVANCE in main code and DB
 	private ArrayList<Integer> addCategory(PDF pdf, long pdfID)
 			throws SQLException {
 		ArrayList<Integer> defKeys = new ArrayList<Integer>();
@@ -314,7 +315,7 @@ public class Database {
 				while (rsT.next()) {
 					int id = rsT.getInt("idCategory");
 					String title = rsT.getString("name");
-					if (pdf.getGenericKeywords().get(count).contains(title)) {
+					if (pdf.getGenericKeywords().get(count).getTitle().contains(title)) {
 						idDef = id;
 						System.out.println("FOUND Category - " + title);
 						break;
@@ -326,7 +327,11 @@ public class Database {
 							"insert into  CORPUS.CATEGORY values (default,?)",
 							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setString(1, pdf.getGenericKeywords()
-							.get(count));
+							.get(count).getTitle());
+//					preparedStatement.setInt(2, (int) pdfID);
+//					preparedStatement.setInt(3, pdf.getGenericKeywords()
+//					.get(count).getTitle().getRelevance());
+					
 					try {
 						preparedStatement.executeUpdate();
 
