@@ -115,6 +115,8 @@ public class PDFHandler {
 							extractor.getWordcount(), extractor.getTitlePage());
 					pdf.setGenericKeywords(extractor.getKeywords());
 					pdf.setCatnumb(extractor.getCatnumb());
+					//VERY RUDEMENTARY TITLE EXTRACTION VIA FILE
+					pdf.setTitle(getFileN(fileEntry));
 					pdfList.add(pdf);
 					corpus.incDocN();
 					corpus.setPdfList(pdfList);
@@ -136,11 +138,9 @@ public class PDFHandler {
 
 	private void createImgText(File fileEntry, ArrayList<WordOcc> occ,
 			String key, String img, String export, String home) {
-		title = fileEntry.getName();
-		int pos = title.lastIndexOf(".");
-		if (pos >= 0) {
-			title = title.substring(0, pos);
-		}
+
+		title = getFileN(fileEntry);
+
 		Text2Image image = new Text2Image();
 		image.generateImage(title, img);
 		createTextExport(occ, key, title);
@@ -152,6 +152,15 @@ public class PDFHandler {
 
 		wcg.generate(home + "/export/", export, title);
 
+	}
+
+	private String getFileN(File fileEntry) {
+		String title = fileEntry.getName();
+		int pos = title.lastIndexOf(".");
+		if (pos >= 0) {
+			title = title.substring(0, pos);
+		}
+		return title;
 	}
 
 	private static void createTextExport(ArrayList<WordOcc> keyOcc,
