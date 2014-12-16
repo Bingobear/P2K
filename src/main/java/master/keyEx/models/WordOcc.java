@@ -5,12 +5,17 @@ import master.keyEx.models.Words;
 public class WordOcc {
 	private Words word;
 	private int occ;
-	private double tf=0;
+	private double tf = 0;
 	private double tfidf = 0;
-	private double idf=0;
-	private int keyinPDF=0;
+	private double idf = 0;
+	private int keyinPDF = 0;
+	private int keyinCat = 0;
 	private int catRel = 1;
-	
+	private double catIDF = 0;
+	private double catTF = 0;
+	private double catTFIDF = 0;
+	private boolean catRet = false;
+
 	WordOcc() {
 
 	}
@@ -19,7 +24,25 @@ public class WordOcc {
 		this.word = word;
 		this.occ = occ;
 	}
-	
+
+
+
+	// TODO DELETE PDF STUFF
+	public WordOcc(WordOcc another) {
+		this.word = new Words(word);
+		this.occ = another.occ;
+		this.tf = another.tf;
+		this.tfidf = another.tfidf;
+		this.idf = another.idf;
+		this.keyinPDF = another.keyinPDF;
+		this.keyinCat = another.keyinCat;
+		this.catRel = another.catRel;
+		this.catIDF = another.catIDF;
+		this.catTF = another.catTF;
+		this.catTFIDF = another.catTFIDF;
+		this.catRet = another.catRet;
+	}
+
 	public Words getWord() {
 		return word;
 	}
@@ -59,7 +82,7 @@ public class WordOcc {
 	public void incKeyinPDF() {
 		this.keyinPDF++;
 	}
-	
+
 	public void setKeyinPDF(int keyinPDF) {
 		this.keyinPDF = keyinPDF;
 	}
@@ -78,5 +101,49 @@ public class WordOcc {
 
 	public void setCatRel(int catRel) {
 		this.catRel = catRel;
+	}
+
+	public double getCatIDF() {
+		return catIDF;
+	}
+
+	public void setCatIDF(double d) {
+		this.catIDF = d;
+	}
+
+	public double getCatTFIDF() {
+		return catTFIDF;
+	}
+
+	public void setCatTFIDF(double tfidf2) {
+		this.catTFIDF = tfidf2;
+	}
+
+	public int getKeyinCat() {
+		return keyinCat;
+	}
+
+	public void setKeyinCat(int keyinCat) {
+		this.keyinCat = keyinCat;
+	}
+
+	public void incKeyinCat() {
+		this.keyinCat++;
+	}
+
+	public double getCatTF() {
+		return catTF;
+	}
+
+	public void setCatTF(double catTF) {
+		this.catTF = catTF;
+	}
+
+	public boolean isCatRet() {
+		return catRet;
+	}
+
+	public void setCatRet(boolean catRet) {
+		this.catRet = catRet;
 	}
 }
