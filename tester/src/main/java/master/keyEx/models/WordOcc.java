@@ -10,7 +10,8 @@ public class WordOcc {
 	private double idf = 0;
 	private int keyinPDF = 0;
 	private int keyinCat = 0;
-	private int catRel = 1;
+	//before 1
+	private int catRel = 0;
 	private double catIDF = 0;
 	private double catTF = 0;
 	private double catTFIDF = 0;

@@ -283,6 +283,7 @@ public class PDFExtractor {
 				if (!tokenSen[jj].replaceAll("\\W", "").isEmpty()) {
 					// tokenSen[jj]
 					// TODO Improve word recognition
+					//TODO Filter line break
 					tokensA.add(tokenSen[jj].replaceAll("\\W", ""));
 				}
 
