@@ -20,6 +20,7 @@ public class PDFHandler {
 	static boolean debug_db = false;
 	static boolean debug_img = false;
 	static String title = "";
+	private ArrayList<Category> globalCategory = new ArrayList<Category>();
 
 	public PDFHandler() {
 
@@ -57,17 +58,18 @@ public class PDFHandler {
 
 	private Corpus parsePDFtoKey() throws LangDetectException, IOException {
 
-//		File hack = new File(".");
-//		String home = hack.getAbsolutePath();
-	//	String importData = "c:/RWTH/Data/Publikationen Cluster/pdf/d3/2014/";
+		// File hack = new File(".");
+		// String home = hack.getAbsolutePath();
+		 String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
 		URL url = getClass().getResource("/data/pdf/");
-		String importData = url.getPath();
+		//String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
 		ArrayList<PDF> pdfList = new ArrayList<PDF>();
 		boolean first = true;
-		corpus = createCorpus(folder,corpus,pdfList,first);
+		corpus = createCorpus(folder, corpus, pdfList, first);
 		corpus.calculateIdf();
+		corpus.calculateCatRele();
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
 		// SAVE FILTER LEVEL
 		// pdfList = corpus.filterPDFTDIDF(pdfList,0.0001);
@@ -75,8 +77,8 @@ public class PDFHandler {
 
 	}
 
-	private Corpus createCorpus(File folder, Corpus corpus, ArrayList<PDF> pdfList, boolean first) throws LangDetectException
-			 {
+	private Corpus createCorpus(File folder, Corpus corpus,
+			ArrayList<PDF> pdfList, boolean first) throws LangDetectException {
 		File hack = new File(".");
 		String home = hack.getAbsolutePath();
 		String img = home + "/export/gen_img/";
@@ -84,18 +86,15 @@ public class PDFHandler {
 		String export = home + "/export/gen_svg/";
 		PDFExtractor extractor = new PDFExtractor();
 
-
-
 		for (final File fileEntry : folder.listFiles()) {
 			if (fileEntry.isFile()) {
 
 				System.out.println("File= " + folder.getAbsolutePath() + "\\"
 						+ fileEntry.getName());
 
-				ArrayList<Words> words =new ArrayList<Words>();
+				ArrayList<Words> words = new ArrayList<Words>();
 				try {
-					words = extractor.parsePDFtoKey(fileEntry,
-							first);
+					words = extractor.parsePDFtoKey(fileEntry, first);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -114,13 +113,14 @@ public class PDFHandler {
 					PDF pdf = new PDF(occ, extractor.getLang(),
 							extractor.getWordcount(), extractor.getTitlePage());
 					pdf.setGenericKeywords(extractor.getKeywords());
+
 					pdf.setCatnumb(extractor.getCatnumb());
-					//VERY RUDEMENTARY TITLE EXTRACTION VIA FILE
+					// VERY RUDEMENTARY TITLE EXTRACTION VIA FILE
 					pdf.setTitle(getFileN(fileEntry));
 					pdfList.add(pdf);
 					corpus.incDocN();
 					corpus.setPdfList(pdfList);
-
+					corpus.associateWordswithCategory(pdf);
 					if (debug_img) {
 						System.out.println("File= " + folder.getAbsolutePath()
 								+ "\\" + fileEntry.getName());
@@ -130,7 +130,7 @@ public class PDFHandler {
 				}
 			} else if (fileEntry.isDirectory()) {
 				System.out.println("RECURSION!");
-				createCorpus(fileEntry,corpus,pdfList,first);
+				createCorpus(fileEntry, corpus, pdfList, first);
 			}
 		}
 		return corpus;
@@ -186,4 +186,5 @@ public class PDFHandler {
 			}
 		}
 	}
+
 }

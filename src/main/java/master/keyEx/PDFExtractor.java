@@ -440,21 +440,21 @@ public class PDFExtractor {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN"))) {
 
-					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
+					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
 					result.add(word);
 				}
 			}
 		} else if (mode == 1) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
-					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
+					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
 					result.add(word);
 				}
 			}
 		} else if (mode == 2) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("JJ"))) {
-					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii]);
+					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
 					result.add(word);
 				}
 			}
@@ -537,6 +537,7 @@ public class PDFExtractor {
 	public ArrayList<Words> parsePDFtoKey(File fileEntry, boolean first)
 			throws LangDetectException, IOException {
 		ArrayList<Words> result = new ArrayList<Words>();
+		this.keywords.clear();
 
 		PDFTextStripper pdfStripper = null;
 		PDDocument pdDoc = null;
