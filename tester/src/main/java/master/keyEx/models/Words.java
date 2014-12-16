@@ -1,18 +1,22 @@
 package master.keyEx.models;
 
+import java.util.ArrayList;
+
 public class Words {
-	String word;
-	String stem;
-	String type;
+	private String word;
+	private String stem;
+	private String type;
+	private ArrayList<Category> category;
 	
 	public Words() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Words(String word, String stem, String type) {
+	public Words(String word, String stem, String type,ArrayList<Category> cat) {
 		this.word = word;
 		this.stem = stem;
 		this.type = type;
+		this.category = cat;
 	}
 
 	public String getWord() {
@@ -37,5 +41,13 @@ public class Words {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public ArrayList<Category> getCategory() {
+		return category;
+	}
+
+	public void setCategory(ArrayList<Category> category) {
+		this.category = category;
 	}
 }

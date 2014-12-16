@@ -9,6 +9,7 @@ public class WordOcc {
 	private double tfidf = 0;
 	private double idf=0;
 	private int keyinPDF=0;
+	private int catRel = 1;
 	
 	WordOcc() {
 
@@ -69,5 +70,13 @@ public class WordOcc {
 
 	public void setIdf(double idf) {
 		this.idf = idf;
+	}
+
+	public int getCatRel() {
+		return catRel;
+	}
+
+	public void setCatRel(int catRel) {
+		this.catRel = catRel;
 	}
 }
