@@ -69,7 +69,8 @@ public class PDFHandler {
 		boolean first = true;
 		corpus = createCorpus(folder, corpus, pdfList, first);
 		corpus.calculateIdf();
-		corpus.calculateCatRele();
+		corpus.calculateCatTFIDF();
+		corpus.calculateRel();
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
 		// SAVE FILTER LEVEL
 		// pdfList = corpus.filterPDFTDIDF(pdfList,0.0001);

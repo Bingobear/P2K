@@ -176,7 +176,7 @@ public class Corpus {
 		this.globalCategory = globalCategory;
 	}
 
-	public void calculateCatRele() {
+	public void calculateCatTFIDF() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
 			PDF current = this.pdfList.get(ii);
 			for (int counter = 0; counter < current.getGenericKeywords().size(); counter++) {
@@ -223,7 +223,7 @@ public class Corpus {
 				if (pdfword.getWord().getWord()
 						.equals(word.getWord().getWord())) {
 					current.getGenericKeywords().get(counter)
-							.incRelevance(word.getOcc());
+							.incwOcc(word.getOcc());
 					break;
 				}
 			}
@@ -240,20 +240,19 @@ public class Corpus {
 				for (CategoryCatalog currdoc : this.globalCategoryCatalog) {
 					wordes = currdoc.getKeywordList();
 					for (int ii = 0; ii < wordes.size(); ii++) {
-						if ((wordes.get(ii).getWord().getWord()
-								.equals(word.getWord().getWord()))&&(!word.isCatRet())) {
+						if ((wordes.get(ii).getWord().getWord().equals(word
+								.getWord().getWord())) && (!word.isCatRet())) {
 
 							word.incKeyinCat();
 
 							System.out.println(currdoc.getCategory().getTitle()
 									+ "->" + word.getWord().getWord());
 
-
 							break;
 						}
 					}
 				}
-				//TODO SOLVE IN NORMAL FASCHION
+				// TODO SOLVE IN NORMAL FASCHION
 				word.setCatRet(true);
 			}
 		}
@@ -266,5 +265,24 @@ public class Corpus {
 			}
 		}
 		// this.idf = Math.log10(docN/pdfList);
+	}
+
+	//preparation to calculate cat
+	public void calculateRel() {
+		for (int ii = 0; ii < this.pdfList.size(); ii++) {
+			ArrayList<Category> pdfcat = this.pdfList.get(ii)
+					.getGenericKeywords();
+			for (WordOcc word : pdfList.get(ii).getWordOccList()) {
+				for (int counter = 0; counter < pdfcat.size(); counter++) {
+					for (Category current : word.getWord().getCategory()) {
+						if (current.getTitle()
+								.equals(pdfcat.get(counter).getTitle())) {
+							this.pdfList.get(ii).getGenericKeywords().get(counter).incRelevance(word.getCatTFIDF());;
+						}
+					}
+				}
+			}
+		}
+
 	}
 }

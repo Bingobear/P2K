@@ -2,8 +2,9 @@ package master.keyEx.models;
 
 public class Category {
 private String title;
-private int relevance;
+private int wOcc;
 private int totalwords;
+private double relevance;
 	public String getTitle() {
 	return title;
 }
@@ -15,20 +16,20 @@ public void setTitle(String title) {
 	}
 	public Category(String name) {
 		this.setTitle(name);
-		this.relevance =1;
+		this.wOcc =0;
 	}
 	public int getRelevance() {
-		return relevance;
+		return wOcc;
 	}
 	
 	//TODO Not relevance but #t in cat
-	public void setRelevance(int relevance) {
-		this.relevance = relevance;
+	public void setwOcc(int relevance) {
+		this.wOcc = relevance;
 	}
 	
-	public void incRelevance(int i) {
+	public void incwOcc(int i) {
 		//this.relevance=this.relevance+1;
-		this.relevance=this.relevance+i;
+		this.wOcc=this.wOcc+i;
 	}
 	public int getTotalwords() {
 		return totalwords;
@@ -39,6 +40,14 @@ public void setTitle(String title) {
 	public void incTotalwords(int i) {
 		//this.relevance=this.relevance+1;
 		this.totalwords=this.totalwords+i;
+	}
+	public void setRelevance(int relevance) {
+		this.relevance = relevance;
+	}
+	
+	public void incRelevance(double i) {
+		//this.relevance=this.relevance+1;
+		this.relevance=this.relevance+i;
 	}
 
 }
