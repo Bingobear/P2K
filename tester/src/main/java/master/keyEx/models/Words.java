@@ -19,6 +19,13 @@ public class Words {
 		this.category = cat;
 	}
 
+	public Words(Words words) {
+		this.word = words.word;
+		this.stem = words.stem;
+		this.type = words.type;
+		this.category = words.category;
+	}
+
 	public String getWord() {
 		return word;
 	}

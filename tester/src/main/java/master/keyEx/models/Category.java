@@ -20,13 +20,15 @@ public void setTitle(String title) {
 	public int getRelevance() {
 		return relevance;
 	}
+	
+	//TODO Not relevance but #t in cat
 	public void setRelevance(int relevance) {
 		this.relevance = relevance;
 	}
 	
 	public void incRelevance(int i) {
-		//this.relevance=this.relevance+i;
-		this.relevance=this.relevance+1;
+		//this.relevance=this.relevance+1;
+		this.relevance=this.relevance+i;
 	}
 	public int getTotalwords() {
 		return totalwords;
@@ -35,8 +37,8 @@ public void setTitle(String title) {
 		this.totalwords = totalwords;
 	}
 	public void incTotalwords(int i) {
-		//this.relevance=this.relevance+i;
-		this.totalwords=this.totalwords+1;
+		//this.relevance=this.relevance+1;
+		this.totalwords=this.totalwords+i;
 	}
 
 }
