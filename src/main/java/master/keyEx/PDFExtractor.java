@@ -537,7 +537,7 @@ public class PDFExtractor {
 	public ArrayList<Words> parsePDFtoKey(File fileEntry, boolean first)
 			throws LangDetectException, IOException {
 		ArrayList<Words> result = new ArrayList<Words>();
-		this.keywords.clear();
+
 
 		PDFTextStripper pdfStripper = null;
 		PDDocument pdDoc = null;
