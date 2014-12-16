@@ -102,6 +102,7 @@ public class Corpus {
 				if (cat.getTitle().equals(
 						this.globalCategoryCatalog.get(counter).getCategory()
 								.getTitle())) {
+					found=true;
 					addCategoryWords(counter, pdf.getWordOccList());
 					break;
 				}
@@ -123,6 +124,8 @@ public class Corpus {
 			for (WordOcc gkey : keys) {
 				if (word.getWord().getWord().equals(gkey.getWord().getWord())) {
 					found = true;
+					//gkey.setOcc(gkey.getOcc() + word.getOcc());
+					//needs to be relative to word number
 					gkey.setOcc(gkey.getOcc() + word.getOcc());
 					System.out.println("Good WORD");
 					break;
@@ -183,12 +186,12 @@ public class Corpus {
 
 	}
 
-	//TODO consider occurence when rating
+	//TODO consider occurence when rating - and norm value
 	private PDF calculateRelPDF(PDF current, int counter, CategoryCatalog catcat) {
 		for (WordOcc pdfword : current.getWordOccList()) {
 			for (WordOcc word : catcat.getKeywordList()) {
 				if(pdfword.getWord().getWord().equals(word.getWord().getWord())){
-					current.getGenericKeywords().get(counter).incRelevance();
+					current.getGenericKeywords().get(counter).incRelevance(word.getOcc());
 					break;
 				}
 			}
