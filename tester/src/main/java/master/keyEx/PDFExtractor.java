@@ -440,9 +440,20 @@ public class PDFExtractor {
 		if (mode == 0) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN"))) {
-
-					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
-					result.add(word);
+					if (!this.language.equals("de")) {
+						Words word = new Words(
+								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
+								filter[ii],this.keywords);
+						result.add(word);
+					} else {
+						//MAYBE SOLVES PROBLEM?TODO
+						Words word = new Words(tokens[ii].replaceAll("[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
+								filter[ii],this.keywords);
+						result.add(word);
+					}
+					//TODO OLD VERSION BETTER ?
+//					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
+//					result.add(word);
 				}
 			}
 		} else if (mode == 1) {
@@ -605,6 +616,7 @@ public class PDFExtractor {
 		return result;
 	}
 
+	@SuppressWarnings("unused")
 	private String extractTitle(String parsedText) {
 		SentenceDetector sentdetector = sentencedetect();
 		String[] sentence = sentdetector.sentDetect(parsedText);
