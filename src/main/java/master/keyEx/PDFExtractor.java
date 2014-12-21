@@ -283,11 +283,20 @@ public class PDFExtractor {
 			String[] tokenSen = generalToken(sentence[ii]);
 			for (int jj = 0; jj < tokenSen.length; jj++) {
 				help = tokenSen[jj].replaceAll("\\W", "");
+
 				if ((!help.isEmpty())&&(help.length()>2)) {
+					System.out.println(tokenSen[jj]);		
 					// tokenSen[jj].replaceAll("\\W", "")
 					// TODO Improve word recognition
 					//TODO Filter line break
 					tokensA.add(tokenSen[jj]);
+				}else if((help.equals("-"))&&(jj+1<tokenSen.length)){
+					System.out.println(tokenSen[jj]);
+					String tokencomb = tokensA.get(tokensA.size()-1)+"-"+tokenSen[jj+1];
+					jj++;
+					tokensA.add(tokencomb);
+					System.out.println("NEW TOKEN"+tokensA.get(tokensA.size()-1));
+					
 				}
 
 			}
@@ -444,7 +453,7 @@ public class PDFExtractor {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN"))) {
 					if (!this.language.equals("de")) {
-						System.out.println(tokens[ii]);
+//						System.out.println(tokens[ii]);
 						Words word = new Words(
 								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
 								filter[ii],this.keywords);
@@ -464,7 +473,7 @@ public class PDFExtractor {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
 					if (!this.language.equals("de")) {
-						System.out.println(tokens[ii]);
+//						System.out.println(tokens[ii]);
 						Words word = new Words(
 								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
 								filter[ii],this.keywords);
@@ -481,7 +490,7 @@ public class PDFExtractor {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("JJ"))) {
 					if (!this.language.equals("de")) {
-						System.out.println(tokens[ii]);
+//						System.out.println(tokens[ii]);
 						Words word = new Words(
 								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
 								filter[ii],this.keywords);
@@ -625,7 +634,7 @@ public class PDFExtractor {
 				String[] tokens = getToken(parsedText);
 				String[] filter = posttags(tokens);
 				//TODO move sonderzeichen behandlung zu occurence function
-				ArrayList<Words> words = generateWords(filter, tokens, 0);
+				ArrayList<Words> words = generateWords(filter, tokens, 2);
 				result.addAll(words);
 				System.out.println("normal:" + tokens.length
 						+ ", optimiertNouns:" + words.size());
