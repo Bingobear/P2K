@@ -273,18 +273,21 @@ public class PDFExtractor {
 		return tokens;
 	}
 
+	//Optimize extraction
 	public String[] getToken(String parsedText) {
 		SentenceDetector sentdetector = sentencedetect();
 		String[] sentence = sentdetector.sentDetect(parsedText);
 		ArrayList<String> tokensA = new ArrayList<String>();
+		String help = "";
 		for (int ii = 0; ii < sentence.length; ii++) {
 			String[] tokenSen = generalToken(sentence[ii]);
 			for (int jj = 0; jj < tokenSen.length; jj++) {
-				if (!tokenSen[jj].replaceAll("\\W", "").isEmpty()) {
-					// tokenSen[jj]
+				help = tokenSen[jj].replaceAll("\\W", "");
+				if ((!help.isEmpty())&&(help.length()>2)) {
+					// tokenSen[jj].replaceAll("\\W", "")
 					// TODO Improve word recognition
 					//TODO Filter line break
-					tokensA.add(tokenSen[jj].replaceAll("\\W", ""));
+					tokensA.add(tokenSen[jj]);
 				}
 
 			}
@@ -441,6 +444,7 @@ public class PDFExtractor {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN"))) {
 					if (!this.language.equals("de")) {
+						System.out.println(tokens[ii]);
 						Words word = new Words(
 								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
 								filter[ii],this.keywords);
@@ -459,15 +463,35 @@ public class PDFExtractor {
 		} else if (mode == 1) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
-					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
-					result.add(word);
+					if (!this.language.equals("de")) {
+						System.out.println(tokens[ii]);
+						Words word = new Words(
+								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
+								filter[ii],this.keywords);
+						result.add(word);
+					} else {
+						//MAYBE SOLVES PROBLEM?TODO
+						Words word = new Words(tokens[ii].replaceAll("[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
+								filter[ii],this.keywords);
+						result.add(word);
+					}
 				}
 			}
 		} else if (mode == 2) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("JJ"))) {
-					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
-					result.add(word);
+					if (!this.language.equals("de")) {
+						System.out.println(tokens[ii]);
+						Words word = new Words(
+								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
+								filter[ii],this.keywords);
+						result.add(word);
+					} else {
+						//MAYBE SOLVES PROBLEM?TODO
+						Words word = new Words(tokens[ii].replaceAll("[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
+								filter[ii],this.keywords);
+						result.add(word);
+					}
 				}
 			}
 		}
@@ -600,7 +624,7 @@ public class PDFExtractor {
 				// sentence detector -> tokenizer
 				String[] tokens = getToken(parsedText);
 				String[] filter = posttags(tokens);
-
+				//TODO move sonderzeichen behandlung zu occurence function
 				ArrayList<Words> words = generateWords(filter, tokens, 0);
 				result.addAll(words);
 				System.out.println("normal:" + tokens.length
