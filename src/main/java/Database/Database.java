@@ -232,7 +232,8 @@ public class Database {
 		}
 
 	}
-//TODO for some reason not all cats are added
+
+	// TODO for some reason not all cats are added
 	private void addCathasKeys(ArrayList<Integer> defKeys,
 			ArrayList<Integer> genKeys, long pdfID) throws SQLException {
 		for (int ii = 0; ii < defKeys.size(); ii++) {
@@ -266,6 +267,7 @@ public class Database {
 
 	}
 
+	// ALSO GIVE CAT IDF AND SO ON
 	private ArrayList<Integer> addKeywords(ArrayList<WordOcc> words,
 			long corpID, long pdfID) throws SQLException {
 		ArrayList<Integer> genKeys = new ArrayList<Integer>();
@@ -302,7 +304,7 @@ public class Database {
 		return genKeys;
 	}
 
-	//TODO EXTEND CATEGORY AND RELEVANCE in main code and DB
+	// TODO EXTEND CATEGORY AND RELEVANCE in main code and DB
 	private ArrayList<Integer> addCategory(PDF pdf, long pdfID)
 			throws SQLException {
 		ArrayList<Integer> defKeys = new ArrayList<Integer>();
@@ -315,7 +317,8 @@ public class Database {
 				while (rsT.next()) {
 					int id = rsT.getInt("idCategory");
 					String title = rsT.getString("name");
-					if (pdf.getGenericKeywords().get(count).getTitle().contains(title)) {
+					if (pdf.getGenericKeywords().get(count).getTitle()
+							.contains(title)) {
 						idDef = id;
 						System.out.println("FOUND Category - " + title);
 						break;
@@ -328,10 +331,10 @@ public class Database {
 							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setString(1, pdf.getGenericKeywords()
 							.get(count).getTitle());
-//					preparedStatement.setInt(2, (int) pdfID);
-//					preparedStatement.setInt(3, pdf.getGenericKeywords()
-//					.get(count).getTitle().getRelevance());
-					
+					 preparedStatement.setInt(2, (int) pdfID);
+					 preparedStatement.setInt(3, pdf.getGenericKeywords()
+					 .get(count).getRelevance());
+
 					try {
 						preparedStatement.executeUpdate();
 
@@ -471,6 +474,83 @@ public class Database {
 				}
 			}
 		}
+		// onDuplicate increase occurence
+		addGlobalCategory(corpus, corpID);
 		return corpID;
+	}
+
+	// TODO SAVE GLOBAL RELEVANCE ?
+	private void addGlobalCategory(Corpus corpus, int corpID)
+			throws SQLException {
+		// NOT NECESSARY
+		ArrayList<Integer> gCids = new ArrayList<Integer>();
+		Statement stmt = connect.createStatement();
+		String sqlT = "SELECT idGlobalCategory, title FROM corpus.GlobalCategory";
+		ResultSet rsT = stmt.executeQuery(sqlT);
+		int id = rsT.getInt("idGlobalCategory");
+		boolean found = false;
+		for (int ii = 0; ii < corpus.getGlobalCategoryCatalog().size(); ii++) {
+			while (rsT.next()) {
+				id = rsT.getInt("idGlobalCategory");
+				String title = rsT.getString("title");
+
+				if (corpus.getGlobalCategoryCatalog().get(ii).getCategory()
+						.getTitle().contains(title)) {
+					gCids.add(id);
+					addCatKeywords(id, corpus.getGlobalCategoryCatalog()
+							.get(ii).getKeywordList());
+					System.out.println("FOUND Category - " + title);
+					found = true;
+					break;
+				}
+
+			}
+			if (found) {
+				found = false;
+				preparedStatement = connect
+						.prepareStatement(
+								"insert into  CORPUS.GlobalCategory values (default,?, ?)",
+								Statement.RETURN_GENERATED_KEYS);
+				preparedStatement.setInt(1, corpID);
+				preparedStatement.setString(2, corpus
+						.getGlobalCategoryCatalog().get(ii).getCategory()
+						.getTitle());
+				try {
+					preparedStatement.executeUpdate();
+					ResultSet rs = preparedStatement.getGeneratedKeys();
+					if (rs.next()) {
+						id = (int) rs.getLong(1);
+						gCids.add(id);
+					}
+				} catch (Exception e) {
+					System.out.println(corpus.getDocN());
+					e.printStackTrace();
+				}
+				addCatKeywords(id, corpus.getGlobalCategoryCatalog().get(ii)
+						.getKeywordList());
+			}
+		}
+	}
+
+	// addCatKeywords()
+	// TODO Auto-generated method stub
+
+	// geht das so ?=
+	//ALSO GIVE IDF TF AND SO ON ?
+	private void addCatKeywords(int id, ArrayList<WordOcc> keywordList)
+			throws SQLException {
+		for (int ii = 0; ii < keywordList.size(); ii++) {
+			preparedStatement = connect.prepareStatement(
+					"insert into  CORPUS.Cat_Keyw values (default,?, ?,?,?)"
+							+ " ON DUPLICATE KEY update occ=occ+"
+							+ keywordList.get(ii).getOcc(),
+					Statement.RETURN_GENERATED_KEYS);
+			preparedStatement.setInt(1, id);
+			preparedStatement.setString(2, keywordList.get(ii).getWord()
+					.getWord());
+			preparedStatement.setInt(3, keywordList.get(ii).getOcc());
+			preparedStatement.setDouble(4, keywordList.get(ii).getCatTFIDF());
+		}
+
 	}
 }

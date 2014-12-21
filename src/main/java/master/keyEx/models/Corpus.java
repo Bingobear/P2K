@@ -7,8 +7,17 @@ public class Corpus {
 	private int docN = 0;
 	private ArrayList<PDF> pdfList = new ArrayList<PDF>();
 	// Merge Both
-	private ArrayList<Category> globalCategory = new ArrayList<Category>();
+//	private ArrayList<Category> globalCategory = new ArrayList<Category>();
 	private ArrayList<CategoryCatalog> globalCategoryCatalog = new ArrayList<CategoryCatalog>();
+
+	public ArrayList<CategoryCatalog> getGlobalCategoryCatalog() {
+		return globalCategoryCatalog;
+	}
+
+	public void setGlobalCategoryCatalog(
+			ArrayList<CategoryCatalog> globalCategoryCatalog) {
+		this.globalCategoryCatalog = globalCategoryCatalog;
+	}
 
 	// NOT SURE IF ITS RIGHT
 	public void calculateIdf() {
@@ -138,10 +147,13 @@ public class Corpus {
 				}
 			}
 			if (!found) {
-				WordOcc words = new WordOcc(word);
+				if(word==null){
+					int test = 0;
+				}
+				//WordOcc words = new WordOcc(word);
 				this.globalCategoryCatalog.get(position).getKeywordList()
-						.add(words);
-				catocc = catocc + words.getOcc();
+						.add(word);
+				catocc = catocc + word.getOcc();
 			} else {
 				found = false;
 			}
@@ -150,31 +162,31 @@ public class Corpus {
 
 	}
 
-	public void addGlobalCat(ArrayList<Category> keywords) {
-		boolean found = false;
-		for (int ii = 0; ii < keywords.size(); ii++) {
-			for (int jj = 0; jj < getGlobalCategory().size(); jj++) {
-				Category current = this.globalCategory.get(jj);
-				if (keywords.get(ii).getTitle().equals(current.getTitle())) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				this.globalCategory.add(keywords.get(ii));
-			} else {
-				found = false;
-			}
-		}
-	}
-
-	public ArrayList<Category> getGlobalCategory() {
-		return globalCategory;
-	}
-
-	public void setGlobalCategory(ArrayList<Category> globalCategory) {
-		this.globalCategory = globalCategory;
-	}
+//	public void addGlobalCat(ArrayList<Category> keywords) {
+//		boolean found = false;
+//		for (int ii = 0; ii < keywords.size(); ii++) {
+//			for (int jj = 0; jj < getGlobalCategory().size(); jj++) {
+//				Category current = this.globalCategory.get(jj);
+//				if (keywords.get(ii).getTitle().equals(current.getTitle())) {
+//					found = true;
+//					break;
+//				}
+//			}
+//			if (!found) {
+//				this.globalCategory.add(keywords.get(ii));
+//			} else {
+//				found = false;
+//			}
+//		}
+//	}
+//
+//	public ArrayList<Category> getGlobalCategory() {
+//		return globalCategory;
+//	}
+//
+//	public void setGlobalCategory(ArrayList<Category> globalCategory) {
+//		this.globalCategory = globalCategory;
+//	}
 
 	public void calculateCatTFIDF() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
@@ -260,6 +272,7 @@ public class Corpus {
 			words = doc.getKeywordList();
 			for (WordOcc word : words) {
 				word.setCatIDF(TFIDF.calcIDF(
+						//have to consider also occurence not only size
 						(double) this.globalCategoryCatalog.size(),
 						(double) word.getKeyinCat()));
 			}
@@ -267,7 +280,7 @@ public class Corpus {
 		// this.idf = Math.log10(docN/pdfList);
 	}
 
-	//preparation to calculate cat
+	//preparation to calculate cat -> normalized result
 	public void calculateRel() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
 			ArrayList<Category> pdfcat = this.pdfList.get(ii)
@@ -283,6 +296,7 @@ public class Corpus {
 				}
 			}
 		}
+
 
 	}
 }
