@@ -21,88 +21,6 @@ public class Database {
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
 
-	@SuppressWarnings("deprecation")
-	public void readDataBase() throws Exception {
-		try {
-			// this will load the MySQL driver, each DB has its own driver
-			Class.forName("com.mysql.jdbc.Driver");
-			// setup the connection with the DB.
-			connect = DriverManager
-					.getConnection("jdbc:mysql://localhost/feedback?"
-							+ "user=test&password=test");
-
-			// statements allow to issue SQL queries to the database
-			statement = connect.createStatement();
-			// resultSet gets the result of the SQL query
-			resultSet = statement
-					.executeQuery("select * from FEEDBACK.COMMENTS");
-			writeResultSet(resultSet);
-
-			// preparedStatements can use variables and are more efficient
-			preparedStatement = connect
-					.prepareStatement("insert into  FEEDBACK.COMMENTS values (default, ?, ?, ?, ? , ?, ?)");
-			// "myuser, webpage, datum, summary, COMMENTS from FEEDBACK.COMMENTS");
-			// parameters start with 1
-			preparedStatement.setString(1, "Test");
-			preparedStatement.setString(2, "TestEmail");
-			preparedStatement.setString(3, "TestWebpage");
-			preparedStatement.setDate(4, new java.sql.Date(2009, 12, 11));
-			preparedStatement.setString(5, "TestSummary");
-			preparedStatement.setString(6, "TestComment");
-			preparedStatement.executeUpdate();
-
-			preparedStatement = connect
-					.prepareStatement("SELECT myuser, webpage, datum, summary, COMMENTS from FEEDBACK.COMMENTS");
-			resultSet = preparedStatement.executeQuery();
-			writeResultSet(resultSet);
-
-			// remove again the insert comment
-			preparedStatement = connect
-					.prepareStatement("delete from FEEDBACK.COMMENTS where myuser= ? ; ");
-			preparedStatement.setString(1, "Test");
-			preparedStatement.executeUpdate();
-
-			resultSet = statement
-					.executeQuery("select * from FEEDBACK.COMMENTS");
-			writeMetaData(resultSet);
-
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			close();
-		}
-
-	}
-
-	private void writeMetaData(ResultSet resultSet) throws SQLException {
-		// now get some metadata from the database
-		System.out.println("The columns in the table are: ");
-		System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
-		for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-			System.out.println("Column " + i + " "
-					+ resultSet.getMetaData().getColumnName(i));
-		}
-	}
-
-	private void writeResultSet(ResultSet resultSet) throws SQLException {
-		// resultSet is initialised before the first data set
-		while (resultSet.next()) {
-			// it is possible to get the columns via name
-			// also possible to get the columns via the column number
-			// which starts at 1
-			// e.g., resultSet.getSTring(2);
-			String user = resultSet.getString("myuser");
-			String website = resultSet.getString("webpage");
-			String summary = resultSet.getString("summary");
-			Date date = resultSet.getDate("datum");
-			String comment = resultSet.getString("comments");
-			System.out.println("User: " + user);
-			System.out.println("Website: " + website);
-			System.out.println("Summary: " + summary);
-			System.out.println("Date: " + date);
-			System.out.println("Comment: " + comment);
-		}
-	}
 
 	// you need to close all three to make sure
 	private void close() {
@@ -327,19 +245,19 @@ public class Database {
 				rsT.close();
 				if (idDef < 0) {
 					preparedStatement = connect.prepareStatement(
-							"insert into  CORPUS.CATEGORY values (default,?)",
+							"insert into  CORPUS.CATEGORY values (default,?,?,?)",
 							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setString(1, pdf.getGenericKeywords()
 							.get(count).getTitle());
-					 preparedStatement.setInt(2, (int) pdfID);
-					 preparedStatement.setInt(3, pdf.getGenericKeywords()
-					 .get(count).getRelevance());
+					preparedStatement.setInt(2, (int) pdfID);
+					preparedStatement.setInt(3,
+							pdf.getGenericKeywords().get(count).getRelevance());
 
 					try {
 						preparedStatement.executeUpdate();
 
 					} catch (Exception e) {
-						System.out.println(pdfID);
+					//	System.out.println(pdfID);
 						e.printStackTrace();
 					}
 					ResultSet rs = null;
@@ -407,7 +325,7 @@ public class Database {
 				preparedStatement.executeUpdate();
 
 			} catch (Exception e) {
-				System.out.println(pdfID);
+			//	System.out.println(pdfID);
 				e.printStackTrace();
 			}
 
@@ -469,17 +387,19 @@ public class Database {
 						corpID = (int) rs.getLong(1);
 					}
 				} catch (Exception e) {
-					System.out.println(corpus.getDocN());
+					//System.out.println(corpus.getDocN());
 					e.printStackTrace();
 				}
+				// onDuplicate increase occurence
+				addGlobalCategory(corpus, corpID);
 			}
 		}
-		// onDuplicate increase occurence
-		addGlobalCategory(corpus, corpID);
+
 		return corpID;
 	}
 
 	// TODO SAVE GLOBAL RELEVANCE ?
+	//TODO DUPLICATE PDF
 	private void addGlobalCategory(Corpus corpus, int corpID)
 			throws SQLException {
 		// NOT NECESSARY
@@ -487,26 +407,35 @@ public class Database {
 		Statement stmt = connect.createStatement();
 		String sqlT = "SELECT idGlobalCategory, title FROM corpus.GlobalCategory";
 		ResultSet rsT = stmt.executeQuery(sqlT);
-		int id = rsT.getInt("idGlobalCategory");
+		int id = -1;
+
+
 		boolean found = false;
 		for (int ii = 0; ii < corpus.getGlobalCategoryCatalog().size(); ii++) {
-			while (rsT.next()) {
+			if (rsT.next()) {
 				id = rsT.getInt("idGlobalCategory");
-				String title = rsT.getString("title");
-
-				if (corpus.getGlobalCategoryCatalog().get(ii).getCategory()
-						.getTitle().contains(title)) {
-					gCids.add(id);
-					addCatKeywords(id, corpus.getGlobalCategoryCatalog()
-							.get(ii).getKeywordList());
-					System.out.println("FOUND Category - " + title);
-					found = true;
-					break;
-				}
-
 			}
-			if (found) {
-				found = false;
+			if (id != -1) {
+				while (rsT.next()) {
+					String title = rsT.getString("title");
+
+					if (corpus.getGlobalCategoryCatalog().get(ii).getCategory()
+							.getTitle().contains(title)) {
+						gCids.add(id);
+						if(id==2){
+							System.out.println("BS");
+						}
+						addCatKeywords(id, corpus.getGlobalCategoryCatalog()
+								.get(ii).getKeywordList());
+						//System.out.println("FOUND Category - " + title);
+						found = true;
+						break;
+					}
+
+				}
+			}
+			if (!found) {
+
 				preparedStatement = connect
 						.prepareStatement(
 								"insert into  CORPUS.GlobalCategory values (default,?, ?)",
@@ -523,33 +452,49 @@ public class Database {
 						gCids.add(id);
 					}
 				} catch (Exception e) {
-					System.out.println(corpus.getDocN());
+					//System.out.println(corpus.getDocN());
 					e.printStackTrace();
+				}
+				if(id==2){
+					System.out.println("BS");
 				}
 				addCatKeywords(id, corpus.getGlobalCategoryCatalog().get(ii)
 						.getKeywordList());
+			} else {
+				found = false;
 			}
 		}
+
 	}
 
 	// addCatKeywords()
 	// TODO Auto-generated method stub
 
 	// geht das so ?=
-	//ALSO GIVE IDF TF AND SO ON ?
+	// ALSO GIVE IDF TF AND SO ON ?
 	private void addCatKeywords(int id, ArrayList<WordOcc> keywordList)
 			throws SQLException {
+		if(id==2){
+			System.out.println("BS");
+		}
 		for (int ii = 0; ii < keywordList.size(); ii++) {
 			preparedStatement = connect.prepareStatement(
 					"insert into  CORPUS.Cat_Keyw values (default,?, ?,?,?)"
 							+ " ON DUPLICATE KEY update occ=occ+"
 							+ keywordList.get(ii).getOcc(),
 					Statement.RETURN_GENERATED_KEYS);
+
 			preparedStatement.setInt(1, id);
 			preparedStatement.setString(2, keywordList.get(ii).getWord()
 					.getWord());
 			preparedStatement.setInt(3, keywordList.get(ii).getOcc());
 			preparedStatement.setDouble(4, keywordList.get(ii).getCatTFIDF());
+			try {
+				preparedStatement.executeUpdate();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
