@@ -7,7 +7,7 @@ public class Corpus {
 	private int docN = 0;
 	private ArrayList<PDF> pdfList = new ArrayList<PDF>();
 	// Merge Both
-//	private ArrayList<Category> globalCategory = new ArrayList<Category>();
+	// private ArrayList<Category> globalCategory = new ArrayList<Category>();
 	private ArrayList<CategoryCatalog> globalCategoryCatalog = new ArrayList<CategoryCatalog>();
 
 	public ArrayList<CategoryCatalog> getGlobalCategoryCatalog() {
@@ -77,14 +77,14 @@ public class Corpus {
 	public ArrayList<PDF> calculateTD_IDF(ArrayList<PDF> pdfList) {
 		for (int ii = 0; ii < pdfList.size(); ii++) {
 			pdfList.get(ii).calculateTF_IDF();
-			System.out.println(ii);
+			// System.out.println(ii);
 			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
-			for (int jj = 0; jj < words.size(); jj++) {
-				System.out.println(words.get(jj).getTfidf() + ":"
-						+ words.get(jj).getWord().getWord());
-			}
-			System.out
-					.println("______________________________________________________________");
+			// for (int jj = 0; jj < words.size(); jj++) {
+			// System.out.println(words.get(jj).getTfidf() + ":"
+			// + words.get(jj).getWord().getWord());
+			// }
+			// System.out
+			// .println("______________________________________________________________");
 		}
 		return pdfList;
 
@@ -98,7 +98,7 @@ public class Corpus {
 				if (words.get(jj).getTfidf() > level) {
 					filtwords.add(words.get(jj));
 				}
-				System.out.println(filtwords.get(jj));
+				// System.out.println(filtwords.get(jj));
 				pdfList.get(ii).setWordOcc(filtwords);
 			}
 		}
@@ -142,15 +142,15 @@ public class Corpus {
 					// needs to be relative to word number
 					gkey.setOcc(gkey.getOcc() + word.getOcc());
 					catocc = catocc + gkey.getOcc();
-					System.out.println("Good WORD");
+					// System.out.println("Good WORD");
 					break;
 				}
 			}
 			if (!found) {
-				if(word==null){
+				if (word == null) {
 					int test = 0;
 				}
-				//WordOcc words = new WordOcc(word);
+				// WordOcc words = new WordOcc(word);
 				this.globalCategoryCatalog.get(position).getKeywordList()
 						.add(word);
 				catocc = catocc + word.getOcc();
@@ -162,31 +162,31 @@ public class Corpus {
 
 	}
 
-//	public void addGlobalCat(ArrayList<Category> keywords) {
-//		boolean found = false;
-//		for (int ii = 0; ii < keywords.size(); ii++) {
-//			for (int jj = 0; jj < getGlobalCategory().size(); jj++) {
-//				Category current = this.globalCategory.get(jj);
-//				if (keywords.get(ii).getTitle().equals(current.getTitle())) {
-//					found = true;
-//					break;
-//				}
-//			}
-//			if (!found) {
-//				this.globalCategory.add(keywords.get(ii));
-//			} else {
-//				found = false;
-//			}
-//		}
-//	}
-//
-//	public ArrayList<Category> getGlobalCategory() {
-//		return globalCategory;
-//	}
-//
-//	public void setGlobalCategory(ArrayList<Category> globalCategory) {
-//		this.globalCategory = globalCategory;
-//	}
+	// public void addGlobalCat(ArrayList<Category> keywords) {
+	// boolean found = false;
+	// for (int ii = 0; ii < keywords.size(); ii++) {
+	// for (int jj = 0; jj < getGlobalCategory().size(); jj++) {
+	// Category current = this.globalCategory.get(jj);
+	// if (keywords.get(ii).getTitle().equals(current.getTitle())) {
+	// found = true;
+	// break;
+	// }
+	// }
+	// if (!found) {
+	// this.globalCategory.add(keywords.get(ii));
+	// } else {
+	// found = false;
+	// }
+	// }
+	// }
+	//
+	// public ArrayList<Category> getGlobalCategory() {
+	// return globalCategory;
+	// }
+	//
+	// public void setGlobalCategory(ArrayList<Category> globalCategory) {
+	// this.globalCategory = globalCategory;
+	// }
 
 	public void calculateCatTFIDF() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
@@ -211,20 +211,20 @@ public class Corpus {
 	private void calculateCatTDIF() {
 		for (int ii = 0; ii < this.globalCategoryCatalog.size(); ii++) {
 			this.globalCategoryCatalog.get(ii).calculateTF_IDF();
-			System.out.println(ii);
-			ArrayList<WordOcc> words = this.globalCategoryCatalog.get(ii)
-					.getKeywordList();
-			for (int jj = 0; jj < words.size(); jj++) {
-				if (words.get(jj).getCatTFIDF() > 0) {
-					System.out.println("CATEGORY:"
-							+ this.globalCategoryCatalog.get(ii).getCategory()
-									.getTitle() + " "
-							+ words.get(jj).getCatTFIDF() + ":"
-							+ words.get(jj).getWord().getWord());
-				}
-			}
-			System.out
-					.println("______________________________________________________________");
+			// System.out.println(ii);
+			// ArrayList<WordOcc> words = this.globalCategoryCatalog.get(ii)
+			// .getKeywordList();
+			// for (int jj = 0; jj < words.size(); jj++) {
+			// if (words.get(jj).getCatTFIDF() > 0) {
+			// System.out.println("CATEGORY:"
+			// + this.globalCategoryCatalog.get(ii).getCategory()
+			// .getTitle() + " "
+			// + words.get(jj).getCatTFIDF() + ":"
+			// + words.get(jj).getWord().getWord());
+			// }
+			// }
+			// System.out
+			// .println("______________________________________________________________");
 		}
 	}
 
@@ -257,8 +257,8 @@ public class Corpus {
 
 							word.incKeyinCat();
 
-							System.out.println(currdoc.getCategory().getTitle()
-									+ "->" + word.getWord().getWord());
+//							System.out.println("Corpus:"+currdoc.getCategory().getTitle()
+//									+ "->" + word.getWord().getWord());
 
 							break;
 						}
@@ -272,7 +272,7 @@ public class Corpus {
 			words = doc.getKeywordList();
 			for (WordOcc word : words) {
 				word.setCatIDF(TFIDF.calcIDF(
-						//have to consider also occurence not only size
+						// have to consider also occurence not only size
 						(double) this.globalCategoryCatalog.size(),
 						(double) word.getKeyinCat()));
 			}
@@ -280,7 +280,7 @@ public class Corpus {
 		// this.idf = Math.log10(docN/pdfList);
 	}
 
-	//preparation to calculate cat -> normalized result
+	// preparation to calculate cat -> normalized result
 	public void calculateRel() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
 			ArrayList<Category> pdfcat = this.pdfList.get(ii)
@@ -288,15 +288,17 @@ public class Corpus {
 			for (WordOcc word : pdfList.get(ii).getWordOccList()) {
 				for (int counter = 0; counter < pdfcat.size(); counter++) {
 					for (Category current : word.getWord().getCategory()) {
-						if (current.getTitle()
-								.equals(pdfcat.get(counter).getTitle())) {
-							this.pdfList.get(ii).getGenericKeywords().get(counter).incRelevance(word.getCatTFIDF());;
+						if (current.getTitle().equals(
+								pdfcat.get(counter).getTitle())) {
+							this.pdfList.get(ii).getGenericKeywords()
+									.get(counter)
+									.incRelevance(word.getCatTFIDF());
+							;
 						}
 					}
 				}
 			}
 		}
-
 
 	}
 }

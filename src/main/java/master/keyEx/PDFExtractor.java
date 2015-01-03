@@ -285,7 +285,7 @@ public class PDFExtractor {
 				help = tokenSen[jj].replaceAll("\\W", "");
 
 				if ((!help.isEmpty())&&(help.length()>2)) {
-					System.out.println(tokenSen[jj]);		
+					//System.out.println(tokenSen[jj]);		
 					// tokenSen[jj].replaceAll("\\W", "")
 					// TODO Improve word recognition
 					//TODO Filter line break
@@ -295,7 +295,7 @@ public class PDFExtractor {
 					String tokencomb = tokensA.get(tokensA.size()-1)+"-"+tokenSen[jj+1];
 					jj++;
 					tokensA.add(tokencomb);
-					System.out.println("NEW TOKEN"+tokensA.get(tokensA.size()-1));
+				//	System.out.println("NEW TOKEN"+tokensA.get(tokensA.size()-1));
 					
 				}
 
