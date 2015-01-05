@@ -27,14 +27,17 @@ public class Corpus {
 		for (PDF doc : pdfList) {
 			words = doc.getWordOccList();
 			for (WordOcc word : words) {
-				for (PDF currdoc : pdfList) {
-					// words overwrite?
-					wordes = currdoc.getWordOccList();
-					for (int ii = 0; ii < wordes.size(); ii++) {
-						if (wordes.get(ii).getWord().getWord()
-								.contains(word.getWord().getWord())) {
-							word.incKeyinPDF();
-							break;
+				//so words are not considered multiple times
+				if (word.getKeyinPDF() == 0) {
+					for (PDF currdoc : pdfList) {
+						// words overwrite?
+						wordes = currdoc.getWordOccList();
+						for (int ii = 0; ii < wordes.size(); ii++) {
+							if (wordes.get(ii).getWord().getWord()
+									.contains(word.getWord().getWord())) {
+								word.incKeyinPDF();
+								break;
+							}
 						}
 					}
 				}
@@ -79,12 +82,12 @@ public class Corpus {
 			pdfList.get(ii).calculateTF_IDF();
 			// System.out.println(ii);
 			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
-			// for (int jj = 0; jj < words.size(); jj++) {
-			// System.out.println(words.get(jj).getTfidf() + ":"
-			// + words.get(jj).getWord().getWord());
-			// }
-			// System.out
-			// .println("______________________________________________________________");
+			for (int jj = 0; jj < words.size(); jj++) {
+				System.out.println(words.get(jj).getTfidf() + ":"
+						+ words.get(jj).getWord().getWord());
+			}
+			System.out
+					.println("______________________________________________________________");
 		}
 		return pdfList;
 
@@ -162,31 +165,6 @@ public class Corpus {
 
 	}
 
-	// public void addGlobalCat(ArrayList<Category> keywords) {
-	// boolean found = false;
-	// for (int ii = 0; ii < keywords.size(); ii++) {
-	// for (int jj = 0; jj < getGlobalCategory().size(); jj++) {
-	// Category current = this.globalCategory.get(jj);
-	// if (keywords.get(ii).getTitle().equals(current.getTitle())) {
-	// found = true;
-	// break;
-	// }
-	// }
-	// if (!found) {
-	// this.globalCategory.add(keywords.get(ii));
-	// } else {
-	// found = false;
-	// }
-	// }
-	// }
-	//
-	// public ArrayList<Category> getGlobalCategory() {
-	// return globalCategory;
-	// }
-	//
-	// public void setGlobalCategory(ArrayList<Category> globalCategory) {
-	// this.globalCategory = globalCategory;
-	// }
 
 	public void calculateCatTFIDF() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
@@ -249,6 +227,8 @@ public class Corpus {
 		for (CategoryCatalog doc : this.globalCategoryCatalog) {
 			words = doc.getKeywordList();
 			for (WordOcc word : words) {
+				//NO NEGATIVE VALUES
+				if (word.getKeyinCat() == 0) {
 				for (CategoryCatalog currdoc : this.globalCategoryCatalog) {
 					wordes = currdoc.getKeywordList();
 					for (int ii = 0; ii < wordes.size(); ii++) {
@@ -257,8 +237,8 @@ public class Corpus {
 
 							word.incKeyinCat();
 
-//							System.out.println("Corpus:"+currdoc.getCategory().getTitle()
-//									+ "->" + word.getWord().getWord());
+							// System.out.println("Corpus:"+currdoc.getCategory().getTitle()
+							// + "->" + word.getWord().getWord());
 
 							break;
 						}
@@ -266,6 +246,7 @@ public class Corpus {
 				}
 				// TODO SOLVE IN NORMAL FASCHION
 				word.setCatRet(true);
+				}
 			}
 		}
 		for (CategoryCatalog doc : this.globalCategoryCatalog) {
