@@ -73,14 +73,14 @@ public class PDFHandler {
 		corpus.calculateRel();
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
 		// SAVE FILTER LEVEL
-		// pdfList = corpus.filterPDFTDIDF(pdfList,0.0001);
-//		for(int ii =0;ii<corpus.getPdfList().size();ii++){
-//			System.out.println("----------------------------------------------------------------");
-//			System.out.println(corpus.getPdfList().get(ii).getTitle());
-//			for(int jj=0;jj<corpus.getPdfList().get(ii).getGenericKeywords().size();jj++){
-//				System.out.println(corpus.getPdfList().get(ii).getGenericKeywords().get(jj).getTitle()+" has Relevance: "+corpus.getPdfList().get(ii).getGenericKeywords().get(jj).getRelevance());
-//			}
-//		}
+	//	 pdfList = corpus.filterPDFTDIDF(pdfList,0.0001);
+		for(int ii =0;ii<corpus.getPdfList().size();ii++){
+			System.out.println("----------------------------------------------------------------");
+			System.out.println(corpus.getPdfList().get(ii).getTitle());
+			for(int jj=0;jj<corpus.getPdfList().get(ii).getGenericKeywords().size();jj++){
+				System.out.println(corpus.getPdfList().get(ii).getGenericKeywords().get(jj).getTitle()+" has Relevance: "+corpus.getPdfList().get(ii).getGenericKeywords().get(jj).getRelevance());
+			}
+		}
 		return corpus;
 
 	}
