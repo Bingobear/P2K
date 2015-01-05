@@ -27,7 +27,7 @@ public class Corpus {
 		for (PDF doc : pdfList) {
 			words = doc.getWordOccList();
 			for (WordOcc word : words) {
-				//so words are not considered multiple times
+				// so words are not considered multiple times
 				if (word.getKeyinPDF() == 0) {
 					for (PDF currdoc : pdfList) {
 						// words overwrite?
@@ -83,8 +83,11 @@ public class Corpus {
 			// System.out.println(ii);
 			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
 			for (int jj = 0; jj < words.size(); jj++) {
-				System.out.println(words.get(jj).getTfidf() + ":"
-						+ words.get(jj).getWord().getWord());
+				System.out.println(words.get(jj).getWord().getWord()
+						+ "- TFIDF: " + words.get(jj).getTfidf() + " IDF: "
+						+ words.get(jj).getIdf() + " TF: "
+						+ words.get(jj).getTf() + " wordocc: "
+						+ words.get(jj).getOcc());
 			}
 			System.out
 					.println("______________________________________________________________");
@@ -165,7 +168,6 @@ public class Corpus {
 
 	}
 
-
 	public void calculateCatTFIDF() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
 			PDF current = this.pdfList.get(ii);
@@ -227,25 +229,26 @@ public class Corpus {
 		for (CategoryCatalog doc : this.globalCategoryCatalog) {
 			words = doc.getKeywordList();
 			for (WordOcc word : words) {
-				//NO NEGATIVE VALUES
+				// NO NEGATIVE VALUES
 				if (word.getKeyinCat() == 0) {
-				for (CategoryCatalog currdoc : this.globalCategoryCatalog) {
-					wordes = currdoc.getKeywordList();
-					for (int ii = 0; ii < wordes.size(); ii++) {
-						if ((wordes.get(ii).getWord().getWord().equals(word
-								.getWord().getWord())) && (!word.isCatRet())) {
+					for (CategoryCatalog currdoc : this.globalCategoryCatalog) {
+						wordes = currdoc.getKeywordList();
+						for (int ii = 0; ii < wordes.size(); ii++) {
+							if ((wordes.get(ii).getWord().getWord().equals(word
+									.getWord().getWord()))
+									&& (!word.isCatRet())) {
 
-							word.incKeyinCat();
+								word.incKeyinCat();
 
-							// System.out.println("Corpus:"+currdoc.getCategory().getTitle()
-							// + "->" + word.getWord().getWord());
+								// System.out.println("Corpus:"+currdoc.getCategory().getTitle()
+								// + "->" + word.getWord().getWord());
 
-							break;
+								break;
+							}
 						}
 					}
-				}
-				// TODO SOLVE IN NORMAL FASCHION
-				word.setCatRet(true);
+					// TODO SOLVE IN NORMAL FASCHION
+					word.setCatRet(true);
 				}
 			}
 		}
