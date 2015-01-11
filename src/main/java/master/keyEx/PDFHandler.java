@@ -60,9 +60,10 @@ public class PDFHandler {
 
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
-		 String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
+		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
+		String importData = "c:/RWTH/Data/HCI/test/";
 		URL url = getClass().getResource("/data/pdf/");
-		//String importData = url.getPath();
+		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
 		ArrayList<PDF> pdfList = new ArrayList<PDF>();
@@ -73,12 +74,34 @@ public class PDFHandler {
 		corpus.calculateRel();
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
 		// SAVE FILTER LEVEL
-	//	 pdfList = corpus.filterPDFTDIDF(pdfList,0.0001);
-		for(int ii =0;ii<corpus.getPdfList().size();ii++){
-			System.out.println("----------------------------------------------------------------");
+		corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(), 0.0001));
+		System.out.println("PDFHandler");
+		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
+			ArrayList<WordOcc> words = corpus.getPdfList().get(ii).getWordOccList();
+			for (int jj = 0; jj < words.size(); jj++) {
+				System.out.println(words.get(jj).getWord().getWord()
+						+ " -  TF: "
+						+ words.get(jj).getTf()  + " IDF: "
+						+ words.get(jj).getIdf() + "TFIDF: " + words.get(jj).getTfidf() + " wordocc: "
+						+ words.get(jj).getOcc());
+			}
+			System.out
+			.println("______________________________________________________________");
+		}
+		System.out
+				.println("______________________________________________________________");
+		System.out.println("PDFHandler");
+		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
+			System.out
+					.println("----------------------------------------------------------------");
 			System.out.println(corpus.getPdfList().get(ii).getTitle());
-			for(int jj=0;jj<corpus.getPdfList().get(ii).getGenericKeywords().size();jj++){
-				System.out.println(corpus.getPdfList().get(ii).getGenericKeywords().get(jj).getTitle()+" has Relevance: "+corpus.getPdfList().get(ii).getGenericKeywords().get(jj).getRelevance());
+			for (int jj = 0; jj < corpus.getPdfList().get(ii)
+					.getGenericKeywords().size(); jj++) {
+				System.out.println(corpus.getPdfList().get(ii)
+						.getGenericKeywords().get(jj).getTitle()
+						+ " has Relevance: "
+						+ corpus.getPdfList().get(ii).getGenericKeywords()
+								.get(jj).getRelevance());
 			}
 		}
 		return corpus;
@@ -125,14 +148,21 @@ public class PDFHandler {
 					pdf.setCatnumb(extractor.getCatnumb());
 					// VERY RUDEMENTARY TITLE EXTRACTION VIA FILE
 					pdf.setTitle(getFileN(fileEntry));
-					pdfList.add(pdf);
-					corpus.incDocN();
-					corpus.setPdfList(pdfList);
-					corpus.associateWordswithCategory(pdf);
-					if (debug_img) {
-						System.out.println("File= " + folder.getAbsolutePath()
-								+ "\\" + fileEntry.getName());
-						createImgText(fileEntry, occ, key, img, export, home);
+
+					// No keywords tough love
+					if (!pdf.getGenericKeywords().isEmpty()) {
+						pdfList.add(pdf);
+						String language = pdf.getLanguage();
+						corpus.incDocN(language);
+						corpus.setPdfList(pdfList);
+						corpus.associateWordswithCategory(pdf);
+						if (debug_img) {
+							System.out.println("File= "
+									+ folder.getAbsolutePath() + "\\"
+									+ fileEntry.getName());
+							createImgText(fileEntry, occ, key, img, export,
+									home);
+						}
 
 					}
 				}

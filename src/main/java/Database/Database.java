@@ -14,9 +14,10 @@ import Database.model.*;
 import master.keyEx.models.Corpus;
 import master.keyEx.models.PDF;
 import master.keyEx.models.WordOcc;
-
+//TODO HCICORPUS ->CORPUS (later)
 public class Database {
 	private Connection connect = null;
+	private String dbName = "hciCorpus";
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
@@ -45,11 +46,11 @@ public class Database {
 		// this will load the MySQL driver, each DB has its own driver
 		Class.forName("com.mysql.jdbc.Driver");
 		// setup the connection with the DB.
-		connect = DriverManager.getConnection("jdbc:mysql://localhost/corpus?"
+		connect = DriverManager.getConnection("jdbc:mysql://localhost/"+dbName+"?"
 				+ "user=test&password=test");
 		Statement stmt = connect.createStatement();
 		int idPub = -1;
-		String sqlT = "SELECT idPublication,title FROM corpus.Publication";
+		String sqlT = "SELECT idPublication,title FROM "+dbName+".Publication";
 		ResultSet rsT = stmt.executeQuery(sqlT);
 		while (rsT.next()) {
 			int id = rsT.getInt("idPublication");
@@ -64,7 +65,7 @@ public class Database {
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
-			String sql = "SELECT idAuthor,name FROM corpus.Author";
+			String sql = "SELECT idAuthor,name FROM "+dbName+".Author";
 			ResultSet rs = stmt.executeQuery(sql);
 			// STEP 5: Extract data from result set
 
@@ -159,7 +160,7 @@ public class Database {
 				// TODO duplicate!!!
 				preparedStatement = connect
 						.prepareStatement(
-								"insert into  CORPUS.KEYWORD_has_Category values (?, ?)",
+								"insert into  "+dbName+".KEYWORD_has_Category values (?, ?)",
 								Statement.RETURN_GENERATED_KEYS);
 				if (ii == 3) {
 					System.out.println(jj);
@@ -192,7 +193,7 @@ public class Database {
 		for (int ii = 0; ii < words.size(); ii++) {
 			preparedStatement = connect
 					.prepareStatement(
-							"insert into  CORPUS.Keyword values (default,?, ?,?,?,?,?,?)",
+							"insert into  "+dbName+".Keyword values (default,?, ?,?,?,?,?,?)",
 							Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setInt(1, (int) corpID);
 			preparedStatement.setInt(2, (int) pdfID);
@@ -229,7 +230,7 @@ public class Database {
 		if (!pdf.getGenericKeywords().isEmpty()) {
 			for (int count = 0; count < pdf.getGenericKeywords().size(); count++) {
 				int idDef = -1;
-				String sqlT = "SELECT idCategory,name FROM corpus.Category";
+				String sqlT = "SELECT idCategory,name FROM "+dbName+".Category";
 				Statement stmt = connect.createStatement();
 				ResultSet rsT = stmt.executeQuery(sqlT);
 				while (rsT.next()) {
@@ -245,12 +246,12 @@ public class Database {
 				rsT.close();
 				if (idDef < 0) {
 					preparedStatement = connect.prepareStatement(
-							"insert into  CORPUS.CATEGORY values (default,?,?,?)",
+							"insert into  "+dbName+".CATEGORY values (default,?,?,?)",
 							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setString(1, pdf.getGenericKeywords()
 							.get(count).getTitle());
 					preparedStatement.setInt(2, (int) pdfID);
-					preparedStatement.setInt(3,
+					preparedStatement.setDouble(3,
 							pdf.getGenericKeywords().get(count).getRelevance());
 
 					try {
@@ -285,7 +286,7 @@ public class Database {
 	private long addTPDF(long corpID, int idPub, PDF pdf) throws SQLException {
 		int pdfID = -1;
 		preparedStatement = connect.prepareStatement(
-				"insert into  CORPUS.PDF values (default, ?,?, ?,?,?)"
+				"insert into  "+dbName+".PDF values (default, ?,?, ?,?,?)"
 						+ " ON DUPLICATE KEY update wordcount=?",
 				Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setInt(1, (int) corpID);
@@ -316,7 +317,7 @@ public class Database {
 		for (int jj = 0; jj < authors.size(); jj++) {
 			// on Duplicate ?
 			preparedStatement = connect.prepareStatement(
-					"insert into  CORPUS.PDF_has_Author values (?, ?)",
+					"insert into  "+dbName+".PDF_has_Author values (?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setInt(1, (int) pdfID);
 			preparedStatement.setInt(2, authors.get(jj));
@@ -336,7 +337,7 @@ public class Database {
 	private long addPDF(long corpID, PDF pdf) throws SQLException {
 		int pdfID = -1;
 		preparedStatement = connect.prepareStatement(
-				"insert into  CORPUS.PDF values (default,?, ?, ?,?,?)"
+				"insert into  "+dbName+".PDF values (default,?, ?, ?,?,?)"
 						+ " ON DUPLICATE KEY update wordcount=?",
 				Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setInt(1, (int) corpID);
@@ -366,19 +367,21 @@ public class Database {
 		if (corpus != null) {
 
 			Statement stmt = connect.createStatement();
-			String sqlT = "SELECT id FROM corpus.corpus";
+			String sqlT = "SELECT id FROM "+dbName+".corpus";
 			ResultSet rsT = stmt.executeQuery(sqlT);
 
 			if (rsT.next()) {
 				corpID = (int) rsT.getLong(1);
 			} else {
 				preparedStatement = connect.prepareStatement(
-						"insert into  CORPUS.CORPUS values (default,?, ?)"
+						"insert into  "+dbName+".CORPUS values (default,?, ?)"
 								+ " ON DUPLICATE KEY update uniqueRow=?",
 						Statement.RETURN_GENERATED_KEYS);
-				preparedStatement.setInt(1, corpus.getDocN());
-				preparedStatement.setString(2, "yes");
+				//TODO include both formats of language DOC N !!!
+				preparedStatement.setInt(1, corpus.getDocN("de"));
+				preparedStatement.setInt(2, corpus.getDocN("en"));
 				preparedStatement.setString(3, "yes");
+				preparedStatement.setString(4, "yes");
 
 				try {
 					preparedStatement.executeUpdate();
@@ -405,7 +408,7 @@ public class Database {
 		// NOT NECESSARY
 		ArrayList<Integer> gCids = new ArrayList<Integer>();
 		Statement stmt = connect.createStatement();
-		String sqlT = "SELECT idGlobalCategory, title FROM corpus.GlobalCategory";
+		String sqlT = "SELECT idGlobalCategory, title FROM "+dbName+".GlobalCategory";
 		ResultSet rsT = stmt.executeQuery(sqlT);
 		int id = -1;
 
@@ -438,7 +441,7 @@ public class Database {
 
 				preparedStatement = connect
 						.prepareStatement(
-								"insert into  CORPUS.GlobalCategory values (default,?, ?)",
+								"insert into  hciCorpus.GlobalCategory values (default,?, ?)",
 								Statement.RETURN_GENERATED_KEYS);
 				preparedStatement.setInt(1, corpID);
 				preparedStatement.setString(2, corpus
@@ -479,7 +482,7 @@ public class Database {
 		}
 		for (int ii = 0; ii < keywordList.size(); ii++) {
 			preparedStatement = connect.prepareStatement(
-					"insert into  CORPUS.Cat_Keyw values (default,?, ?,?,?)"
+					"insert into  hciCorpus.Cat_Keyw values (default,?, ?,?,?)"
 							+ " ON DUPLICATE KEY update occ=occ+"
 							+ keywordList.get(ii).getOcc(),
 					Statement.RETURN_GENERATED_KEYS);
