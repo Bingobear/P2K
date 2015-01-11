@@ -18,8 +18,11 @@ public void setTitle(String title) {
 		this.setTitle(name);
 		this.wOcc =0;
 	}
-	public int getRelevance() {
-		return wOcc;
+//	public int getRelevance() {
+//		return wOcc;
+//	}
+	public double getRelevance() {
+		return this.relevance;
 	}
 	
 	//TODO Not relevance but #t in cat
@@ -41,7 +44,7 @@ public void setTitle(String title) {
 		//this.relevance=this.relevance+1;
 		this.totalwords=this.totalwords+i;
 	}
-	public void setRelevance(int relevance) {
+	public void setRelevance(double relevance) {
 		this.relevance = relevance;
 	}
 	

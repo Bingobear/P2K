@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 public class Corpus {
 
-	private int docN = 0;
+	private int docNEng = 0;
+	private int docNGer = 0;
 	private ArrayList<PDF> pdfList = new ArrayList<PDF>();
 	// Merge Both
 	// private ArrayList<Category> globalCategory = new ArrayList<Category>();
@@ -24,19 +25,26 @@ public class Corpus {
 		ArrayList<WordOcc> words = null;
 		// new
 		ArrayList<WordOcc> wordes = null;
+		String language = null;
 		for (PDF doc : pdfList) {
 			words = doc.getWordOccList();
+			language = doc.getLanguage();
 			for (WordOcc word : words) {
 				// so words are not considered multiple times
 				if (word.getKeyinPDF() == 0) {
 					for (PDF currdoc : pdfList) {
 						// words overwrite?
-						wordes = currdoc.getWordOccList();
-						for (int ii = 0; ii < wordes.size(); ii++) {
-							if (wordes.get(ii).getWord().getWord()
-									.contains(word.getWord().getWord())) {
-								word.incKeyinPDF();
-								break;
+						if(word.getWord().getWord().equals("future")){
+						String test = "0";	
+						}
+						if (currdoc.getLanguage().equals(language)) {
+							wordes = currdoc.getWordOccList();
+							for (int ii = 0; ii < wordes.size(); ii++) {
+								if (wordes.get(ii).getWord().getWord()
+										.contains(word.getWord().getWord())) {
+									word.incKeyinPDF();
+									break;
+								}
 							}
 						}
 					}
@@ -46,23 +54,39 @@ public class Corpus {
 		for (PDF doc : pdfList) {
 			words = doc.getWordOccList();
 			for (WordOcc word : words) {
-				word.setIdf(TFIDF.calcIDF((double) docN,
+				String pdfLanguage = doc.getLanguage();
+				word.setIdf(TFIDF.calcIDF((double) getDocN(pdfLanguage),
 						(double) word.getKeyinPDF()));
 			}
 		}
 		// this.idf = Math.log10(docN/pdfList);
 	}
 
-	public int getDocN() {
-		return docN;
+	// TODO DONE LANGUAGE ADDING
+	public int getDocN(String language) {
+		if(language.equals("de")){
+		return  docNGer;
+		}else if(language.equals("en")){
+			return  docNEng;
+		}
+		return docNEng;
+
 	}
 
-	public void setDocN(int docN) {
-		this.docN = docN;
+	public void setDocN(int docN,String language) {
+		if(language.equals("de")){
+		this.docNGer = docN;
+		}else if(language.equals("en")){
+			this.docNEng = docN;
+		}
 	}
 
-	public void incDocN() {
-		this.docN++;
+	public void incDocN(String language) {
+		if(language.equals("de")){
+		this.docNGer++;
+		}else if(language.equals("en")){
+			this.docNEng++;
+		}
 	}
 
 	public Corpus() {
@@ -81,16 +105,16 @@ public class Corpus {
 		for (int ii = 0; ii < pdfList.size(); ii++) {
 			pdfList.get(ii).calculateTF_IDF();
 			// System.out.println(ii);
-			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
-			for (int jj = 0; jj < words.size(); jj++) {
-				System.out.println(words.get(jj).getWord().getWord()
-						+ "- TFIDF: " + words.get(jj).getTfidf() + " IDF: "
-						+ words.get(jj).getIdf() + " TF: "
-						+ words.get(jj).getTf() + " wordocc: "
-						+ words.get(jj).getOcc());
-			}
-			System.out
-					.println("______________________________________________________________");
+//			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
+//			for (int jj = 0; jj < words.size(); jj++) {
+//				System.out.println(words.get(jj).getWord().getWord()
+//						+ "- TFIDF: " + words.get(jj).getTfidf() + " IDF: "
+//						+ words.get(jj).getIdf() + " TF: "
+//						+ words.get(jj).getTf() + " wordocc: "
+//						+ words.get(jj).getOcc());
+//			}
+//			System.out
+//					.println("______________________________________________________________");
 		}
 		return pdfList;
 
@@ -99,14 +123,16 @@ public class Corpus {
 	public ArrayList<PDF> filterPDFTDIDF(ArrayList<PDF> pdfList2, double level) {
 		for (int ii = 0; ii < pdfList.size(); ii++) {
 			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
+			ArrayList<WordOcc> test = new ArrayList();
+
 			for (int jj = 0; jj < words.size(); jj++) {
-				ArrayList<WordOcc> filtwords = new ArrayList<WordOcc>();
+
 				if (words.get(jj).getTfidf() > level) {
-					filtwords.add(words.get(jj));
-				}
-				// System.out.println(filtwords.get(jj));
-				pdfList.get(ii).setWordOcc(filtwords);
+					test.add(words.get(jj));
+					}
+
 			}
+			pdfList.get(ii).setWordOcc(test);
 		}
 		return pdfList;
 	}

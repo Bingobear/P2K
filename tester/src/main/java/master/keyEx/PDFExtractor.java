@@ -102,8 +102,8 @@ public class PDFExtractor {
 		counter++;
 		int offset = 0;
 		while (counter != 0) {
-			if (((textPDF.get(counter).equals(",") || (textPDF.get(counter)
-					.equals(".") ^ ((textPDF.get(counter).matches("\\d+"))))) && (offset != 0))) {
+			if (((textPDF.get(counter).equals(",") || (textPDF.get(counter).equals(";") ||(textPDF.get(counter)
+					.equals(".") ^ ((textPDF.get(counter).matches("\\d+"))))) && (offset != 0)))){
 				String currkey = "";
 				for (int ii = counter - offset; ii < counter; ii++) {
 					currkey = currkey + textPDF.get(ii);
@@ -619,9 +619,12 @@ public class PDFExtractor {
 					String[] tokens = getTokenPM(parsedText);
 					// TODO create regEx for identifying keyword - area
 					ArrayList<Category> keywords = getKeywordsfromPDF(tokens);
+					
+					//No keywords you are out 
 					if (keywords.isEmpty()) {
-
+						System.out.println("PDFExtractor: No Keywords in pdf -> ignore");
 						// empty - could not directly extract keywords
+						break;
 					} else {
 						this.setKeywords(keywords);
 					}
@@ -634,7 +637,7 @@ public class PDFExtractor {
 				String[] tokens = getToken(parsedText);
 				String[] filter = posttags(tokens);
 				//TODO move sonderzeichen behandlung zu occurence function
-				ArrayList<Words> words = generateWords(filter, tokens, 2);
+				ArrayList<Words> words = generateWords(filter, tokens, 0);
 				result.addAll(words);
 				System.out.println("normal:" + tokens.length
 						+ ", optimiertNouns:" + words.size());
