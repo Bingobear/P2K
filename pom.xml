@@ -21,11 +21,16 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-<dependency>
-	<groupId>net.arnx</groupId>
-	<artifactId>jsonic</artifactId>
-	<version>1.2.7</version>
-</dependency>
+		<dependency>
+			<groupId>net.arnx</groupId>
+			<artifactId>jsonic</artifactId>
+			<version>1.2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>
 			<artifactId>opennlp-tools</artifactId>
@@ -42,15 +47,15 @@
 			<version>1.8.7</version>
 		</dependency>
 		<dependency>
-  <groupId>org.bouncycastle</groupId>
-  <artifactId>bcprov-jdk15</artifactId>
-  <version>1.44</version>
-</dependency>
-<dependency>
-  <groupId>org.bouncycastle</groupId>
-  <artifactId>bcmail-jdk15</artifactId>
-  <version>1.44</version>
-</dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15</artifactId>
+			<version>1.44</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcmail-jdk15</artifactId>
+			<version>1.44</version>
+		</dependency>
 	</dependencies>
 
 

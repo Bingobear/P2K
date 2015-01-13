@@ -61,8 +61,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/HCI/test/";
-		URL url = getClass().getResource("/data/pdf/");
+		String importData = "c:/RWTH/Data/test/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
@@ -86,7 +85,7 @@ public class PDFHandler {
 						+ words.get(jj).getOcc());
 			}
 			System.out
-			.println("______________________________________________________________");
+			.println(corpus.getPdfList().get(ii).getTitle()+"______________________________________________________________");
 		}
 		System.out
 				.println("______________________________________________________________");

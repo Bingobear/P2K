@@ -374,7 +374,7 @@ public class Database {
 				corpID = (int) rsT.getLong(1);
 			} else {
 				preparedStatement = connect.prepareStatement(
-						"insert into  "+dbName+".CORPUS values (default,?, ?)"
+						"insert into  "+dbName+".CORPUS values (default,?, ?,?)"
 								+ " ON DUPLICATE KEY update uniqueRow=?",
 						Statement.RETURN_GENERATED_KEYS);
 				//TODO include both formats of language DOC N !!!
