@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -22,6 +23,7 @@ import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.Span;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -91,25 +93,33 @@ public class PDFExtractor {
 		ArrayList<Category> keywords = new ArrayList<Category>();
 		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(text));
 		int counter = 0;
+
 		if (textPDF.contains("Keywords")) {
 			counter = textPDF.indexOf("Keywords");
+
 		} else if (textPDF.contains("key")) {
 			counter = textPDF.indexOf("key");
 
 		} else if (textPDF.contains("word")) {
 			counter = textPDF.indexOf("word");
+		} else if (textPDF.contains("Index Terms")) {
+			// does not work i think
+			counter = textPDF.indexOf("Index Terms");
 		}
 		counter++;
 		int offset = 0;
+
 		while (counter != 0) {
-			if (((textPDF.get(counter).equals(",") || (textPDF.get(counter).equals(";") ||(textPDF.get(counter)
-					.equals(".") ^ ((textPDF.get(counter).matches("\\d+"))))) && (offset != 0)))){
+			if (((textPDF.get(counter).equals(",") || (textPDF.get(counter)
+					.equals(";") || (textPDF.get(counter).equals(".") ^ ((textPDF
+					.get(counter).matches("\\d+")))))
+					&& (offset != 0)))) {
 				String currkey = "";
 				for (int ii = counter - offset; ii < counter; ii++) {
 					currkey = currkey + textPDF.get(ii);
 					if (!(textPDF.get(ii + 1).equals(",") || (textPDF.get(
-							ii + 1).equals(".") ^ (textPDF.get(ii + 1)
-							.matches("\\d+"))))) {
+							counter).equals(";") || (textPDF.get(ii + 1)
+							.equals(".") ^ (textPDF.get(ii + 1).matches("\\d+")))))) {
 						currkey = currkey.replaceAll("\\W", "") + " ";
 					}
 				}
@@ -119,7 +129,7 @@ public class PDFExtractor {
 				}
 				counter++;
 				offset = 0;
-			} else if (offset > 4) {
+			} else if ((offset > 4)) {
 				counter = 0;
 			} else {
 				counter++;
@@ -273,7 +283,7 @@ public class PDFExtractor {
 		return tokens;
 	}
 
-	//Optimize extraction
+	// Optimize extraction
 	public String[] getToken(String parsedText) {
 		SentenceDetector sentdetector = sentencedetect();
 		String[] sentence = sentdetector.sentDetect(parsedText);
@@ -284,19 +294,20 @@ public class PDFExtractor {
 			for (int jj = 0; jj < tokenSen.length; jj++) {
 				help = tokenSen[jj].replaceAll("\\W", "");
 
-				if ((!help.isEmpty())&&(help.length()>2)) {
-					//System.out.println(tokenSen[jj]);		
+				if ((!help.isEmpty()) && (help.length() > 2)) {
+					// System.out.println(tokenSen[jj]);
 					// tokenSen[jj].replaceAll("\\W", "")
 					// TODO Improve word recognition
-					//TODO Filter line break
+					// TODO Filter line break
 					tokensA.add(tokenSen[jj]);
-				}else if((help.equals("-"))&&(jj+1<tokenSen.length)){
+				} else if ((help.equals("-")) && (jj + 1 < tokenSen.length)) {
 					System.out.println(tokenSen[jj]);
-					String tokencomb = tokensA.get(tokensA.size()-1)+"-"+tokenSen[jj+1];
+					String tokencomb = tokensA.get(tokensA.size() - 1) + "-"
+							+ tokenSen[jj + 1];
 					jj++;
 					tokensA.add(tokencomb);
-				//	System.out.println("NEW TOKEN"+tokensA.get(tokensA.size()-1));
-					
+					// System.out.println("NEW TOKEN"+tokensA.get(tokensA.size()-1));
+
 				}
 
 			}
@@ -392,8 +403,10 @@ public class PDFExtractor {
 	public ArrayList<WordOcc> keyOcc(ArrayList<Words> words) {
 		ArrayList<Words> keywords = new ArrayList<Words>();
 		keywords = (ArrayList<Words>) words.clone();
-		int arraySize = keywords.size();
 		ArrayList<WordOcc> result = new ArrayList<WordOcc>();
+		int arraySize = keywords.size();
+		
+		
 		int counter = 0;
 		int size = 0;
 		while (arraySize > 0) {
@@ -404,12 +417,17 @@ public class PDFExtractor {
 				Words compare = keywords.get(ii);
 
 				// TODO:Question compare words or only stem with type
+				//TODO: some words have fallouts - not accounted duplicates
 				// Lower Border
 				// IMPROVED FILTER ALGO
-				if (((compare.getStem().equals(current.getStem()))
-						&& ((compare.getType().contains(current.getType()) || (current
-								.getType().contains(compare.getType())))) || (compare
-							.getWord().equals(current.getWord())))) {
+				
+				if (compare.getWord().equals(current.getWord())
+						|| ((compare.getStem().equals(current.getStem())) && ((compare
+								.getType().contains(current.getType()) || (current
+								.getType().contains(compare.getType())))))) {
+					if(compare.getWord().equals("cloud")){
+						String test = "";
+					}
 					keywords.remove(ii);
 					count++;
 					arraySize--;
@@ -453,35 +471,38 @@ public class PDFExtractor {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN"))) {
 					if (!this.language.equals("de")) {
-//						System.out.println(tokens[ii]);
+						// System.out.println(tokens[ii]);
 						Words word = new Words(
 								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
-								filter[ii],this.keywords);
+								filter[ii], this.keywords);
 						result.add(word);
 					} else {
-						//MAYBE SOLVES PROBLEM?TODO
-						Words word = new Words(tokens[ii].replaceAll("[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
-								filter[ii],this.keywords);
+						// MAYBE SOLVES PROBLEM?TODO
+						Words word = new Words(tokens[ii].replaceAll(
+								"[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
+								filter[ii], this.keywords);
 						result.add(word);
 					}
-					//TODO OLD VERSION BETTER ?
-//					Words word = new Words(tokens[ii], stemmedW[ii], filter[ii],this.keywords);
-//					result.add(word);
+					// TODO OLD VERSION BETTER ?
+					// Words word = new Words(tokens[ii], stemmedW[ii],
+					// filter[ii],this.keywords);
+					// result.add(word);
 				}
 			}
 		} else if (mode == 1) {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
 					if (!this.language.equals("de")) {
-//						System.out.println(tokens[ii]);
+						// System.out.println(tokens[ii]);
 						Words word = new Words(
 								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
-								filter[ii],this.keywords);
+								filter[ii], this.keywords);
 						result.add(word);
 					} else {
-						//MAYBE SOLVES PROBLEM?TODO
-						Words word = new Words(tokens[ii].replaceAll("[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
-								filter[ii],this.keywords);
+						// MAYBE SOLVES PROBLEM?TODO
+						Words word = new Words(tokens[ii].replaceAll(
+								"[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
+								filter[ii], this.keywords);
 						result.add(word);
 					}
 				}
@@ -490,15 +511,16 @@ public class PDFExtractor {
 			for (int ii = 0; ii < filter.length; ii++) {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("JJ"))) {
 					if (!this.language.equals("de")) {
-//						System.out.println(tokens[ii]);
+						// System.out.println(tokens[ii]);
 						Words word = new Words(
 								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
-								filter[ii],this.keywords);
+								filter[ii], this.keywords);
 						result.add(word);
 					} else {
-						//MAYBE SOLVES PROBLEM?TODO
-						Words word = new Words(tokens[ii].replaceAll("[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
-								filter[ii],this.keywords);
+						// MAYBE SOLVES PROBLEM?TODO
+						Words word = new Words(tokens[ii].replaceAll(
+								"[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
+								filter[ii], this.keywords);
 						result.add(word);
 					}
 				}
@@ -583,7 +605,6 @@ public class PDFExtractor {
 			throws LangDetectException, IOException {
 		ArrayList<Words> result = new ArrayList<Words>();
 
-
 		PDFTextStripper pdfStripper = null;
 		PDDocument pdDoc = null;
 		COSDocument cosDoc = null;
@@ -619,10 +640,13 @@ public class PDFExtractor {
 					String[] tokens = getTokenPM(parsedText);
 					// TODO create regEx for identifying keyword - area
 					ArrayList<Category> keywords = getKeywordsfromPDF(tokens);
-					
-					//No keywords you are out 
+
+					// No keywords you are out
 					if (keywords.isEmpty()) {
-						System.out.println("PDFExtractor: No Keywords in pdf -> ignore");
+						File dest = new File("c:/RWTH/Data/noKeywords/");
+						System.out
+								.println("PDFExtractor: No Keywords in pdf -> ignore");
+						FileUtils.copyFileToDirectory(fileEntry, dest);
 						// empty - could not directly extract keywords
 						break;
 					} else {
@@ -636,7 +660,7 @@ public class PDFExtractor {
 				// sentence detector -> tokenizer
 				String[] tokens = getToken(parsedText);
 				String[] filter = posttags(tokens);
-				//TODO move sonderzeichen behandlung zu occurence function
+				// TODO move sonderzeichen behandlung zu occurence function
 				ArrayList<Words> words = generateWords(filter, tokens, 0);
 				result.addAll(words);
 				System.out.println("normal:" + tokens.length
