@@ -96,20 +96,28 @@ public class PDFExtractor {
 
 		if (textPDF.contains("Keywords")) {
 			counter = textPDF.indexOf("Keywords");
+			System.out.println("Keyword found");
 
 		} else if (textPDF.contains("key")) {
 			counter = textPDF.indexOf("key");
 
 		} else if (textPDF.contains("word")) {
 			counter = textPDF.indexOf("word");
-		} else if (textPDF.contains("Index Terms")) {
+		} else if (textPDF.contains("Index")) {
 			// does not work i think
-			counter = textPDF.indexOf("Index Terms");
+			counter = textPDF.indexOf("Index");
+			System.out.println("Index found");
+			if (textPDF.get(counter + 1).equals("Terms")) {
+				counter = counter + 1;
+			} else {
+				counter = 0;
+			}
 		}
 		counter++;
 		int offset = 0;
 
 		while (counter != 0) {
+			String intro = textPDF.get(counter).toUpperCase();
 			if (((textPDF.get(counter).equals(",") || (textPDF.get(counter)
 					.equals(";") || (textPDF.get(counter).equals(".") ^ ((textPDF
 					.get(counter).matches("\\d+")))))
@@ -129,7 +137,9 @@ public class PDFExtractor {
 				}
 				counter++;
 				offset = 0;
-			} else if ((offset > 4)) {
+			} else if ((offset > 5)) {
+				counter = 0;
+			} else if (intro.equals("INTRODUCTION")||intro.equals("ABSTRACT")) {
 				counter = 0;
 			} else {
 				counter++;
@@ -187,17 +197,7 @@ public class PDFExtractor {
 
 	public ArrayList<String> NameFinder(String[] sentences)
 			throws InvalidFormatException, IOException {
-		// TEST STUFF
-		// String[] sentences = {
-		// "If President John F. Kennedy, after visiting France in 1961 with his immensely popular wife,"
-		// +
-		// " famously described himself as 'the man who had accompanied Jacqueline Kennedy to Paris,'"
-		// +
-		// " Mr. Hollande has been most conspicuous on this state visit for traveling alone.",
-		// "Mr. Draghi spoke on the first day of an economic policy conference here organized by"
-		// +
-		// " the E.C.B. as a sort of counterpart to the annual symposium held in Jackson"
-		// + " Hole, Wyo., by the Federal Reserve Bank of Kansas City. " };
+		// TEST
 
 		// Load the model file downloaded from OpenNLP
 		// http://opennlp.sourceforge.net/models-1.5/en-ner-person.bin
@@ -405,8 +405,7 @@ public class PDFExtractor {
 		keywords = (ArrayList<Words>) words.clone();
 		ArrayList<WordOcc> result = new ArrayList<WordOcc>();
 		int arraySize = keywords.size();
-		
-		
+
 		int counter = 0;
 		int size = 0;
 		while (arraySize > 0) {
@@ -417,15 +416,15 @@ public class PDFExtractor {
 				Words compare = keywords.get(ii);
 
 				// TODO:Question compare words or only stem with type
-				//TODO: some words have fallouts - not accounted duplicates
+				// TODO: some words have fallouts - not accounted duplicates
 				// Lower Border
 				// IMPROVED FILTER ALGO
-				
+
 				if (compare.getWord().equals(current.getWord())
 						|| ((compare.getStem().equals(current.getStem())) && ((compare
 								.getType().contains(current.getType()) || (current
 								.getType().contains(compare.getType())))))) {
-					if(compare.getWord().equals("cloud")){
+					if (compare.getWord().equals("cloud")) {
 						String test = "";
 					}
 					keywords.remove(ii);
