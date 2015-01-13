@@ -34,8 +34,8 @@ public class Corpus {
 				if (word.getKeyinPDF() == 0) {
 					for (PDF currdoc : pdfList) {
 						// words overwrite?
-						if(word.getWord().getWord().equals("future")){
-						String test = "0";	
+						if (word.getWord().getWord().equals("future")) {
+							String test = "0";
 						}
 						if (currdoc.getLanguage().equals(language)) {
 							wordes = currdoc.getWordOccList();
@@ -64,27 +64,27 @@ public class Corpus {
 
 	// TODO DONE LANGUAGE ADDING
 	public int getDocN(String language) {
-		if(language.equals("de")){
-		return  docNGer;
-		}else if(language.equals("en")){
-			return  docNEng;
+		if (language.equals("de")) {
+			return docNGer;
+		} else if (language.equals("en")) {
+			return docNEng;
 		}
 		return docNEng;
 
 	}
 
-	public void setDocN(int docN,String language) {
-		if(language.equals("de")){
-		this.docNGer = docN;
-		}else if(language.equals("en")){
+	public void setDocN(int docN, String language) {
+		if (language.equals("de")) {
+			this.docNGer = docN;
+		} else if (language.equals("en")) {
 			this.docNEng = docN;
 		}
 	}
 
 	public void incDocN(String language) {
-		if(language.equals("de")){
-		this.docNGer++;
-		}else if(language.equals("en")){
+		if (language.equals("de")) {
+			this.docNGer++;
+		} else if (language.equals("en")) {
 			this.docNEng++;
 		}
 	}
@@ -105,16 +105,16 @@ public class Corpus {
 		for (int ii = 0; ii < pdfList.size(); ii++) {
 			pdfList.get(ii).calculateTF_IDF();
 			// System.out.println(ii);
-//			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
-//			for (int jj = 0; jj < words.size(); jj++) {
-//				System.out.println(words.get(jj).getWord().getWord()
-//						+ "- TFIDF: " + words.get(jj).getTfidf() + " IDF: "
-//						+ words.get(jj).getIdf() + " TF: "
-//						+ words.get(jj).getTf() + " wordocc: "
-//						+ words.get(jj).getOcc());
-//			}
-//			System.out
-//					.println("______________________________________________________________");
+			// ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
+			// for (int jj = 0; jj < words.size(); jj++) {
+			// System.out.println(words.get(jj).getWord().getWord()
+			// + "- TFIDF: " + words.get(jj).getTfidf() + " IDF: "
+			// + words.get(jj).getIdf() + " TF: "
+			// + words.get(jj).getTf() + " wordocc: "
+			// + words.get(jj).getOcc());
+			// }
+			// System.out
+			// .println("______________________________________________________________");
 		}
 		return pdfList;
 
@@ -129,7 +129,7 @@ public class Corpus {
 
 				if (words.get(jj).getTfidf() > level) {
 					test.add(words.get(jj));
-					}
+				}
 
 			}
 			pdfList.get(ii).setWordOcc(test);
@@ -308,6 +308,24 @@ public class Corpus {
 					}
 				}
 			}
+		}
+
+	}
+
+	public void filterCatTFIDF(double level) {
+		for (int ii = 0; ii < globalCategoryCatalog.size(); ii++) {
+			ArrayList<WordOcc> words = globalCategoryCatalog.get(ii)
+					.getKeywordList();
+			ArrayList<WordOcc> test = new ArrayList();
+
+			for (int jj = 0; jj < words.size(); jj++) {
+
+				if (words.get(jj).getTfidf() > level) {
+					test.add(words.get(jj));
+				}
+
+			}
+			globalCategoryCatalog.get(ii).setKeywordList(test);
 		}
 
 	}

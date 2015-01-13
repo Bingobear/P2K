@@ -20,7 +20,7 @@ public class PDFHandler {
 	static boolean debug_db = false;
 	static boolean debug_img = false;
 	static String title = "";
-	private ArrayList<Category> globalCategory = new ArrayList<Category>();
+
 
 	public PDFHandler() {
 
@@ -61,7 +61,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/test/";
+		String importData = "c:/RWTH/Data/HCI/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
@@ -69,23 +69,30 @@ public class PDFHandler {
 		boolean first = true;
 		corpus = createCorpus(folder, corpus, pdfList, first);
 		corpus.calculateIdf();
-		corpus.calculateCatTFIDF();
-		corpus.calculateRel();
+		// First calculate Keyword TFIDF (Relevance)
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
 		// SAVE FILTER LEVEL
+		// Filter pdf keylist with min level 0.0001
 		corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(), 0.0001));
+		// Calculate CatTFIDF with filtered keywords
+		corpus.calculateCatTFIDF();
+		corpus.filterCatTFIDF(0.0001);
+		corpus.calculateRel();
 		System.out.println("PDFHandler");
 		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
-			ArrayList<WordOcc> words = corpus.getPdfList().get(ii).getWordOccList();
+			ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
+					.getWordOccList();
+			System.out
+			.println(corpus.getPdfList().get(ii).getTitle()
+					+ "______________________________________________________________");
 			for (int jj = 0; jj < words.size(); jj++) {
 				System.out.println(words.get(jj).getWord().getWord()
-						+ " -  TF: "
-						+ words.get(jj).getTf()  + " IDF: "
-						+ words.get(jj).getIdf() + "TFIDF: " + words.get(jj).getTfidf() + " wordocc: "
+						+ " -  TF: " + words.get(jj).getTf() + " IDF: "
+						+ words.get(jj).getIdf() + "TFIDF: "
+						+ words.get(jj).getTfidf() + " wordocc: "
 						+ words.get(jj).getOcc());
 			}
-			System.out
-			.println(corpus.getPdfList().get(ii).getTitle()+"______________________________________________________________");
+
 		}
 		System.out
 				.println("______________________________________________________________");
