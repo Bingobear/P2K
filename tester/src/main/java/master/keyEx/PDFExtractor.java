@@ -649,6 +649,8 @@ public class PDFExtractor {
 						// empty - could not directly extract keywords
 						break;
 					} else {
+						File dest = new File("c:/RWTH/Data/hasKeywords/");
+						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 					}
 
