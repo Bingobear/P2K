@@ -153,6 +153,7 @@ public class Database {
 	}
 
 	// TODO for some reason not all cats are added
+	// TODO different solution to duplicates !  testing if connection already exists
 	private void addCathasKeys(ArrayList<Integer> defKeys,
 			ArrayList<Integer> genKeys, long pdfID) throws SQLException {
 		for (int ii = 0; ii < defKeys.size(); ii++) {
@@ -294,6 +295,7 @@ public class Database {
 		preparedStatement.setString(2, pdf.getFirstPage().substring(0, 200));
 		preparedStatement.setInt(3, pdf.getWordcount());
 		preparedStatement.setString(4, pdf.getLanguage());
+		preparedStatement.setInt(5, pdf.getWordcount());
 		preparedStatement.executeUpdate();
 
 		ResultSet rs = null;

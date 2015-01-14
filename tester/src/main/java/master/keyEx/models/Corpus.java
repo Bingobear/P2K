@@ -303,9 +303,15 @@ public class Corpus {
 							this.pdfList.get(ii).getGenericKeywords()
 									.get(counter)
 									.incRelevance(word.getCatTFIDF());
-							;
 						}
 					}
+				}
+			}
+			// TODO QUESTION IS 0 RELEVANCE A GOOD VALUE ? -> CURRENT VERSION:
+			// BETTER USE LOWER BRACKET NOT OPEN
+			for (int counter = 0; counter < pdfcat.size(); counter++) {
+				if (pdfcat.get(counter).getRelevance() == 0) {
+					pdfcat.get(counter).setRelevance(0.00001);
 				}
 			}
 		}
@@ -316,16 +322,16 @@ public class Corpus {
 		for (int ii = 0; ii < globalCategoryCatalog.size(); ii++) {
 			ArrayList<WordOcc> words = globalCategoryCatalog.get(ii)
 					.getKeywordList();
-			ArrayList<WordOcc> test = new ArrayList();
+			ArrayList<WordOcc> relevantWords = new ArrayList();
 
 			for (int jj = 0; jj < words.size(); jj++) {
 
 				if (words.get(jj).getTfidf() > level) {
-					test.add(words.get(jj));
+					relevantWords.add(words.get(jj));
 				}
 
 			}
-			globalCategoryCatalog.get(ii).setKeywordList(test);
+			globalCategoryCatalog.get(ii).setKeywordList(relevantWords);
 		}
 
 	}
