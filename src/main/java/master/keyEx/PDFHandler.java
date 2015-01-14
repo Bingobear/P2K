@@ -17,7 +17,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = false;
+	static boolean debug_db = true;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -61,7 +61,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/HCI/";
+		String importData = "c:/RWTH/Data/hasKeywords/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
@@ -76,7 +76,7 @@ public class PDFHandler {
 		corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(), 0.0001));
 		// Calculate CatTFIDF with filtered keywords
 		corpus.calculateCatTFIDF();
-		corpus.filterCatTFIDF(0.0001);
+		corpus.filterCatTFIDF(0.00001);
 		corpus.calculateRel();
 		System.out.println("PDFHandler");
 		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {

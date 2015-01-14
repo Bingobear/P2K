@@ -123,12 +123,14 @@ public class PDFExtractor {
 					.get(counter).matches("\\d+")))))
 					&& (offset != 0)))) {
 				String currkey = "";
+				//TODO KEYWORD EXTRACTION HAS TO LOOK BETTER
 				for (int ii = counter - offset; ii < counter; ii++) {
 					currkey = currkey + textPDF.get(ii);
 					if (!(textPDF.get(ii + 1).equals(",") || (textPDF.get(
 							counter).equals(";") || (textPDF.get(ii + 1)
 							.equals(".") ^ (textPDF.get(ii + 1).matches("\\d+")))))) {
 						currkey = currkey.replaceAll("\\W", "") + " ";
+						
 					}
 				}
 				if (!currkey.matches("\\d+")) {
@@ -137,7 +139,7 @@ public class PDFExtractor {
 				}
 				counter++;
 				offset = 0;
-			} else if ((offset > 5)) {
+			} else if ((offset > 4)) {
 				counter = 0;
 			} else if (intro.equals("INTRODUCTION")||intro.equals("ABSTRACT")) {
 				counter = 0;
@@ -529,66 +531,9 @@ public class PDFExtractor {
 		return result;
 	}
 
-	// /**
 
-	// *
-	// * @return
-	// * @throws LangDetectException
-	// * @throws IOException
-	// */
-	// public ArrayList<Words> parsePDFtoKey() throws LangDetectException,
-	// IOException {
-	// ArrayList<Words> result = new ArrayList<Words>();
-	//
-	// PDFTextStripper pdfStripper = null;
-	// PDDocument pdDoc = null;
-	// COSDocument cosDoc = null;
-	//
-	// // antrag big, test small
-	// URL url = getClass().getResource("/text/test.pdf");
-	// File file = new File(url.getPath());
-	//
-	// PDFParser parser = new PDFParser(new FileInputStream(file));
-	// parser.parse();
-	// cosDoc = parser.getDocument();
-	// pdfStripper = new PDFTextStripper();
-	//
-	// pdDoc = new PDDocument(cosDoc);
-	//
-	// LangDetect lang = new LangDetect();
-	//
-	// for (int counter = 0; counter < pdDoc.getNumberOfPages(); counter += 5) {
-	// String parsedText = parsePdftoString(pdfStripper, pdDoc, counter,
-	// counter + 4);
-	// // int test = pdDoc.getNumberOfPages();
-	// // Language detection
-	// if (counter == 0) {
-	// setLang(lang.detect(parsedText));
-	// System.out.println(getLang());
-	// }
-	// // sentence detector -> tokenizer
-	// String[] tokens = getToken(parsedText);
-	// String[] filter = posttags(tokens);
-	//
-	//
-	// ArrayList<String> keywords = getKeywordsfromPDF(tokens);
-	//
-	// if (keywords.isEmpty()) {
-	//
-	// // empty - could not directly extract keywords
-	// } else {
-	// // use extracted keywords as ref. elements
-	// }
-	//
-	// ArrayList<Words> words = generateWords(filter, tokens, 0);
-	// result.addAll(words);
-	// System.out.println("normal:" + tokens.length + ", optimiertNouns:"
-	// + words.size());
-	// System.out.println("");
-	// }
-	// System.out.println("FINAL RESULT:optimiertNouns:" + result.size());
-	// return result;
-	// }
+
+	
 	/**
 	 * TODO: GET TITLE FROM FIRST SENTENCE - idea: use namefinder
 	 * 
@@ -642,15 +587,15 @@ public class PDFExtractor {
 
 					// No keywords you are out
 					if (keywords.isEmpty()) {
-						File dest = new File("c:/RWTH/Data/noKeywords/");
-						System.out
-								.println("PDFExtractor: No Keywords in pdf -> ignore");
-						FileUtils.copyFileToDirectory(fileEntry, dest);
+//						File dest = new File("c:/RWTH/Data/noKeywords/");
+//						System.out
+//								.println("PDFExtractor: No Keywords in pdf -> ignore");
+//						FileUtils.copyFileToDirectory(fileEntry, dest);
 						// empty - could not directly extract keywords
 						break;
 					} else {
-						File dest = new File("c:/RWTH/Data/hasKeywords/");
-						FileUtils.copyFileToDirectory(fileEntry, dest);
+//						File dest = new File("c:/RWTH/Data/hasKeywords/");
+//						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 					}
 
