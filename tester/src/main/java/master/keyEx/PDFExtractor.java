@@ -589,6 +589,7 @@ public class PDFExtractor {
 					String[] tokens = getTokenPM(parsedText);
 					// TODO create regEx for identifying keyword - area
 					ArrayList<Category> keywords = getKeywordsfromPDF(tokenstest);
+					//QUESTION SHOULD I ANTICIPATE UPPERCASE ERRORS
 					ArrayList<Category> keywordL = getKeywordsFromPDF(tokens);
 					keywords.clear();
 
@@ -663,6 +664,9 @@ public class PDFExtractor {
 			System.out.print(keywords.get(ii).getTitle()+", ");
 		}
 		setCatnumb(keywords.size());
+		if(getCatnumb()<2){
+			keywords.clear();
+		}
 		return keywords;
 	}
 
@@ -718,7 +722,7 @@ public class PDFExtractor {
 			if (textPDF.contains(stops[ii])) {
 				endCandidate = textPDF.indexOf(stops[ii]);
 				if ((end > endCandidate) && (endCandidate > 4)) {
-					end = endCandidate-1;
+					end = endCandidate;
 				}
 			}
 		}
