@@ -55,7 +55,8 @@ public class Corpus {
 			words = doc.getWordOccList();
 			for (WordOcc word : words) {
 				String pdfLanguage = doc.getLanguage();
-				word.setIdf(AlgorithmUtil.calcIDF((double) getDocN(pdfLanguage),
+				word.setIdf(AlgorithmUtil.calcIDF(
+						(double) getDocN(pdfLanguage),
 						(double) word.getKeyinPDF()));
 			}
 		}
@@ -143,9 +144,23 @@ public class Corpus {
 		boolean found = false;
 		for (Category cat : pdf.getGenericKeywords()) {
 			for (int counter = 0; counter < this.globalCategoryCatalog.size(); counter++) {
-				if (cat.getTitle().equals(
-						this.globalCategoryCatalog.get(counter).getCategory()
-								.getTitle())) {
+				String wordCat = cat.getNormtitle();
+				String wordGlobal =this.globalCategoryCatalog.get(counter).getCategory()
+						.getNormtitle();
+				//naive approach
+//				if (wordCat.equals(wordGlobal)) {
+//					found = true;
+//					addCategoryWords(counter, pdf.getWordOccList());
+//					break;
+//				}
+				int ld = AlgorithmUtil.LevenshteinDistance(wordCat, wordGlobal);
+				double sim = 0;
+				if(wordCat.length()>wordGlobal.length()){
+					sim = AlgorithmUtil.calculateWordSim(wordCat, ld);
+				}else{
+					sim = AlgorithmUtil.calculateWordSim(wordGlobal, ld);
+				}
+				if(sim<=0.2){
 					found = true;
 					addCategoryWords(counter, pdf.getWordOccList());
 					break;

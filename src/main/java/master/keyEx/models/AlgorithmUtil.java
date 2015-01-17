@@ -24,7 +24,7 @@ public class AlgorithmUtil {
 	}
 	
 	//SOURCE WIKIPEDIA
-	public int LevenshteinDistance (String wordA, String wordB) {                          
+	public static int LevenshteinDistance (String wordA, String wordB) {                          
 	    int len0 = wordA.length() + 1;                                                     
 	    int len1 = wordB.length() + 1;                                                     
 	 
@@ -64,7 +64,7 @@ public class AlgorithmUtil {
 	    return cost[len0 - 1];                                                          
 	}
 	
-	public double calculateWordSim(String word,int diff){
+	public static double calculateWordSim(String word,double diff){
 		return diff/word.length();
 	}
 

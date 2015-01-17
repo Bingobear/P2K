@@ -583,27 +583,27 @@ public class PDFExtractor {
 					this.setTitlePage(parsePdftoString(pdfStripper, pdDoc,
 							counter, counter + 1)); // TODO:MOVE KEYWORDS TO PDF
 													// OBJECT
-					String test = parsedText;
-					String[] tokenstest = getTokenPM(parsedText);
+//					String test = parsedText;
+//					String[] tokenstest = getTokenPM(parsedText);
 					parsedText = parsedText.toUpperCase();
 					String[] tokens = getTokenPM(parsedText);
-					// TODO create regEx for identifying keyword - area
-					ArrayList<Category> keywords = getKeywordsfromPDF(tokenstest);
+					// old variant
+//					ArrayList<Category> keywords = getKeywordsfromPDF(tokenstest);
 					//QUESTION SHOULD I ANTICIPATE UPPERCASE ERRORS
-					ArrayList<Category> keywordL = getKeywordsFromPDF(tokens);
-					keywords.clear();
+					ArrayList<Category> keywords = getKeywordsFromPDF(tokens);
+//					keywords.clear();
 
 					// No keywords you are out
 					if (keywords.isEmpty()) {
-						// File dest = new File("c:/RWTH/Data/noKeywords/");
-						// System.out
-						// .println("PDFExtractor: No Keywords in pdf -> ignore");
-						// FileUtils.copyFileToDirectory(fileEntry, dest);
+						 File dest = new File("c:/RWTH/Data/noKeywords1/");
+//						 System.out
+//						 .println("PDFExtractor: No Keywords in pdf -> ignore");
+						 FileUtils.copyFileToDirectory(fileEntry, dest);
 						// empty - could not directly extract keywords
 						break;
 					} else {
-						// File dest = new File("c:/RWTH/Data/hasKeywords/");
-						// FileUtils.copyFileToDirectory(fileEntry, dest);
+						 File dest = new File("c:/RWTH/Data/hasKeywords1/");
+						 FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 					}
 
@@ -650,22 +650,25 @@ public class PDFExtractor {
 			for (int ii = 0; ii < textPDF.size(); ii++) {
 				if (textPDF.get(ii).equals(seperator)) {
 					currKey = currKey.trim();
-					keywords.add(new Category(currKey));
+					String normKey = currKey.replaceAll("[^\\p{L}]+", "");
+					keywords.add(new Category(currKey,normKey));
 					currKey = "";
 				} else {
 					currKey = currKey +" "+ textPDF.get(ii);
 				}
 			}
 			currKey = currKey.trim();
-			keywords.add(new Category(currKey));
+			String normKey = currKey.replaceAll("[^\\p{L}]+", "");
+			keywords.add(new Category(currKey,normKey));
 		}
-		System.out.println("NEW: ");
-		for(int ii=0;ii<keywords.size();ii++){
-			System.out.print(keywords.get(ii).getTitle()+", ");
-		}
+
 		setCatnumb(keywords.size());
 		if(getCatnumb()<2){
 			keywords.clear();
+		}
+		System.out.println("NEW:");
+		for(int ii=0;ii<keywords.size();ii++){
+			System.out.print(keywords.get(ii).getTitle()+" + "+keywords.get(ii).getNormtitle()+", ");
 		}
 		return keywords;
 	}
