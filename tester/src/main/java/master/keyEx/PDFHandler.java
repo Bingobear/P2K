@@ -17,7 +17,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = true;
+	static boolean debug_db = false;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -61,7 +61,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/hasKeywords/";
+		String importData = "c:/RWTH/Data/test/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
@@ -78,38 +78,38 @@ public class PDFHandler {
 		corpus.calculateCatTFIDF();
 		corpus.filterCatTFIDF(0.00001);
 		corpus.calculateRel();
-		System.out.println("PDFHandler");
-		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
-			ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
-					.getWordOccList();
-			System.out
-			.println(corpus.getPdfList().get(ii).getTitle()
-					+ "______________________________________________________________");
-			for (int jj = 0; jj < words.size(); jj++) {
-				System.out.println(words.get(jj).getWord().getWord()
-						+ " -  TF: " + words.get(jj).getTf() + " IDF: "
-						+ words.get(jj).getIdf() + "TFIDF: "
-						+ words.get(jj).getTfidf() + " wordocc: "
-						+ words.get(jj).getOcc());
-			}
-
-		}
-		System.out
-				.println("______________________________________________________________");
-		System.out.println("PDFHandler");
-		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
-			System.out
-					.println("----------------------------------------------------------------");
-			System.out.println(corpus.getPdfList().get(ii).getTitle());
-			for (int jj = 0; jj < corpus.getPdfList().get(ii)
-					.getGenericKeywords().size(); jj++) {
-				System.out.println(corpus.getPdfList().get(ii)
-						.getGenericKeywords().get(jj).getTitle()
-						+ " has Relevance: "
-						+ corpus.getPdfList().get(ii).getGenericKeywords()
-								.get(jj).getRelevance());
-			}
-		}
+//		System.out.println("PDFHandler");
+//		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
+//			ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
+//					.getWordOccList();
+//			System.out
+//			.println(corpus.getPdfList().get(ii).getTitle()
+//					+ "______________________________________________________________");
+//			for (int jj = 0; jj < words.size(); jj++) {
+//				System.out.println(words.get(jj).getWord().getWord()
+//						+ " -  TF: " + words.get(jj).getTf() + " IDF: "
+//						+ words.get(jj).getIdf() + "TFIDF: "
+//						+ words.get(jj).getTfidf() + " wordocc: "
+//						+ words.get(jj).getOcc());
+//			}
+//
+//		}
+//		System.out
+//				.println("______________________________________________________________");
+//		System.out.println("PDFHandler");
+//		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
+//			System.out
+//					.println("----------------------------------------------------------------");
+//			System.out.println(corpus.getPdfList().get(ii).getTitle());
+//			for (int jj = 0; jj < corpus.getPdfList().get(ii)
+//					.getGenericKeywords().size(); jj++) {
+//				System.out.println(corpus.getPdfList().get(ii)
+//						.getGenericKeywords().get(jj).getTitle()
+//						+ " has Relevance: "
+//						+ corpus.getPdfList().get(ii).getGenericKeywords()
+//								.get(jj).getRelevance());
+//			}
+//		}
 		return corpus;
 
 	}
