@@ -40,10 +40,10 @@ private int totalW=0;
 		WordOcc word = null;
 		for (int ii = 0; ii < keywordList.size(); ii++) {
 			word = keywordList.get(ii);
-			double tf = TFIDF
+			double tf = AlgorithmUtil
 					.calcTF((double) word.getOcc(), (double) this.totalW);
 			word.setCatTF(tf);
-			double tfidf = TFIDF.calcTFIDF(tf, (double) word.getCatIDF());
+			double tfidf = AlgorithmUtil.calcTFIDF(tf, (double) word.getCatIDF());
 			word.setCatTFIDF(tfidf);
 		}
 		

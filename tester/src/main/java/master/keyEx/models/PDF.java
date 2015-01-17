@@ -25,10 +25,10 @@ public class PDF {
 		WordOcc word = null;
 		for (int ii = 0; ii < wordOcc.size(); ii++) {
 			word = wordOcc.get(ii);
-			double tf = TFIDF
+			double tf = AlgorithmUtil
 					.calcTF((double) word.getOcc(), (double) wordcount);
 			word.setTf(tf);
-			double tfidf = TFIDF.calcTFIDF(tf, (double) word.getIdf());
+			double tfidf = AlgorithmUtil.calcTFIDF(tf, (double) word.getIdf());
 			word.setTfidf(tfidf);
 		}
 	}
