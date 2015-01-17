@@ -55,7 +55,7 @@ public class Corpus {
 			words = doc.getWordOccList();
 			for (WordOcc word : words) {
 				String pdfLanguage = doc.getLanguage();
-				word.setIdf(TFIDF.calcIDF((double) getDocN(pdfLanguage),
+				word.setIdf(AlgorithmUtil.calcIDF((double) getDocN(pdfLanguage),
 						(double) word.getKeyinPDF()));
 			}
 		}
@@ -281,7 +281,7 @@ public class Corpus {
 		for (CategoryCatalog doc : this.globalCategoryCatalog) {
 			words = doc.getKeywordList();
 			for (WordOcc word : words) {
-				word.setCatIDF(TFIDF.calcIDF(
+				word.setCatIDF(AlgorithmUtil.calcIDF(
 						// have to consider also occurence not only size
 						(double) this.globalCategoryCatalog.size(),
 						(double) word.getKeyinCat()));
