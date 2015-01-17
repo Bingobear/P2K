@@ -5,6 +5,7 @@ private String title;
 private int wOcc;
 private int totalwords;
 private double relevance;
+private String normtitle;
 	public String getTitle() {
 	return title;
 }
@@ -18,6 +19,12 @@ public void setTitle(String title) {
 		this.setTitle(name);
 		this.wOcc =0;
 	}
+	public Category(String name,String normTitle) {
+		this.setTitle(name);
+		this.setNormtitle(normTitle);
+		this.wOcc =0;
+	}
+	
 //	public int getRelevance() {
 //		return wOcc;
 //	}
@@ -51,6 +58,12 @@ public void setTitle(String title) {
 	public void incRelevance(double i) {
 		//this.relevance=this.relevance+1;
 		this.relevance=this.relevance+i;
+	}
+	public String getNormtitle() {
+		return normtitle;
+	}
+	public void setNormtitle(String normtitle) {
+		this.normtitle = normtitle;
 	}
 
 }

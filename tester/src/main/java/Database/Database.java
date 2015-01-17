@@ -247,13 +247,14 @@ public class Database {
 				rsT.close();
 				if (idDef < 0) {
 					preparedStatement = connect.prepareStatement(
-							"insert into  "+dbName+".CATEGORY values (default,?,?,?)",
+							"insert into  "+dbName+".CATEGORY values (default,?,?,?,?)",
 							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setString(1, pdf.getGenericKeywords()
 							.get(count).getTitle());
 					preparedStatement.setInt(2, (int) pdfID);
 					preparedStatement.setDouble(3,
 							pdf.getGenericKeywords().get(count).getRelevance());
+					preparedStatement.setString(4, pdf.getGenericKeywords().get(count).getNormtitle());
 
 					try {
 						preparedStatement.executeUpdate();
@@ -345,7 +346,8 @@ public class Database {
 		preparedStatement.setInt(1, (int) corpID);
 		// TODO setNULL
 		preparedStatement.setNull(2, java.sql.Types.INTEGER);
-		preparedStatement.setString(3, pdf.getFirstPage().substring(0, 100));
+//		pdf.getFirstPage().substring(0, 100)
+		preparedStatement.setString(3, pdf.getTitle());
 		preparedStatement.setInt(4, pdf.getWordcount());
 		preparedStatement.setString(5, pdf.getLanguage());
 		preparedStatement.setInt(6, pdf.getWordcount());
@@ -422,10 +424,10 @@ public class Database {
 			}
 			if (id != -1) {
 				while (rsT.next()) {
-					String title = rsT.getString("title");
+					String normtitle = rsT.getString("normtitle");
 
 					if (corpus.getGlobalCategoryCatalog().get(ii).getCategory()
-							.getTitle().contains(title)) {
+							.getNormtitle().contains(normtitle)) {
 						gCids.add(id);
 						if(id==2){
 							System.out.println("BS");
@@ -443,12 +445,15 @@ public class Database {
 
 				preparedStatement = connect
 						.prepareStatement(
-								"insert into  hciCorpus.GlobalCategory values (default,?, ?)",
+								"insert into  hciCorpus.GlobalCategory values (default,?, ?,?)",
 								Statement.RETURN_GENERATED_KEYS);
 				preparedStatement.setInt(1, corpID);
 				preparedStatement.setString(2, corpus
 						.getGlobalCategoryCatalog().get(ii).getCategory()
 						.getTitle());
+				preparedStatement.setString(3, corpus
+						.getGlobalCategoryCatalog().get(ii).getCategory()
+						.getNormtitle());
 				try {
 					preparedStatement.executeUpdate();
 					ResultSet rs = preparedStatement.getGeneratedKeys();
