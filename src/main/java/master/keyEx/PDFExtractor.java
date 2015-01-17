@@ -123,14 +123,14 @@ public class PDFExtractor {
 					.get(counter).matches("\\d+")))))
 					&& (offset != 0)))) {
 				String currkey = "";
-				//TODO KEYWORD EXTRACTION HAS TO LOOK BETTER
+				// TODO KEYWORD EXTRACTION HAS TO LOOK BETTER
 				for (int ii = counter - offset; ii < counter; ii++) {
-					currkey = currkey + textPDF.get(ii);
+					currkey = currkey +" "+ textPDF.get(ii);
 					if (!(textPDF.get(ii + 1).equals(",") || (textPDF.get(
 							counter).equals(";") || (textPDF.get(ii + 1)
 							.equals(".") ^ (textPDF.get(ii + 1).matches("\\d+")))))) {
 						currkey = currkey.replaceAll("\\W", "") + " ";
-						
+
 					}
 				}
 				if (!currkey.matches("\\d+")) {
@@ -141,7 +141,7 @@ public class PDFExtractor {
 				offset = 0;
 			} else if ((offset > 4)) {
 				counter = 0;
-			} else if (intro.equals("INTRODUCTION")||intro.equals("ABSTRACT")) {
+			} else if (intro.equals("INTRODUCTION") || intro.equals("ABSTRACT")) {
 				counter = 0;
 			} else {
 				counter++;
@@ -150,6 +150,10 @@ public class PDFExtractor {
 		}
 		// System.out.print(counter);
 		setCatnumb(keywords.size());
+		System.out.println("OLD:");
+		for(int ii=0;ii<keywords.size();ii++){
+			System.out.print(keywords.get(ii).getTitle()+", ");
+		}
 		return keywords;
 
 	}
@@ -531,9 +535,6 @@ public class PDFExtractor {
 		return result;
 	}
 
-
-
-	
 	/**
 	 * TODO: GET TITLE FROM FIRST SENTENCE - idea: use namefinder
 	 * 
@@ -578,24 +579,30 @@ public class PDFExtractor {
 					if (first) {
 						first = false;
 					}
+
 					this.setTitlePage(parsePdftoString(pdfStripper, pdDoc,
 							counter, counter + 1)); // TODO:MOVE KEYWORDS TO PDF
 													// OBJECT
+					String test = parsedText;
+					String[] tokenstest = getTokenPM(parsedText);
+					parsedText = parsedText.toUpperCase();
 					String[] tokens = getTokenPM(parsedText);
 					// TODO create regEx for identifying keyword - area
-					ArrayList<Category> keywords = getKeywordsfromPDF(tokens);
+					ArrayList<Category> keywords = getKeywordsfromPDF(tokenstest);
+					ArrayList<Category> keywordL = getKeywordsFromPDF(tokens);
+					keywords.clear();
 
 					// No keywords you are out
 					if (keywords.isEmpty()) {
-//						File dest = new File("c:/RWTH/Data/noKeywords/");
-//						System.out
-//								.println("PDFExtractor: No Keywords in pdf -> ignore");
-//						FileUtils.copyFileToDirectory(fileEntry, dest);
+						// File dest = new File("c:/RWTH/Data/noKeywords/");
+						// System.out
+						// .println("PDFExtractor: No Keywords in pdf -> ignore");
+						// FileUtils.copyFileToDirectory(fileEntry, dest);
 						// empty - could not directly extract keywords
 						break;
 					} else {
-//						File dest = new File("c:/RWTH/Data/hasKeywords/");
-//						FileUtils.copyFileToDirectory(fileEntry, dest);
+						// File dest = new File("c:/RWTH/Data/hasKeywords/");
+						// FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 					}
 
@@ -620,6 +627,104 @@ public class PDFExtractor {
 		}
 		System.out.println("FINAL RESULT:optimiertNouns:" + result.size());
 		return result;
+	}
+
+	private ArrayList<Category> getKeywordsFromPDF(String[] tokens) {
+		ArrayList<Category> keywords = new ArrayList<Category>();
+		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(tokens));
+		int start = findKeyWStart(textPDF);
+
+		if (start > 0) {
+
+			if (textPDF.get(start).equals(":")) {
+				start++;
+			}
+			textPDF = new ArrayList<String>(textPDF.subList(start,
+					textPDF.size() - 1));
+			int end = findKeyWEnd(textPDF);
+			textPDF = new ArrayList<String>(textPDF.subList(0, end));
+			String seperator = findSep(textPDF);
+			System.out.println(seperator);
+			String currKey = "";
+			for (int ii = 0; ii < textPDF.size(); ii++) {
+				if (textPDF.get(ii).equals(seperator)) {
+					currKey = currKey.trim();
+					keywords.add(new Category(currKey));
+					currKey = "";
+				} else {
+					currKey = currKey +" "+ textPDF.get(ii);
+				}
+			}
+			currKey = currKey.trim();
+			keywords.add(new Category(currKey));
+		}
+		System.out.println("NEW: ");
+		for(int ii=0;ii<keywords.size();ii++){
+			System.out.print(keywords.get(ii).getTitle()+", ");
+		}
+		setCatnumb(keywords.size());
+		return keywords;
+	}
+
+	private String findSep(ArrayList<String> textPDF) {
+		String[] seperatorC = { ",", ";", ".", "-" };
+		int[] occ = new int[seperatorC.length];
+		for (int ii = 0; ii < occ.length; ii++) {
+			occ[ii] = 0;
+		}
+		int sep = 0;
+		for (int ii = 0; ii < textPDF.size(); ii++) {
+			for (int counter = 0; counter < occ.length; counter++) {
+				if (textPDF.get(ii).equals(seperatorC[counter])) {
+					occ[counter] = occ[counter] + 1;
+					if (occ[sep] < occ[counter]) {
+						sep = counter;
+					}
+				}
+			}
+		}
+		return seperatorC[sep];
+	}
+
+	private int findKeyWStart(ArrayList<String> textPDF) {
+		int start = 0;
+		if (textPDF.contains("KEYWORDS")) {
+			start = textPDF.indexOf("KEYWORDS") + 1;
+			System.out.println("Keyword found " + start);
+
+		} else if (textPDF.contains("KEY")) {
+			start = textPDF.indexOf("KEY") + 1;
+
+		} else if (textPDF.contains("WORD")) {
+			start = textPDF.indexOf("WORD") + 1;
+		} else if (textPDF.contains("INDEX")) {
+			// does not work i think
+			start = textPDF.indexOf("INDEX");
+			if (textPDF.get(start + 1).equals("TERMS")) {
+				start = start + 1;
+				System.out.println("Index found " + start);
+			} else {
+				start = 0;
+			}
+		}
+		return start;
+	}
+
+	private int findKeyWEnd(ArrayList<String> textPDF) {
+		int end = textPDF.size() - 1;
+		int endCandidate = 0;
+		String[] stops = { "INTRODUCTION", "MOTIVATION", "ABSTRACT", "." };
+		for (int ii = 0; ii < stops.length; ii++) {
+			if (textPDF.contains(stops[ii])) {
+				endCandidate = textPDF.indexOf(stops[ii]);
+				if ((end > endCandidate) && (endCandidate > 4)) {
+					end = endCandidate-1;
+				}
+			}
+		}
+
+		return end;
+
 	}
 
 	@SuppressWarnings("unused")
