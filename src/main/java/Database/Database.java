@@ -412,7 +412,7 @@ public class Database {
 		// NOT NECESSARY
 		ArrayList<Integer> gCids = new ArrayList<Integer>();
 		Statement stmt = connect.createStatement();
-		String sqlT = "SELECT idGlobalCategory, title FROM "+dbName+".GlobalCategory";
+		String sqlT = "SELECT idGlobalCategory, title,normtitle FROM "+dbName+".GlobalCategory";
 		ResultSet rsT = stmt.executeQuery(sqlT);
 		int id = -1;
 
@@ -429,9 +429,7 @@ public class Database {
 					if (corpus.getGlobalCategoryCatalog().get(ii).getCategory()
 							.getNormtitle().contains(normtitle)) {
 						gCids.add(id);
-						if(id==2){
-							System.out.println("BS");
-						}
+
 						addCatKeywords(id, corpus.getGlobalCategoryCatalog()
 								.get(ii).getKeywordList());
 						//System.out.println("FOUND Category - " + title);
