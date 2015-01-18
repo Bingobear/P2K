@@ -607,9 +607,8 @@ public class PDFExtractor {
 						break;
 					} else if ((keywords.size() < 4) || (keywords.size() > 8)) {
 						File dest = new File("c:/RWTH/Data/wKeywords/");
-						// System.out
-						// .println("PDFExtractor: No Keywords in pdf -> ignore");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
+						this.setKeywords(keywords);
 					}
 
 					else {
@@ -753,7 +752,8 @@ public class PDFExtractor {
 	private int findKeyWEnd(ArrayList<String> textPDF) {
 		int end = textPDF.size() - 1;
 		int endCandidate = 0;
-		String[] stops = { "INTRODUCTION", "MOTIVATION", "ABSTRACT", "." };
+		//ami2011 - towards 1s20 - ACM, WHEN- beul_et_al._ahfe.pdf
+		String[] stops = { "INTRODUCTION", "MOTIVATION", "ABSTRACT", ".","ACM","TOWARDS","WHEN" };
 		for (int ii = 0; ii < stops.length; ii++) {
 			if (textPDF.contains(stops[ii])) {
 				endCandidate = textPDF.indexOf(stops[ii]);
