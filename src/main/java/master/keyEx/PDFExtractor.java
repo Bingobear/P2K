@@ -1,7 +1,9 @@
 package master.keyEx;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -125,7 +127,7 @@ public class PDFExtractor {
 				String currkey = "";
 				// TODO KEYWORD EXTRACTION HAS TO LOOK BETTER
 				for (int ii = counter - offset; ii < counter; ii++) {
-					currkey = currkey +" "+ textPDF.get(ii);
+					currkey = currkey + " " + textPDF.get(ii);
 					if (!(textPDF.get(ii + 1).equals(",") || (textPDF.get(
 							counter).equals(";") || (textPDF.get(ii + 1)
 							.equals(".") ^ (textPDF.get(ii + 1).matches("\\d+")))))) {
@@ -151,8 +153,8 @@ public class PDFExtractor {
 		// System.out.print(counter);
 		setCatnumb(keywords.size());
 		System.out.println("OLD:");
-		for(int ii=0;ii<keywords.size();ii++){
-			System.out.print(keywords.get(ii).getTitle()+", ");
+		for (int ii = 0; ii < keywords.size(); ii++) {
+			System.out.print(keywords.get(ii).getTitle() + ", ");
 		}
 		return keywords;
 
@@ -583,30 +585,39 @@ public class PDFExtractor {
 					this.setTitlePage(parsePdftoString(pdfStripper, pdDoc,
 							counter, counter + 1)); // TODO:MOVE KEYWORDS TO PDF
 													// OBJECT
-//					String test = parsedText;
-//					String[] tokenstest = getTokenPM(parsedText);
+													// String test = parsedText;
+					// String[] tokenstest = getTokenPM(parsedText);
 					parsedText = parsedText.toUpperCase();
 					String[] tokens = getTokenPM(parsedText);
 					// old variant
-//					ArrayList<Category> keywords = getKeywordsfromPDF(tokenstest);
-					//QUESTION SHOULD I ANTICIPATE UPPERCASE ERRORS
-					ArrayList<Category> keywords = getKeywordsFromPDF(tokens);
-//					keywords.clear();
+					// ArrayList<Category> keywords =
+					// getKeywordsfromPDF(tokenstest);
+					// QUESTION SHOULD I ANTICIPATE UPPERCASE ERRORS
+					ArrayList<Category> keywords = getKeywordsFromPDF(tokens,
+							fileEntry.getName());
+					// keywords.clear();
 
 					// No keywords you are out
 					if (keywords.isEmpty()) {
-						 File dest = new File("c:/RWTH/Data/noKeywords1/");
-//						 System.out
-//						 .println("PDFExtractor: No Keywords in pdf -> ignore");
-						 FileUtils.copyFileToDirectory(fileEntry, dest);
+						File dest = new File("c:/RWTH/Data/noKeywords1/");
+						// System.out
+						// .println("PDFExtractor: No Keywords in pdf -> ignore");
+						FileUtils.copyFileToDirectory(fileEntry, dest);
 						// empty - could not directly extract keywords
 						break;
-					} else {
-						 File dest = new File("c:/RWTH/Data/hasKeywords1/");
-						 FileUtils.copyFileToDirectory(fileEntry, dest);
-						this.setKeywords(keywords);
+					} else if ((keywords.size() < 4) || (keywords.size() > 8)) {
+						File dest = new File("c:/RWTH/Data/wKeywords/");
+						// System.out
+						// .println("PDFExtractor: No Keywords in pdf -> ignore");
+						FileUtils.copyFileToDirectory(fileEntry, dest);
 					}
 
+					else {
+						File dest = new File("c:/RWTH/Data/hasKeywords1/");
+						FileUtils.copyFileToDirectory(fileEntry, dest);
+						this.setKeywords(keywords);
+					}
+					break;
 				}
 
 				parsedText = parsedText.toLowerCase();
@@ -630,10 +641,11 @@ public class PDFExtractor {
 		return result;
 	}
 
-	private ArrayList<Category> getKeywordsFromPDF(String[] tokens) {
+	private ArrayList<Category> getKeywordsFromPDF(String[] tokens, String name) {
 		ArrayList<Category> keywords = new ArrayList<Category>();
 		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(tokens));
 		int start = findKeyWStart(textPDF);
+		String seperator = "";
 
 		if (start > 0) {
 
@@ -644,33 +656,57 @@ public class PDFExtractor {
 					textPDF.size() - 1));
 			int end = findKeyWEnd(textPDF);
 			textPDF = new ArrayList<String>(textPDF.subList(0, end));
-			String seperator = findSep(textPDF);
+			seperator = findSep(textPDF);
 			System.out.println(seperator);
 			String currKey = "";
 			for (int ii = 0; ii < textPDF.size(); ii++) {
 				if (textPDF.get(ii).equals(seperator)) {
 					currKey = currKey.trim();
 					String normKey = currKey.replaceAll("[^\\p{L}]+", "");
-					keywords.add(new Category(currKey,normKey));
+					keywords.add(new Category(currKey, normKey));
 					currKey = "";
 				} else {
-					currKey = currKey +" "+ textPDF.get(ii);
+					currKey = currKey + " " + textPDF.get(ii);
 				}
 			}
 			currKey = currKey.trim();
 			String normKey = currKey.replaceAll("[^\\p{L}]+", "");
-			keywords.add(new Category(currKey,normKey));
+			keywords.add(new Category(currKey, normKey));
 		}
 
 		setCatnumb(keywords.size());
-		if(getCatnumb()<2){
-			keywords.clear();
+		try {
+			writelog(keywords, name, seperator, textPDF.size());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		System.out.println("NEW:");
-		for(int ii=0;ii<keywords.size();ii++){
-			System.out.print(keywords.get(ii).getTitle()+" + "+keywords.get(ii).getNormtitle()+", ");
-		}
+
 		return keywords;
+	}
+
+	private void writelog(ArrayList<Category> keywords2, String name,
+			String seperator, int size) throws IOException {
+		String timeLog = "Keywords_log";
+		File logFile = new File(timeLog);
+
+		// This will output the full path where the file will be written to...
+		System.out.println(logFile.getCanonicalPath());
+
+		BufferedWriter writer = writer = new BufferedWriter(new FileWriter(
+				logFile, true));
+		writer.write("Name: " + name + ", seperaotr: " + seperator
+				+ ", Stringextract: " + size);
+		writer.newLine();
+		for (int ii = 0; ii < keywords.size(); ii++) {
+			writer.write(keywords.get(ii).getTitle() + " + "
+					+ keywords.get(ii).getNormtitle() + ", ");
+			writer.newLine();
+		}
+		writer.write("_________________________________________________________");
+		writer.newLine();
+		writer.close();
+
 	}
 
 	private String findSep(ArrayList<String> textPDF) {
@@ -699,11 +735,9 @@ public class PDFExtractor {
 			start = textPDF.indexOf("KEYWORDS") + 1;
 			System.out.println("Keyword found " + start);
 
-		} else if (textPDF.contains("KEY")) {
-			start = textPDF.indexOf("KEY") + 1;
+		} else if (textPDF.contains("KEYWORD")) {
+			start = textPDF.indexOf("KEYWORD") + 1;
 
-		} else if (textPDF.contains("WORD")) {
-			start = textPDF.indexOf("WORD") + 1;
 		} else if (textPDF.contains("INDEX")) {
 			// does not work i think
 			start = textPDF.indexOf("INDEX");
