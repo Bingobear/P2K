@@ -617,7 +617,6 @@ public class PDFExtractor {
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 					}
-					break;
 				}
 
 				parsedText = parsedText.toLowerCase();
@@ -698,9 +697,9 @@ public class PDFExtractor {
 		writer.write("Name: " + name + ", seperaotr: " + seperator
 				+ ", Stringextract: " + size);
 		writer.newLine();
-		for (int ii = 0; ii < keywords.size(); ii++) {
-			writer.write(keywords.get(ii).getTitle() + " + "
-					+ keywords.get(ii).getNormtitle() + ", ");
+		for (int ii = 0; ii < keywords2.size(); ii++) {
+			writer.write(keywords2.get(ii).getTitle() + " + "
+					+ keywords2.get(ii).getNormtitle() + ", ");
 			writer.newLine();
 		}
 		writer.write("_________________________________________________________");
