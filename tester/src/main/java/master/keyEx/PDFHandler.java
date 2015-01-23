@@ -63,7 +63,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/test/";
+		String importData = "c:/RWTH/Data/HCI/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
