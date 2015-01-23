@@ -7,6 +7,7 @@ private int totalwords;
 private double relevance;
 private String normtitle;
 private String akronom;
+private String associatedGCAT;
 	public String getTitle() {
 	return title;
 }
@@ -78,6 +79,12 @@ public void setTitle(String title) {
 	}
 	public void setAkronom(String akronom) {
 		this.akronom = akronom;
+	}
+	public String getAssociatedGCAT() {
+		return associatedGCAT;
+	}
+	public void setAssociatedGCAT(String associatedGCAT) {
+		this.associatedGCAT = associatedGCAT;
 	}
 
 }

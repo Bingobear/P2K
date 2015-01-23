@@ -162,6 +162,7 @@ public class Corpus {
 				}
 				if(sim<=0.2){
 					found = true;
+					cat.setAssociatedGCAT(this.getGlobalCategoryCatalog().get(counter).getCategory().getNormtitle());
 					addCategoryWords(counter, pdf.getWordOccList());
 					break;
 				}

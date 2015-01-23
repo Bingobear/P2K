@@ -436,14 +436,14 @@ public class PDFExtractor {
 					if (compare.getWord().equals("cloud")) {
 						String test = "";
 					}
-					System.out.println(compare.getWord());
+//					System.out.println(compare.getWord());
 					keywords.remove(ii);
 					count++;
 					arraySize--;
 				} else if (AlgorithmUtil.LevenshteinDistance(current.getWord(),
 						compare.getWord()) < 0.2) {
 					keywords.remove(ii);
-					System.out.println(compare.getWord());
+//					System.out.println(compare.getWord());
 					count++;
 					arraySize--;
 				}
@@ -634,7 +634,6 @@ public class PDFExtractor {
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 						// KEYDEBUG
-						break;
 					}
 
 					else {
@@ -642,7 +641,6 @@ public class PDFExtractor {
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 						// KEYDEBUG
-						break;
 					}
 				}
 
@@ -693,10 +691,10 @@ public class PDFExtractor {
 			int end = findKeyWEnd(textPDF);
 			textPDF = new ArrayList<String>(textPDF.subList(0, end));
 			seperator = findSep(textPDF);
-			System.out.println("_______________________________");
-			System.out.println("Seperator: " + seperator);
-			System.out.println("start: " + start + ", end: " + start + end);
-			System.out.println(textPDF.subList(0, end));
+//			System.out.println("_______________________________");
+//			System.out.println("Seperator: " + seperator);
+//			System.out.println("start: " + start + ", end: " + start + end);
+//			System.out.println(textPDF.subList(0, end));
 			// TODO aKRONOM IN DATABASE
 			String akronom = "";
 			String currKey = "";
@@ -712,7 +710,7 @@ public class PDFExtractor {
 					// RICHTIG ?
 					if ((!currKey.isEmpty()) && (!normKey.isEmpty())) {
 						keywords.add(new Category(currKey, normKey, akronom));
-						System.out.println(currKey);
+//						System.out.println(currKey);
 					}
 					akronom = "";
 					currKey = "";
@@ -739,7 +737,7 @@ public class PDFExtractor {
 				String normKey = currKey.replaceAll("[^\\p{L}]+", "");
 				if ((!currKey.isEmpty()) && (!normKey.isEmpty())) {
 					keywords.add(new Category(currKey, normKey, akronom));
-					System.out.println(currKey);
+//					System.out.println(currKey);
 				}
 			}
 		}
