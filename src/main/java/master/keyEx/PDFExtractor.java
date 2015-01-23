@@ -623,7 +623,7 @@ public class PDFExtractor {
 
 					// No keywords you are out
 					if (keywords.isEmpty()) {
-						File dest = new File("c:/RWTH/Data/noKeywords1/");
+						File dest = new File("c:/RWTH/Data/noKeywords2/");
 						// System.out
 						// .println("PDFExtractor: No Keywords in pdf -> ignore");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
@@ -638,7 +638,7 @@ public class PDFExtractor {
 					}
 
 					else {
-						File dest = new File("c:/RWTH/Data/hasKeywords1/");
+						File dest = new File("c:/RWTH/Data/hasKeywords2/");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 						// KEYDEBUG
@@ -726,15 +726,21 @@ public class PDFExtractor {
 
 				}
 			}
-			currKey = currKey.replaceFirst("[^\\p{L}]+", "");
-			if (currKey.endsWith(".")) {
-				currKey = currKey.substring(0, currKey.length() - 1);
-			}
-			currKey = currKey.trim();
-			String normKey = currKey.replaceAll("[^\\p{L}]+", "");
-			if ((!currKey.isEmpty()) && (!normKey.isEmpty())) {
-				keywords.add(new Category(currKey, normKey, akronom));
-				System.out.println(currKey);
+			if (currKey.length() < 100) {
+				if (!akronom.isEmpty()) {
+					currKey = currKey.replaceAll("(" + akronom + ")", "");
+					currKey = currKey.replace(")", "");
+				}
+				currKey = currKey.replaceFirst("[^\\p{L}]+", "");
+				if (currKey.endsWith(".")) {
+					currKey = currKey.substring(0, currKey.length() - 1);
+				}
+				currKey = currKey.trim();
+				String normKey = currKey.replaceAll("[^\\p{L}]+", "");
+				if ((!currKey.isEmpty()) && (!normKey.isEmpty())) {
+					keywords.add(new Category(currKey, normKey, akronom));
+					System.out.println(currKey);
+				}
 			}
 		}
 
@@ -816,7 +822,7 @@ public class PDFExtractor {
 			start = getKeywPosition(textPDF);
 			System.out.println("Keyword found within word" + start);
 		}
-		//TODO MAKE IT BEAUTIFUL
+		// TODO MAKE IT BEAUTIFUL
 		if (textPDF.contains("INDEX")) {
 			// does not work i think
 			int Istart = textPDF.indexOf("INDEX");
@@ -827,10 +833,8 @@ public class PDFExtractor {
 				}
 				System.out.println("Index found " + start);
 			} else if ((Istart < start) || (start == 0)) {
-				start = findTermsposition(Istart+1,new ArrayList<String>(textPDF.subList(Istart+1, textPDF.size())));
-			}else
-			{
-				start = 0;
+				start = findTermsposition(Istart + 1, new ArrayList<String>(
+						textPDF.subList(Istart + 1, textPDF.size())));
 			}
 		}
 		return start;
@@ -842,15 +846,15 @@ public class PDFExtractor {
 				String word = arrayList.get(ii).replace("TERMS", "");
 				if (word.length() > 1) {
 					// word that contains dot -> is itself a keyword
-					return ii+ostart;
+					return ii + ostart;
 				} else {
 					// word is a fragment with no meaning
-					return ii + 1+ostart;
+					return ii + 1 + ostart;
 				}
 			}
 		}
 		return 0;
-		
+
 	}
 
 	private int getKeywPosition(ArrayList<String> textPDF) {
@@ -872,9 +876,9 @@ public class PDFExtractor {
 	private int findKeyWEnd(ArrayList<String> textPDF) {
 		int end = textPDF.size() - 1;
 		int endCandidate = 0;
-		// ami2011 - towards 1s20 - ACM, WHEN- beul_et_al._ahfe.pdf
+		// ami2011 - towards 1s20 - ACM, WHEN- beul_et_al._ahfe.pdf, editorial - iwc.iwt053.full.pdf
 		String[] stops = { "INTRODUCTION", "MOTIVATION", "ABSTRACT", ".",
-				"ACM", "TOWARDS", "WHEN" };
+				"ACM", "TOWARDS", "WHEN" ,"EDITORIAL"};
 		for (int ii = 0; ii < stops.length; ii++) {
 			endCandidate = textPDF.indexOf(stops[ii]);
 			if (textPDF.contains(stops[ii])) {
