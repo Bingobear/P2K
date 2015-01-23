@@ -680,6 +680,14 @@ public class PDFExtractor {
 			if (textPDF.get(start).equals(":")) {
 				start++;
 			}
+			if (textPDF.get(start).contains("KEYWORDS")) {
+				String value = textPDF.get(start);
+				textPDF.set(start, value.replaceAll("KEYWORDS", ""));
+			}
+			if (textPDF.get(start).contains("TERMS")) {
+				String value = textPDF.get(start);
+				textPDF.set(start, value.replaceAll("TERMS", ""));
+			}
 			textPDF = new ArrayList<String>(textPDF.subList(start,
 					textPDF.size() - 1));
 			int end = findKeyWEnd(textPDF);
@@ -689,20 +697,23 @@ public class PDFExtractor {
 			System.out.println("Seperator: " + seperator);
 			System.out.println("start: " + start + ", end: " + start + end);
 			System.out.println(textPDF.subList(0, end));
-			//TODO aKRONOM IN DATABASE
+			// TODO aKRONOM IN DATABASE
 			String akronom = "";
 			String currKey = "";
 			for (int ii = 0; ii < textPDF.size(); ii++) {
 				if (textPDF.get(ii).equals(seperator)) {
 					if (!akronom.isEmpty()) {
-						currKey = currKey.replaceAll("("+akronom+")", "");
+						currKey = currKey.replaceAll("(" + akronom + ")", "");
 						currKey = currKey.replace(")", "");
 					}
 					currKey = currKey.replaceFirst("[^\\p{L}]+", "");
 					currKey = currKey.trim();
 					String normKey = currKey.replaceAll("[^\\p{L}]+", "");
-					keywords.add(new Category(currKey, normKey, akronom));
-					System.out.println(currKey);
+					// RICHTIG ?
+					if ((!currKey.isEmpty()) && (!normKey.isEmpty())) {
+						keywords.add(new Category(currKey, normKey, akronom));
+						System.out.println(currKey);
+					}
 					akronom = "";
 					currKey = "";
 
@@ -721,8 +732,10 @@ public class PDFExtractor {
 			}
 			currKey = currKey.trim();
 			String normKey = currKey.replaceAll("[^\\p{L}]+", "");
-			keywords.add(new Category(currKey, normKey, akronom));
-			System.out.println(currKey);
+			if ((!currKey.isEmpty()) && (!normKey.isEmpty())) {
+				keywords.add(new Category(currKey, normKey, akronom));
+				System.out.println(currKey);
+			}
 		}
 
 		setCatnumb(keywords.size());
@@ -754,8 +767,8 @@ public class PDFExtractor {
 		// This will output the full path where the file will be written to...
 		System.out.println(logFile.getCanonicalPath());
 
-		BufferedWriter writer = writer = new BufferedWriter(new FileWriter(
-				logFile, true));
+		BufferedWriter writer;
+		writer = new BufferedWriter(new FileWriter(logFile, true));
 		writer.write("Name: " + name + ", seperaotr: " + seperator
 				+ ", Stringextract: " + size);
 		writer.newLine();
@@ -794,22 +807,66 @@ public class PDFExtractor {
 		int start = 0;
 		if (textPDF.contains("KEYWORDS")) {
 			start = textPDF.indexOf("KEYWORDS") + 1;
+
 			System.out.println("Keyword found " + start);
 
 		} else if (textPDF.contains("KEYWORD")) {
 			start = textPDF.indexOf("KEYWORD") + 1;
-
-		} else if (textPDF.contains("INDEX")) {
+		} else {
+			start = getKeywPosition(textPDF);
+			System.out.println("Keyword found within word" + start);
+		}
+		//TODO MAKE IT BEAUTIFUL
+		if (textPDF.contains("INDEX")) {
 			// does not work i think
-			start = textPDF.indexOf("INDEX");
+			int Istart = textPDF.indexOf("INDEX");
 			if (textPDF.get(start + 1).equals("TERMS")) {
-				start = start + 2;
+				Istart = Istart + 2;
+				if ((Istart < start) || (start == 0)) {
+					start = Istart;
+				}
 				System.out.println("Index found " + start);
-			} else {
+			} else if ((Istart < start) || (start == 0)) {
+				start = findTermsposition(Istart+1,new ArrayList<String>(textPDF.subList(Istart+1, textPDF.size())));
+			}else
+			{
 				start = 0;
 			}
 		}
 		return start;
+	}
+
+	private int findTermsposition(int ostart, ArrayList<String> arrayList) {
+		for (int ii = 0; ii < arrayList.size(); ii++) {
+			if ((arrayList.get(ii).contains("TERMS"))) {
+				String word = arrayList.get(ii).replace("TERMS", "");
+				if (word.length() > 1) {
+					// word that contains dot -> is itself a keyword
+					return ii+ostart;
+				} else {
+					// word is a fragment with no meaning
+					return ii + 1+ostart;
+				}
+			}
+		}
+		return 0;
+		
+	}
+
+	private int getKeywPosition(ArrayList<String> textPDF) {
+		for (int ii = 0; ii < textPDF.size(); ii++) {
+			if ((textPDF.get(ii).contains("KEYWORDS"))) {
+				String word = textPDF.get(ii).replace("KEYWORDS", "");
+				if (word.length() > 1) {
+					// word that contains dot -> is itself a keyword
+					return ii;
+				} else {
+					// word is a fragment with no meaning
+					return ii + 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 	private int findKeyWEnd(ArrayList<String> textPDF) {
