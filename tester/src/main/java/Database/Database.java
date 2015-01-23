@@ -57,7 +57,7 @@ public class Database {
 			String title = rsT.getString("title");
 			if (pdf.getFirstPage().contains(title)) {
 				idPub = id;
-				System.out.println("FOUND Title - " + title);
+//				System.out.println("FOUND Title - " + title);
 				break;
 			}
 		}
@@ -84,8 +84,8 @@ public class Database {
 				for (int count = 0; count < nameparts.size() - 1; count++) {
 					if (pdf.getFirstPage().contains(nameparts.get(count))) {
 						authors.add(id);
-						System.out.println("FOUND Author - " + name
-								+ pdf.getFirstPage().substring(0, 10));
+//						System.out.println("FOUND Author - " + name
+//								+ pdf.getFirstPage().substring(0, 10));
 					}
 				}
 
@@ -163,9 +163,7 @@ public class Database {
 						.prepareStatement(
 								"insert into  "+dbName+".KEYWORD_has_Category values (?, ?)",
 								Statement.RETURN_GENERATED_KEYS);
-				if (ii == 3) {
-					System.out.println(jj);
-				}
+
 				if (defKeys.isEmpty()) {
 					preparedStatement.setInt(1, genKeys.get(jj));
 					preparedStatement.setNull(2, java.sql.Types.INTEGER);
@@ -179,7 +177,7 @@ public class Database {
 					preparedStatement.executeUpdate();
 
 				} catch (Exception e) {
-					System.out.println(pdfID);
+//					System.out.println(pdfID);
 					e.printStackTrace();
 				}
 			}
@@ -240,14 +238,14 @@ public class Database {
 					if (pdf.getGenericKeywords().get(count).getTitle()
 							.contains(title)) {
 						idDef = id;
-						System.out.println("FOUND Category - " + title);
+//						System.out.println("FOUND Category - " + title);
 						break;
 					}
 				}
 				rsT.close();
 				if (idDef < 0) {
 					preparedStatement = connect.prepareStatement(
-							"insert into  "+dbName+".CATEGORY values (default,?,?,?,?)",
+							"insert into  "+dbName+".CATEGORY values (default,?,?,?,?,?)",
 							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setString(1, pdf.getGenericKeywords()
 							.get(count).getTitle());
@@ -255,6 +253,7 @@ public class Database {
 					preparedStatement.setDouble(3,
 							pdf.getGenericKeywords().get(count).getRelevance());
 					preparedStatement.setString(4, pdf.getGenericKeywords().get(count).getNormtitle());
+					preparedStatement.setString(5, pdf.getGenericKeywords().get(count).getAssociatedGCAT());
 
 					try {
 						preparedStatement.executeUpdate();
@@ -360,7 +359,7 @@ public class Database {
 			}
 
 		} catch (Exception e) {
-
+			System.out.println(pdf.getTitle()+" ID: "+pdfID);
 			e.printStackTrace();
 		}
 		return pdfID;
@@ -463,9 +462,7 @@ public class Database {
 					//System.out.println(corpus.getDocN());
 					e.printStackTrace();
 				}
-				if(id==2){
-					System.out.println("BS");
-				}
+
 				addCatKeywords(id, corpus.getGlobalCategoryCatalog().get(ii)
 						.getKeywordList());
 			} else {
@@ -482,9 +479,7 @@ public class Database {
 	// ALSO GIVE IDF TF AND SO ON ?
 	private void addCatKeywords(int id, ArrayList<WordOcc> keywordList)
 			throws SQLException {
-		if(id==2){
-			System.out.println("BS");
-		}
+
 		for (int ii = 0; ii < keywordList.size(); ii++) {
 			preparedStatement = connect.prepareStatement(
 					"insert into  hciCorpus.Cat_Keyw values (default,?, ?,?,?)"
