@@ -20,7 +20,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = true;
+	static boolean debug_db = false;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -63,7 +63,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/HCI/";
+		String importData = "c:/RWTH/Data/test/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
@@ -75,27 +75,27 @@ public class PDFHandler {
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
 		// SAVE FILTER LEVEL
 		// Filter pdf keylist with min level 0.0001
-		corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(), 0.0001));
+//		corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(), 0.0001));
 		// Calculate CatTFIDF with filtered keywords
 		corpus.calculateCatTFIDF();
 		corpus.filterCatTFIDF(0.00001);
 		corpus.calculateRel();
-		// System.out.println("PDFHandler");
-		// for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
-		// ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
-		// .getWordOccList();
-		// System.out
-		// .println(corpus.getPdfList().get(ii).getTitle()
-		// + "______________________________________________________________");
-		// for (int jj = 0; jj < words.size(); jj++) {
-		// System.out.println(words.get(jj).getWord().getWord()
-		// + " -  TF: " + words.get(jj).getTf() + " IDF: "
-		// + words.get(jj).getIdf() + "TFIDF: "
-		// + words.get(jj).getTfidf() + " wordocc: "
-		// + words.get(jj).getOcc());
-		// }
-		//
-		// }
+		System.out.println("PDFHandler");
+		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
+			ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
+					.getWordOccList();
+			System.out
+					.println(corpus.getPdfList().get(ii).getTitle()
+							+ "______________________________________________________________");
+			for (int jj = 0; jj < words.size(); jj++) {
+				System.out.println(words.get(jj).getWord().getWord()
+						+ " -  TF: " + words.get(jj).getTf() + " IDF: "
+						+ words.get(jj).getIdf() + "TFIDF: "
+						+ words.get(jj).getTfidf() + " wordocc: "
+						+ words.get(jj).getOcc());
+			}
+
+		}
 		// System.out
 		// .println("______________________________________________________________");
 		// System.out.println("PDFHandler");
@@ -155,8 +155,8 @@ public class PDFHandler {
 					pdf.setGenericKeywords(extractor.getKeywords());
 
 					pdf.setCatnumb(extractor.getCatnumb());
-					// VERY RUDEMENTARY TITLE EXTRACTION VIA FILE				
-					pdf.setTitle(getTitle(fileEntry.getName(),titles));
+					// VERY RUDEMENTARY TITLE EXTRACTION VIA FILE
+					pdf.setTitle(getTitle(fileEntry.getName(), titles));
 
 					// No keywords tough love
 					if (!pdf.getGenericKeywords().isEmpty()) {
@@ -184,14 +184,14 @@ public class PDFHandler {
 	}
 
 	private String getTitle(String fileName, ArrayList<String> titles) {
-		for(int ii=0;ii<titles.size();ii=ii+2){
-			if(titles.get(ii).equals(fileName)){
+		for (int ii = 0; ii < titles.size(); ii = ii + 2) {
+			if (titles.get(ii).equals(fileName)) {
 				System.out.println("FOUND");
-				return titles.get(ii+1);
+				return titles.get(ii + 1);
 			}
 		}
 		return fileName;
-		
+
 	}
 
 	private ArrayList<String> readCSVTitle(String importtitle) {
@@ -210,8 +210,8 @@ public class PDFHandler {
 				// use comma as separator
 
 				helper = line.split(cvsSplitBy);
-				for(int counter=0;counter<helper.length;counter++){
-				titles.add(helper[counter]);
+				for (int counter = 0; counter < helper.length; counter++) {
+					titles.add(helper[counter]);
 				}
 
 			}

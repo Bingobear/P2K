@@ -6,6 +6,7 @@ private int wOcc;
 private int totalwords;
 private double relevance;
 private String normtitle;
+private String akronom;
 	public String getTitle() {
 	return title;
 }
@@ -23,6 +24,13 @@ public void setTitle(String title) {
 		this.setTitle(name);
 		this.setNormtitle(normTitle);
 		this.wOcc =0;
+	}
+	
+	public Category(String name,String normTitle,String akro) {
+		this.setTitle(name);
+		this.setNormtitle(normTitle);
+		this.wOcc =0;
+		this.akronom = akro;
 	}
 	
 //	public int getRelevance() {
@@ -64,6 +72,12 @@ public void setTitle(String title) {
 	}
 	public void setNormtitle(String normtitle) {
 		this.normtitle = normtitle;
+	}
+	public String getAkronom() {
+		return akronom;
+	}
+	public void setAkronom(String akronom) {
+		this.akronom = akronom;
 	}
 
 }

@@ -22,7 +22,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/RWTH/Eclipse/liferay/liferay-portal-tomcat-6.2-ce-ga2/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/webapps/ROOT/WEB-INF/lib/log4j.jar"/>
 	<classpathentry kind="lib" path="libs/libstemmer_snowball.jar"/>
 	<classpathentry kind="lib" path="libs/langdetect.jar"/>
 	<classpathentry kind="lib" path="libs/mysql-connector-java-5.1.34-bin.jar"/>

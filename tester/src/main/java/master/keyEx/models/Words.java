@@ -7,6 +7,7 @@ public class Words {
 	private String stem;
 	private String type;
 	private ArrayList<Category> category;
+
 	
 	public Words() {
 		// TODO Auto-generated constructor stub
@@ -57,4 +58,6 @@ public class Words {
 	public void setCategory(ArrayList<Category> category) {
 		this.category = category;
 	}
+
+
 }

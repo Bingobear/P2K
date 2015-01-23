@@ -416,6 +416,7 @@ public class PDFExtractor {
 
 		int counter = 0;
 		int size = 0;
+		// System.out.println("PDF EXTRACTOR:keyOcc");
 		while (arraySize > 0) {
 			int count = 0;
 			Words current = keywords.get(0);
@@ -435,7 +436,14 @@ public class PDFExtractor {
 					if (compare.getWord().equals("cloud")) {
 						String test = "";
 					}
+					System.out.println(compare.getWord());
 					keywords.remove(ii);
+					count++;
+					arraySize--;
+				} else if (AlgorithmUtil.LevenshteinDistance(current.getWord(),
+						compare.getWord()) < 0.2) {
+					keywords.remove(ii);
+					System.out.println(compare.getWord());
 					count++;
 					arraySize--;
 				}
@@ -450,7 +458,8 @@ public class PDFExtractor {
 				// arraySize--;
 				// }
 			}
-
+			// System.out.println(current.getWord());
+			// System.out.println("_________________________________________");
 			result.add(new WordOcc(current, count));
 		}
 		return result;
@@ -479,16 +488,21 @@ public class PDFExtractor {
 				if ((filter[ii].contains("NN"))) {
 					if (!this.language.equals("de")) {
 						// System.out.println(tokens[ii]);
-						Words word = new Words(
-								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
-								filter[ii], this.keywords);
-						result.add(word);
+						String text = tokens[ii].replaceAll("\\W", "");
+						if ((!text.isEmpty()) && (text.length() > 1)) {
+							Words word = new Words(text, stemmedW[ii],
+									filter[ii], this.keywords);
+							result.add(word);
+						}
 					} else {
 						// MAYBE SOLVES PROBLEM?TODO
-						Words word = new Words(tokens[ii].replaceAll(
-								"[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
-								filter[ii], this.keywords);
-						result.add(word);
+						String text = tokens[ii].replaceAll(
+								"[^\\p{L}\\p{Nd}]+", "");
+						if ((!text.isEmpty()) && (text.length() > 1)) {
+							Words word = new Words(text, stemmedW[ii],
+									filter[ii], this.keywords);
+							result.add(word);
+						}
 					}
 					// TODO OLD VERSION BETTER ?
 					// Words word = new Words(tokens[ii], stemmedW[ii],
@@ -501,16 +515,21 @@ public class PDFExtractor {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("VB"))) {
 					if (!this.language.equals("de")) {
 						// System.out.println(tokens[ii]);
-						Words word = new Words(
-								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
-								filter[ii], this.keywords);
-						result.add(word);
+						String text = tokens[ii].replaceAll("\\W", "");
+						if ((!text.isEmpty()) && (text.length() > 1)) {
+							Words word = new Words(text, stemmedW[ii],
+									filter[ii], this.keywords);
+							result.add(word);
+						}
 					} else {
 						// MAYBE SOLVES PROBLEM?TODO
-						Words word = new Words(tokens[ii].replaceAll(
-								"[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
-								filter[ii], this.keywords);
-						result.add(word);
+						String text = tokens[ii].replaceAll(
+								"[^\\p{L}\\p{Nd}]+", "");
+						if ((!text.isEmpty()) && (text.length() > 1)) {
+							Words word = new Words(text, stemmedW[ii],
+									filter[ii], this.keywords);
+							result.add(word);
+						}
 					}
 				}
 			}
@@ -519,16 +538,21 @@ public class PDFExtractor {
 				if ((filter[ii].contains("NN")) || (filter[ii].contains("JJ"))) {
 					if (!this.language.equals("de")) {
 						// System.out.println(tokens[ii]);
-						Words word = new Words(
-								tokens[ii].replaceAll("\\W", ""), stemmedW[ii],
-								filter[ii], this.keywords);
-						result.add(word);
+						String text = tokens[ii].replaceAll("\\W", "");
+						if ((!text.isEmpty()) && (text.length() > 1)) {
+							Words word = new Words(text, stemmedW[ii],
+									filter[ii], this.keywords);
+							result.add(word);
+						}
 					} else {
 						// MAYBE SOLVES PROBLEM?TODO
-						Words word = new Words(tokens[ii].replaceAll(
-								"[^\\p{L}\\p{Nd}]+", ""), stemmedW[ii],
-								filter[ii], this.keywords);
-						result.add(word);
+						String text = tokens[ii].replaceAll(
+								"[^\\p{L}\\p{Nd}]+", "");
+						if ((!text.isEmpty()) && (text.length() > 1)) {
+							Words word = new Words(text, stemmedW[ii],
+									filter[ii], this.keywords);
+							result.add(word);
+						}
 					}
 				}
 			}
@@ -609,12 +633,16 @@ public class PDFExtractor {
 						File dest = new File("c:/RWTH/Data/wKeywords/");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
+						// KEYDEBUG
+						break;
 					}
 
 					else {
 						File dest = new File("c:/RWTH/Data/hasKeywords1/");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
+						// KEYDEBUG
+						break;
 					}
 				}
 
@@ -635,16 +663,18 @@ public class PDFExtractor {
 				break;
 			}
 		}
+		cosDoc.close();
 		System.out.println("FINAL RESULT:optimiertNouns:" + result.size());
 		return result;
 	}
 
+	// DOES TOUPPERCAUSE REALLY RUIN IT AGE =! AG E
 	private ArrayList<Category> getKeywordsFromPDF(String[] tokens, String name) {
 		ArrayList<Category> keywords = new ArrayList<Category>();
 		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(tokens));
 		int start = findKeyWStart(textPDF);
 		String seperator = "";
-
+		System.out.println("PDFEXTRACTOR.getKeywordsFromPDF");
 		if (start > 0) {
 
 			if (textPDF.get(start).equals(":")) {
@@ -655,21 +685,44 @@ public class PDFExtractor {
 			int end = findKeyWEnd(textPDF);
 			textPDF = new ArrayList<String>(textPDF.subList(0, end));
 			seperator = findSep(textPDF);
-			System.out.println(seperator);
+			System.out.println("_______________________________");
+			System.out.println("Seperator: " + seperator);
+			System.out.println("start: " + start + ", end: " + start + end);
+			System.out.println(textPDF.subList(0, end));
+			//TODO aKRONOM IN DATABASE
+			String akronom = "";
 			String currKey = "";
 			for (int ii = 0; ii < textPDF.size(); ii++) {
 				if (textPDF.get(ii).equals(seperator)) {
+					if (!akronom.isEmpty()) {
+						currKey = currKey.replaceAll("("+akronom+")", "");
+						currKey = currKey.replace(")", "");
+					}
+					currKey = currKey.replaceFirst("[^\\p{L}]+", "");
 					currKey = currKey.trim();
 					String normKey = currKey.replaceAll("[^\\p{L}]+", "");
-					keywords.add(new Category(currKey, normKey));
+					keywords.add(new Category(currKey, normKey, akronom));
+					System.out.println(currKey);
+					akronom = "";
 					currKey = "";
+
+				} else if (textPDF.get(ii).contains("(")) {
+					akronom = getAkronom(new ArrayList<String>(textPDF.subList(
+							ii + 1, textPDF.size())));
 				} else {
+
 					currKey = currKey + " " + textPDF.get(ii);
+
 				}
+			}
+			currKey = currKey.replaceFirst("[^\\p{L}]+", "");
+			if (currKey.endsWith(".")) {
+				currKey = currKey.substring(0, currKey.length() - 1);
 			}
 			currKey = currKey.trim();
 			String normKey = currKey.replaceAll("[^\\p{L}]+", "");
-			keywords.add(new Category(currKey, normKey));
+			keywords.add(new Category(currKey, normKey, akronom));
+			System.out.println(currKey);
 		}
 
 		setCatnumb(keywords.size());
@@ -681,6 +734,16 @@ public class PDFExtractor {
 		}
 
 		return keywords;
+	}
+
+	private String getAkronom(ArrayList<String> arrayList) {
+		int end = arrayList.indexOf(")");
+		String akro = "";
+		for (int ii = 0; ii < end; ii++) {
+			akro = akro + " " + arrayList.get(ii);
+		}
+		akro.trim();
+		return akro;
 	}
 
 	private void writelog(ArrayList<Category> keywords2, String name,
@@ -740,7 +803,7 @@ public class PDFExtractor {
 			// does not work i think
 			start = textPDF.indexOf("INDEX");
 			if (textPDF.get(start + 1).equals("TERMS")) {
-				start = start + 1;
+				start = start + 2;
 				System.out.println("Index found " + start);
 			} else {
 				start = 0;
@@ -752,19 +815,46 @@ public class PDFExtractor {
 	private int findKeyWEnd(ArrayList<String> textPDF) {
 		int end = textPDF.size() - 1;
 		int endCandidate = 0;
-		//ami2011 - towards 1s20 - ACM, WHEN- beul_et_al._ahfe.pdf
-		String[] stops = { "INTRODUCTION", "MOTIVATION", "ABSTRACT", ".","ACM","TOWARDS","WHEN" };
+		// ami2011 - towards 1s20 - ACM, WHEN- beul_et_al._ahfe.pdf
+		String[] stops = { "INTRODUCTION", "MOTIVATION", "ABSTRACT", ".",
+				"ACM", "TOWARDS", "WHEN" };
 		for (int ii = 0; ii < stops.length; ii++) {
+			endCandidate = textPDF.indexOf(stops[ii]);
 			if (textPDF.contains(stops[ii])) {
-				endCandidate = textPDF.indexOf(stops[ii]);
+				if (stops[ii].equals(".")) {
+					int dotcandidate = findDotPosition(textPDF);
+					if (dotcandidate < endCandidate) {
+						endCandidate = dotcandidate;
+					}
+				}
 				if ((end > endCandidate) && (endCandidate > 4)) {
 					end = endCandidate;
+					System.out.println(stops[ii] + ": - " + end);
 				}
 			}
 		}
 
 		return end;
 
+	}
+
+	private int findDotPosition(ArrayList<String> textPDF) {
+		for (int ii = 0; ii < textPDF.size(); ii++) {
+			if ((textPDF.get(ii).contains("."))) {
+				if (ii > 4) {
+					String word = textPDF.get(ii).replace(".", "");
+					if (word.length() > 1) {
+						// word that contains dot -> is itself a keyword
+						return ii + 1;
+					} else {
+						// word is a fragment with no meaning
+						return ii;
+					}
+				} else
+					break;
+			}
+		}
+		return 50;
 	}
 
 	@SuppressWarnings("unused")
