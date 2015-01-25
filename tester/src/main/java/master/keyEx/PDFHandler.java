@@ -20,7 +20,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = true;
+	static boolean debug_db = true;;
 	static boolean debug_img = false;
 	static String title = "";
 

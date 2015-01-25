@@ -623,21 +623,21 @@ public class PDFExtractor {
 
 					// No keywords you are out
 					if (keywords.isEmpty()) {
-						File dest = new File("c:/RWTH/Data/noKeywords2/");
+						File dest = new File("c:/RWTH/Data/KeywLog/noKeywords2_new/");
 						// System.out
 						// .println("PDFExtractor: No Keywords in pdf -> ignore");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						// empty - could not directly extract keywords
 						break;
 					} else if ((keywords.size() < 4) || (keywords.size() > 8)) {
-						File dest = new File("c:/RWTH/Data/wKeywords/");
+						File dest = new File("c:/RWTH/Data/KeywLog/wKeywords_new/");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 						// KEYDEBUG
 					}
 
 					else {
-						File dest = new File("c:/RWTH/Data/hasKeywords2/");
+						File dest = new File("c:/RWTH/Data/KeywLog/hasKeywords2_new/");
 						FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 						// KEYDEBUG
@@ -724,7 +724,10 @@ public class PDFExtractor {
 
 				}
 			}
-			if (currKey.length() < 100) {
+			if ((currKey.length() < 100)&&(currKey.length()>2)) {
+				if((currKey.charAt(currKey.length()-1)=='1')&&(!currKey.isEmpty())){
+					currKey = currKey.replace("1", "");
+				}
 				if (!akronom.isEmpty()) {
 					currKey = currKey.replaceAll("(" + akronom + ")", "");
 					currKey = currKey.replace(")", "");
@@ -765,7 +768,7 @@ public class PDFExtractor {
 
 	private void writelog(ArrayList<Category> keywords2, String name,
 			String seperator, int size) throws IOException {
-		String timeLog = "Keywords_log";
+		String timeLog = "Keywords_log_new";
 		File logFile = new File(timeLog);
 
 		// This will output the full path where the file will be written to...
