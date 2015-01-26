@@ -1,5 +1,9 @@
 package master.keyEx.models;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Corpus {
@@ -162,6 +166,12 @@ public class Corpus {
 				}
 				if(sim<=0.2){
 					found = true;
+					try {
+						writelog(wordCat,wordGlobal,pdf.getTitle());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					cat.setAssociatedGCAT(this.getGlobalCategoryCatalog().get(counter).getCategory().getNormtitle());
 					addCategoryWords(counter, pdf.getWordOccList());
 					break;
@@ -174,6 +184,22 @@ public class Corpus {
 				found = false;
 			}
 		}
+	}
+	private void writelog(String wordCat, String wordGlobal, String string) throws IOException {
+		String timeLog = "MatchesLogFile";
+		File logFile = new File(timeLog);
+
+		// This will output the full path where the file will be written to...
+		System.out.println(logFile.getCanonicalPath());
+
+		BufferedWriter writer;
+		writer = new BufferedWriter(new FileWriter(logFile, true));
+		writer.write(string+" has matches "+wordCat+" with gCat"+wordGlobal);
+		writer.newLine();
+		writer.write("_________________________________________________________");
+		writer.newLine();
+		writer.close();
+
 	}
 
 	// TODO CONSIDER DUPLICATE PAPER

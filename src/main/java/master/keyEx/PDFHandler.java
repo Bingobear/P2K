@@ -75,27 +75,28 @@ public class PDFHandler {
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
 		// SAVE FILTER LEVEL
 		// Filter pdf keylist with min level 0.0001
-//		corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(), 0.0001));
+		// corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(),
+		// 0.0001));
 		// Calculate CatTFIDF with filtered keywords
 		corpus.calculateCatTFIDF();
 		corpus.filterCatTFIDF(0.00001);
 		corpus.calculateRel();
-		System.out.println("PDFHandler");
-		for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
-			ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
-					.getWordOccList();
-			System.out
-					.println(corpus.getPdfList().get(ii).getTitle()
-							+ "______________________________________________________________");
-			for (int jj = 0; jj < words.size(); jj++) {
-				System.out.println(words.get(jj).getWord().getWord()
-						+ " -  TF: " + words.get(jj).getTf() + " IDF: "
-						+ words.get(jj).getIdf() + "TFIDF: "
-						+ words.get(jj).getTfidf() + " wordocc: "
-						+ words.get(jj).getOcc());
-			}
+		// System.out.println("PDFHandler");
+		// for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
+		// ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
+		// .getWordOccList();
+		// System.out
+		// .println(corpus.getPdfList().get(ii).getTitle()
+		// + "______________________________________________________________");
+		// for (int jj = 0; jj < words.size(); jj++) {
+		// System.out.println(words.get(jj).getWord().getWord()
+		// + " -  TF: " + words.get(jj).getTf() + " IDF: "
+		// + words.get(jj).getIdf() + "TFIDF: "
+		// + words.get(jj).getTfidf() + " wordocc: "
+		// + words.get(jj).getOcc());
+		// }
 
-		}
+		// }
 		// System.out
 		// .println("______________________________________________________________");
 		// System.out.println("PDFHandler");
@@ -134,7 +135,7 @@ public class PDFHandler {
 
 				ArrayList<Words> words = new ArrayList<Words>();
 				try {
-					words = extractor.parsePDFtoKey(fileEntry, first);
+					words = extractor.parsePDFtoKey(fileEntry, first,corpus.getPdfList());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -160,11 +161,13 @@ public class PDFHandler {
 
 					// No keywords tough love
 					if (!pdf.getGenericKeywords().isEmpty()) {
-						pdfList.add(pdf);
-						String language = pdf.getLanguage();
-						corpus.incDocN(language);
-						corpus.setPdfList(pdfList);
-						corpus.associateWordswithCategory(pdf);
+
+							pdfList.add(pdf);
+							String language = pdf.getLanguage();
+							corpus.incDocN(language);
+							corpus.setPdfList(pdfList);
+							corpus.associateWordswithCategory(pdf);
+						
 						if (debug_img) {
 							System.out.println("File= "
 									+ folder.getAbsolutePath() + "\\"
@@ -182,6 +185,8 @@ public class PDFHandler {
 		}
 		return corpus;
 	}
+
+
 
 	private String getTitle(String fileName, ArrayList<String> titles) {
 		for (int ii = 0; ii < titles.size(); ii = ii + 2) {

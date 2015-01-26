@@ -14,14 +14,14 @@ import Database.model.*;
 import master.keyEx.models.Corpus;
 import master.keyEx.models.PDF;
 import master.keyEx.models.WordOcc;
+
 //TODO HCICORPUS ->CORPUS (later)
 public class Database {
 	private Connection connect = null;
-	private String dbName = "hciCorpus";
+	private String dbName = "hciCorpus_test";
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
-
 
 	// you need to close all three to make sure
 	private void close() {
@@ -46,18 +46,19 @@ public class Database {
 		// this will load the MySQL driver, each DB has its own driver
 		Class.forName("com.mysql.jdbc.Driver");
 		// setup the connection with the DB.
-		connect = DriverManager.getConnection("jdbc:mysql://localhost/"+dbName+"?"
-				+ "user=test&password=test");
+		connect = DriverManager.getConnection("jdbc:mysql://localhost/"
+				+ dbName + "?" + "user=test&password=test");
 		Statement stmt = connect.createStatement();
 		int idPub = -1;
-		String sqlT = "SELECT idPublication,title FROM "+dbName+".Publication";
+		String sqlT = "SELECT idPublication,title FROM " + dbName
+				+ ".Publication";
 		ResultSet rsT = stmt.executeQuery(sqlT);
 		while (rsT.next()) {
 			int id = rsT.getInt("idPublication");
 			String title = rsT.getString("title");
 			if (pdf.getFirstPage().contains(title)) {
 				idPub = id;
-//				System.out.println("FOUND Title - " + title);
+				// System.out.println("FOUND Title - " + title);
 				break;
 			}
 		}
@@ -65,7 +66,7 @@ public class Database {
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
-			String sql = "SELECT idAuthor,name FROM "+dbName+".Author";
+			String sql = "SELECT idAuthor,name FROM " + dbName + ".Author";
 			ResultSet rs = stmt.executeQuery(sql);
 			// STEP 5: Extract data from result set
 
@@ -84,8 +85,8 @@ public class Database {
 				for (int count = 0; count < nameparts.size() - 1; count++) {
 					if (pdf.getFirstPage().contains(nameparts.get(count))) {
 						authors.add(id);
-//						System.out.println("FOUND Author - " + name
-//								+ pdf.getFirstPage().substring(0, 10));
+						// System.out.println("FOUND Author - " + name
+						// + pdf.getFirstPage().substring(0, 10));
 					}
 				}
 
@@ -153,31 +154,34 @@ public class Database {
 	}
 
 	// TODO for some reason not all cats are added
-	// TODO different solution to duplicates !  testing if connection already exists
+	// TODO different solution to duplicates ! testing if connection already
+	// exists
 	private void addCathasKeys(ArrayList<Integer> defKeys,
 			ArrayList<Integer> genKeys, long pdfID) throws SQLException {
 		for (int ii = 0; ii < defKeys.size(); ii++) {
 			for (int jj = 0; jj < genKeys.size(); jj++) {
 				// TODO duplicate!!!
-				preparedStatement = connect
-						.prepareStatement(
-								"insert into  "+dbName+".KEYWORD_has_Category values (?, ?)",
-								Statement.RETURN_GENERATED_KEYS);
+				preparedStatement = connect.prepareStatement("insert into  "
+						+ dbName + ".KEYWORD_has_Category values (?, ?)"
+						+ " ON DUPLICATE KEY UPDATE Category_idCategory=?",
+						Statement.RETURN_GENERATED_KEYS);
 
 				if (defKeys.isEmpty()) {
 					preparedStatement.setInt(1, genKeys.get(jj));
 					preparedStatement.setNull(2, java.sql.Types.INTEGER);
+					preparedStatement.setInt(3, defKeys.get(ii));
 
 				} else {
 					preparedStatement.setInt(1, genKeys.get(jj));
 					preparedStatement.setInt(2, defKeys.get(ii));
+					preparedStatement.setInt(3, defKeys.get(ii));
 
 				}
 				try {
 					preparedStatement.executeUpdate();
 
 				} catch (Exception e) {
-//					System.out.println(pdfID);
+					// System.out.println(pdfID);
 					e.printStackTrace();
 				}
 			}
@@ -190,10 +194,9 @@ public class Database {
 			long corpID, long pdfID) throws SQLException {
 		ArrayList<Integer> genKeys = new ArrayList<Integer>();
 		for (int ii = 0; ii < words.size(); ii++) {
-			preparedStatement = connect
-					.prepareStatement(
-							"insert into  "+dbName+".Keyword values (default,?, ?,?,?,?,?,?)",
-							Statement.RETURN_GENERATED_KEYS);
+			preparedStatement = connect.prepareStatement("insert into  "
+					+ dbName + ".Keyword values (default,?, ?,?,?,?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setInt(1, (int) corpID);
 			preparedStatement.setInt(2, (int) pdfID);
 
@@ -229,7 +232,8 @@ public class Database {
 		if (!pdf.getGenericKeywords().isEmpty()) {
 			for (int count = 0; count < pdf.getGenericKeywords().size(); count++) {
 				int idDef = -1;
-				String sqlT = "SELECT idCategory,name FROM "+dbName+".Category";
+				String sqlT = "SELECT idCategory,name FROM " + dbName
+						+ ".Category";
 				Statement stmt = connect.createStatement();
 				ResultSet rsT = stmt.executeQuery(sqlT);
 				while (rsT.next()) {
@@ -238,28 +242,31 @@ public class Database {
 					if (pdf.getGenericKeywords().get(count).getTitle()
 							.contains(title)) {
 						idDef = id;
-//						System.out.println("FOUND Category - " + title);
+						// System.out.println("FOUND Category - " + title);
 						break;
 					}
 				}
 				rsT.close();
 				if (idDef < 0) {
 					preparedStatement = connect.prepareStatement(
-							"insert into  "+dbName+".CATEGORY values (default,?,?,?,?,?)",
+							"insert into  " + dbName
+									+ ".CATEGORY values (default,?,?,?,?,?)",
 							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setString(1, pdf.getGenericKeywords()
 							.get(count).getTitle());
 					preparedStatement.setInt(2, (int) pdfID);
-					preparedStatement.setDouble(3,
-							pdf.getGenericKeywords().get(count).getRelevance());
-					preparedStatement.setString(4, pdf.getGenericKeywords().get(count).getNormtitle());
-					preparedStatement.setString(5, pdf.getGenericKeywords().get(count).getAssociatedGCAT());
+					preparedStatement.setDouble(3, pdf.getGenericKeywords()
+							.get(count).getRelevance());
+					preparedStatement.setString(4, pdf.getGenericKeywords()
+							.get(count).getNormtitle());
+					preparedStatement.setString(5, pdf.getGenericKeywords()
+							.get(count).getAssociatedGCAT());
 
 					try {
 						preparedStatement.executeUpdate();
 
 					} catch (Exception e) {
-					//	System.out.println(pdfID);
+						// System.out.println(pdfID);
 						e.printStackTrace();
 					}
 					ResultSet rs = null;
@@ -286,9 +293,9 @@ public class Database {
 
 	private long addTPDF(long corpID, int idPub, PDF pdf) throws SQLException {
 		int pdfID = -1;
-		preparedStatement = connect.prepareStatement(
-				"insert into  "+dbName+".PDF values (default, ?,?, ?,?,?)"
-						+ " ON DUPLICATE KEY update wordcount=?",
+		preparedStatement = connect.prepareStatement("insert into  " + dbName
+				+ ".PDF values (default, ?,?, ?,?,?)"
+				+ " ON DUPLICATE KEY update wordcount=?",
 				Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setInt(1, (int) corpID);
 		preparedStatement.setInt(2, (int) idPub);
@@ -318,8 +325,8 @@ public class Database {
 
 		for (int jj = 0; jj < authors.size(); jj++) {
 			// on Duplicate ?
-			preparedStatement = connect.prepareStatement(
-					"insert into  "+dbName+".PDF_has_Author values (?, ?)",
+			preparedStatement = connect.prepareStatement("insert into  "
+					+ dbName + ".PDF_has_Author values (?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setInt(1, (int) pdfID);
 			preparedStatement.setInt(2, authors.get(jj));
@@ -328,7 +335,7 @@ public class Database {
 				preparedStatement.executeUpdate();
 
 			} catch (Exception e) {
-			//	System.out.println(pdfID);
+				// System.out.println(pdfID);
 				e.printStackTrace();
 			}
 
@@ -338,14 +345,14 @@ public class Database {
 
 	private long addPDF(long corpID, PDF pdf) throws SQLException {
 		int pdfID = -1;
-		preparedStatement = connect.prepareStatement(
-				"insert into  "+dbName+".PDF values (default,?, ?, ?,?,?)"
-						+ " ON DUPLICATE KEY update wordcount=?",
+		preparedStatement = connect.prepareStatement("insert into  " + dbName
+				+ ".PDF values (default,?, ?, ?,?,?)"
+				+ " ON DUPLICATE KEY update wordcount=?",
 				Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setInt(1, (int) corpID);
 		// TODO setNULL
 		preparedStatement.setNull(2, java.sql.Types.INTEGER);
-//		pdf.getFirstPage().substring(0, 100)
+		// pdf.getFirstPage().substring(0, 100)
 		preparedStatement.setString(3, pdf.getTitle());
 		preparedStatement.setInt(4, pdf.getWordcount());
 		preparedStatement.setString(5, pdf.getLanguage());
@@ -359,7 +366,7 @@ public class Database {
 			}
 
 		} catch (Exception e) {
-			System.out.println(pdf.getTitle()+" ID: "+pdfID);
+			System.out.println(pdf.getTitle() + " ID: " + pdfID);
 			e.printStackTrace();
 		}
 		return pdfID;
@@ -370,17 +377,17 @@ public class Database {
 		if (corpus != null) {
 
 			Statement stmt = connect.createStatement();
-			String sqlT = "SELECT id FROM "+dbName+".corpus";
+			String sqlT = "SELECT id FROM " + dbName + ".corpus";
 			ResultSet rsT = stmt.executeQuery(sqlT);
 
 			if (rsT.next()) {
 				corpID = (int) rsT.getLong(1);
 			} else {
-				preparedStatement = connect.prepareStatement(
-						"insert into  "+dbName+".CORPUS values (default,?, ?,?)"
-								+ " ON DUPLICATE KEY update uniqueRow=?",
+				preparedStatement = connect.prepareStatement("insert into  "
+						+ dbName + ".CORPUS values (default,?, ?,?)"
+						+ " ON DUPLICATE KEY update uniqueRow=?",
 						Statement.RETURN_GENERATED_KEYS);
-				//TODO include both formats of language DOC N !!!
+				// TODO include both formats of language DOC N !!!
 				preparedStatement.setInt(1, corpus.getDocN("de"));
 				preparedStatement.setInt(2, corpus.getDocN("en"));
 				preparedStatement.setString(3, "yes");
@@ -393,7 +400,7 @@ public class Database {
 						corpID = (int) rs.getLong(1);
 					}
 				} catch (Exception e) {
-					//System.out.println(corpus.getDocN());
+					// System.out.println(corpus.getDocN());
 					e.printStackTrace();
 				}
 				// onDuplicate increase occurence
@@ -405,16 +412,16 @@ public class Database {
 	}
 
 	// TODO SAVE GLOBAL RELEVANCE ?
-	//TODO DUPLICATE PDF
+	// TODO DUPLICATE PDF
 	private void addGlobalCategory(Corpus corpus, int corpID)
 			throws SQLException {
 		// NOT NECESSARY
 		ArrayList<Integer> gCids = new ArrayList<Integer>();
 		Statement stmt = connect.createStatement();
-		String sqlT = "SELECT idGlobalCategory, title,normtitle FROM "+dbName+".GlobalCategory";
+		String sqlT = "SELECT idGlobalCategory, title,normtitle FROM " + dbName
+				+ ".GlobalCategory";
 		ResultSet rsT = stmt.executeQuery(sqlT);
 		int id = -1;
-
 
 		boolean found = false;
 		for (int ii = 0; ii < corpus.getGlobalCategoryCatalog().size(); ii++) {
@@ -431,7 +438,7 @@ public class Database {
 
 						addCatKeywords(id, corpus.getGlobalCategoryCatalog()
 								.get(ii).getKeywordList());
-						//System.out.println("FOUND Category - " + title);
+						// System.out.println("FOUND Category - " + title);
 						found = true;
 						break;
 					}
@@ -459,7 +466,7 @@ public class Database {
 						gCids.add(id);
 					}
 				} catch (Exception e) {
-					//System.out.println(corpus.getDocN());
+					// System.out.println(corpus.getDocN());
 					e.printStackTrace();
 				}
 
