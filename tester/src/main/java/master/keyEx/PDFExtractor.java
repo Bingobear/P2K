@@ -566,13 +566,14 @@ public class PDFExtractor {
 	 * 
 	 * @param fileEntry
 	 * @param first
+	 * @param arrayList 
 	 * @param url2
 	 * 
 	 * @return
 	 * @throws LangDetectException
 	 * @throws IOException
 	 */
-	public ArrayList<Words> parsePDFtoKey(File fileEntry, boolean first)
+	public ArrayList<Words> parsePDFtoKey(File fileEntry, boolean first, ArrayList<PDF> arrayList)
 			throws LangDetectException, IOException {
 		ArrayList<Words> result = new ArrayList<Words>();
 
@@ -611,6 +612,9 @@ public class PDFExtractor {
 													// OBJECT
 													// String test = parsedText;
 					// String[] tokenstest = getTokenPM(parsedText);
+					if(pdfExist(this.getTitlePage(),arrayList)){
+						break;
+					}
 					parsedText = parsedText.toUpperCase();
 					String[] tokens = getTokenPM(parsedText);
 					// old variant
@@ -666,6 +670,16 @@ public class PDFExtractor {
 		return result;
 	}
 
+	//TO DETE DOUBLE PDFS
+	private boolean pdfExist(String titlepage, ArrayList<PDF> pdfList) {
+		for (PDF compare:pdfList){
+			if(compare.getFirstPage().substring(0, 20).equals(titlepage.substring(0, 20))){
+				System.out.println("WORKS");
+				return true;
+			}
+		}
+		return false;
+	}
 	// DOES TOUPPERCAUSE REALLY RUIN IT AGE =! AG E
 	private ArrayList<Category> getKeywordsFromPDF(String[] tokens, String name) {
 		ArrayList<Category> keywords = new ArrayList<Category>();
