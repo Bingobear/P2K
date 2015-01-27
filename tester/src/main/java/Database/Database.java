@@ -53,16 +53,16 @@ public class Database {
 		String sqlT = "SELECT idPublication,title FROM " + dbName
 				+ ".Publication";
 		ResultSet rsT = stmt.executeQuery(sqlT);
-		while (rsT.next()) {
-			int id = rsT.getInt("idPublication");
-			String title = rsT.getString("title");
-			if (pdf.getFirstPage().contains(title)) {
-				idPub = id;
-				// System.out.println("FOUND Title - " + title);
-				break;
-			}
-		}
-		rsT.close();
+//		while (rsT.next()) {
+//			int id = rsT.getInt("idPublication");
+//			String title = rsT.getString("title");
+//			if (pdf.getFirstPage().contains(title)) {
+//				idPub = id;
+//				// System.out.println("FOUND Title - " + title);
+//				break;
+//			}
+//		}
+//		rsT.close();
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
@@ -145,7 +145,7 @@ public class Database {
 					ArrayList<Integer> genKeys = addKeywords(words, corpID,
 							pdfID);
 
-					addCathasKeys(defKeys, genKeys, pdfID);
+//					addCathasKeys(defKeys, genKeys, pdfID);
 
 				}
 			}
@@ -449,7 +449,8 @@ public class Database {
 
 				preparedStatement = connect
 						.prepareStatement(
-								"insert into  hciCorpus.GlobalCategory values (default,?, ?,?)",
+								"insert into  "
+						+ dbName + ".GlobalCategory values (default,?, ?,?)",
 								Statement.RETURN_GENERATED_KEYS);
 				preparedStatement.setInt(1, corpID);
 				preparedStatement.setString(2, corpus
