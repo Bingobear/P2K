@@ -164,6 +164,7 @@ public class PDFHandler {
 
 							pdfList.add(pdf);
 							String language = pdf.getLanguage();
+							pdf.setPagecount(extractor.getPagenumber());
 							corpus.incDocN(language);
 							corpus.setPdfList(pdfList);
 							corpus.associateWordswithCategory(pdf);
