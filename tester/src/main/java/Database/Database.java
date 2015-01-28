@@ -145,7 +145,7 @@ public class Database {
 					ArrayList<Integer> genKeys = addKeywords(words, corpID,
 							pdfID);
 
-//					addCathasKeys(defKeys, genKeys, pdfID);
+					addCathasKeys(defKeys, genKeys, pdfID);
 
 				}
 			}
@@ -346,7 +346,7 @@ public class Database {
 	private long addPDF(long corpID, PDF pdf) throws SQLException {
 		int pdfID = -1;
 		preparedStatement = connect.prepareStatement("insert into  " + dbName
-				+ ".PDF values (default,?, ?, ?,?,?)"
+				+ ".PDF values (default,?, ?, ?,?,?,?,?)"
 				+ " ON DUPLICATE KEY update wordcount=?",
 				Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setInt(1, (int) corpID);
@@ -356,7 +356,9 @@ public class Database {
 		preparedStatement.setString(3, pdf.getTitle());
 		preparedStatement.setInt(4, pdf.getWordcount());
 		preparedStatement.setString(5, pdf.getLanguage());
-		preparedStatement.setInt(6, pdf.getWordcount());
+		preparedStatement.setInt(6, pdf.getPagecount());
+		//TODO COLUMN COUNT DOESNT MATCH VALUE COUNT AT ROW 1
+		preparedStatement.setInt(7, pdf.getWordcount());
 		try {
 			preparedStatement.executeUpdate();
 			ResultSet rs = null;
