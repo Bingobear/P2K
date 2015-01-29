@@ -820,7 +820,7 @@ public class PDFExtractor {
 		BufferedWriter writer;
 		writer = new BufferedWriter(new FileWriter(logFile, true));
 		writer.write("Name: " + name + ", seperaotr: " + seperator
-				+ ", Stringextract: " + size);
+				+ ", Stringextract: " + size+", lang:"+this.language);
 		writer.newLine();
 		for (int ii = 0; ii < keywords2.size(); ii++) {
 			writer.write(keywords2.get(ii).getTitle() + " + "
