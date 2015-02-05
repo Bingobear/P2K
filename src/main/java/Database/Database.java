@@ -50,9 +50,9 @@ public class Database {
 				+ dbName + "?" + "user=test&password=test");
 		Statement stmt = connect.createStatement();
 		int idPub = -1;
-		String sqlT = "SELECT idPublication,title FROM " + dbName
-				+ ".Publication";
-		ResultSet rsT = stmt.executeQuery(sqlT);
+//		String sqlT = "SELECT idPublication,title FROM " + dbName
+//				+ ".Publication";
+//		ResultSet rsT = stmt.executeQuery(sqlT);
 		// while (rsT.next()) {
 		// int id = rsT.getInt("idPublication");
 		// String title = rsT.getString("title");
@@ -63,7 +63,6 @@ public class Database {
 		// }
 		// }
 		// rsT.close();
-		idPub=-1;
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
@@ -390,7 +389,7 @@ public class Database {
 	private long addPDF(long corpID, PDF pdf) throws SQLException {
 		int pdfID = -1;
 		preparedStatement = connect.prepareStatement("insert into " + dbName
-				+ ".PDF values (default,?, ?, ?,?,?,?)"
+				+ ".PDF values (default,?, ?, ?,?,?,?,?)"
 				+ " ON DUPLICATE KEY update wordcount=?",
 				Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setInt(1, (int) corpID);
@@ -402,7 +401,8 @@ public class Database {
 		preparedStatement.setString(5, pdf.getLanguage());
 		preparedStatement.setInt(6, pdf.getPagecount());
 		// TODO COLUMN COUNT DOESNT MATCH VALUE COUNT AT ROW 1
-		preparedStatement.setInt(7, pdf.getWordcount());
+		preparedStatement.setString(7, pdf.getFilename());
+		preparedStatement.setInt(8, pdf.getWordcount());
 		try {
 			preparedStatement.executeUpdate();
 			ResultSet rs = null;

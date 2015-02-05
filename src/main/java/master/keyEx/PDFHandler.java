@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.text.Normalizer;
 import java.util.ArrayList;
 
 import master.keyEx.models.*;
@@ -63,7 +64,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/test/";
+		String importData = "c:/RWTH/Data/HCI/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
@@ -135,7 +136,8 @@ public class PDFHandler {
 
 				ArrayList<Words> words = new ArrayList<Words>();
 				try {
-					words = extractor.parsePDFtoKey(fileEntry, first,corpus.getPdfList());
+					words = extractor.parsePDFtoKey(fileEntry, first,
+							corpus.getPdfList());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -161,14 +163,14 @@ public class PDFHandler {
 
 					// No keywords tough love
 					if (!pdf.getGenericKeywords().isEmpty()) {
+						pdf.setFilename(fileEntry.getName());
+						pdfList.add(pdf);
+						String language = pdf.getLanguage();
+						pdf.setPagecount(extractor.getPagenumber());
+						corpus.incDocN(language);
+						corpus.setPdfList(pdfList);
+						corpus.associateWordswithCategory(pdf);
 
-							pdfList.add(pdf);
-							String language = pdf.getLanguage();
-							pdf.setPagecount(extractor.getPagenumber());
-							corpus.incDocN(language);
-							corpus.setPdfList(pdfList);
-							corpus.associateWordswithCategory(pdf);
-						
 						if (debug_img) {
 							System.out.println("File= "
 									+ folder.getAbsolutePath() + "\\"
@@ -187,13 +189,13 @@ public class PDFHandler {
 		return corpus;
 	}
 
-
-
 	private String getTitle(String fileName, ArrayList<String> titles) {
 		for (int ii = 0; ii < titles.size(); ii = ii + 2) {
 			if (titles.get(ii).equals(fileName)) {
-				System.out.println("FOUND:"+ titles.get(ii + 1));
-				return titles.get(ii + 1);
+				System.out.println("FOUND:" + titles.get(ii + 1));
+				String titleNorm = Normalizer.normalize(titles.get(ii + 1),
+						Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+				return titleNorm;
 			}
 		}
 		return fileName;
