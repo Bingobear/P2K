@@ -616,6 +616,8 @@ public class PDFExtractor {
 					if (pdfExist(this.getTitlePage(), arrayList)) {
 						break;
 					}
+					
+					
 					parsedText = parsedText.toLowerCase();
 					String[] tokens = getTokenPM(parsedText);
 					// old variant
@@ -923,7 +925,7 @@ public class PDFExtractor {
 		// ami2011 - towards 1s20 - ACM, WHEN- beul_et_al._ahfe.pdf, editorial -
 		// iwc.iwt053.full.pdf
 		String[] stops = { "introduction", "motivation", "abstract", ".",
-				"acm", "towards", "when", "editorial" };
+				"acm", "towards", "when", "editorial","*" };
 		for (int ii = 0; ii < stops.length; ii++) {
 			endCandidate = textPDF.indexOf(stops[ii]);
 			if (textPDF.contains(stops[ii])) {
