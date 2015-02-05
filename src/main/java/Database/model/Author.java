@@ -6,8 +6,14 @@ private String adress;
 private int pos;
 private int authorID;
 
+
 public Author(){
 	
+}
+
+public Author(String name2, int id){
+	this.name = name2;
+	this.authorID = id;
 }
 public String getName() {
 	return name;

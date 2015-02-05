@@ -7,8 +7,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
 import Database.model.*;
 import master.keyEx.models.Corpus;
@@ -50,62 +52,91 @@ public class Database {
 				+ dbName + "?" + "user=test&password=test");
 		Statement stmt = connect.createStatement();
 		int idPub = -1;
-//		String sqlT = "SELECT idPublication,title FROM " + dbName
-//				+ ".Publication";
-//		ResultSet rsT = stmt.executeQuery(sqlT);
-		// while (rsT.next()) {
-		// int id = rsT.getInt("idPublication");
-		// String title = rsT.getString("title");
-		// if (pdf.getFirstPage().contains(title)) {
-		// idPub = id;
-		// // System.out.println("FOUND Title - " + title);
-		// break;
-		// }
-		// }
-		// rsT.close();
+		String sqlT = "SELECT idPublication,title FROM " + dbName
+				+ ".Publication";
+		ResultSet rsT = stmt.executeQuery(sqlT);
+		while (rsT.next()) {
+			int id = rsT.getInt("idPublication");
+			String title = rsT.getString("title");
+			if (pdf.getFirstPage().contains(title)) {
+				idPub = id;
+				// System.out.println("FOUND Title - " + title);
+				break;
+			}
+		}
+		rsT.close();
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
 			String sql = "SELECT idAuthor,name FROM " + dbName + ".Author";
 			ResultSet rs = stmt.executeQuery(sql);
 			// STEP 5: Extract data from result set
-
-			while (rs.next()) {
-				// Retrieve by column name
-				int id = rs.getInt("idAuthor");
-				String name = rs.getString("name");
+			ArrayList<String> author = new ArrayList<String>();
+			ArrayList<Integer> positions = new ArrayList<Integer>();
+			ArrayList<Author> authorsall = createAllAuthors();
+			for (Author auth : authorsall) {
+				// while (rs.next()) {
+				// // Retrieve by column name
+				// int id = rs.getInt("idAuthor");
+				// String name = rs.getString("name");
 				ArrayList<String> nameparts = new ArrayList<String>();
-				for (String retval : name.split(",")) {
+				for (String retval : auth.getName().split(",")) {
 					nameparts.add(retval);
 				}
 				// if(name.equals("Thombansen, Ulrich")){
 				// String stop = "kacke";
 				// // name="Thombansen";
 				// }
-				String eval = pdf.getFirstPage();
-				//\\p{L}
-				 eval = eval.replaceAll("[^\\p{L}]"," ");
+				// String eval = pdf.getFirstPage();
+				// //\\p{L}
+				// eval = eval.replaceAll("[^\\p{L}]"," ");
+				//
+				// for (int count = 0; count < nameparts.size()-1; count++) {
+				// if(eval.matches(".*\\b"+nameparts.get(count)+"\\b.*")){
+				// // if (pdf.getFirstPage().contains(nameparts.get(count))) {
+				// authors.add(auth.getAuthorID());
+				// System.out.println(nameparts.get(count));
+				// // System.out.println("FOUND Author - " + name
+				// // + pdf.getFirstPage().substring(0, 10));
+				// }
+				// }
+				// if(authors.isEmpty()){
 				for (int count = 0; count < nameparts.size() - 1; count++) {
-					if(eval.matches(".*\\b"+nameparts.get(count)+"\\b.*")){
-				//	if (pdf.getFirstPage().contains(nameparts.get(count))) {
-						authors.add(id);
-						System.out.println(nameparts.get(count));
+
+					if (pdf.getFirstPage().contains(nameparts.get(count))) {
+
+						authors.add(auth.getAuthorID());
+						positions.add(pdf.getFirstPage().indexOf(
+								nameparts.get(count)));
+						author.add(nameparts.get(count));
+
 						// System.out.println("FOUND Author - " + name
 						// + pdf.getFirstPage().substring(0, 10));
 					}
 				}
-				if(authors.isEmpty()){
-					for (int count = 0; count < nameparts.size() - 1; count++) {
-			
-						if (pdf.getFirstPage().contains(nameparts.get(count))) {
-							authors.add(id);
-							
-							// System.out.println("FOUND Author - " + name
-							// + pdf.getFirstPage().substring(0, 10));
-						}
-					}	
-				}
+				// }
 
+			}
+			// Create subfunction
+			HashSet<Integer> uniqueValues = new HashSet<Integer>(positions);
+			if (uniqueValues.size() < positions.size()) {
+				ArrayList<Integer> ids = new ArrayList<Integer>();
+				for (int ii = 0; ii < positions.size(); ii++) {
+					for (int jj = ii + 1; jj < positions.size(); jj++) {
+						if (positions.get(jj).equals(positions.get(ii))) {
+							if (author.get(jj).length() > author.get(ii)
+									.length()) {
+								author.remove(ii);
+								authors.remove(ii);
+								positions.remove(ii);
+							} else {
+								author.remove(jj);
+								authors.remove(jj);
+								positions.remove(jj);
+							}
+						}
+					}
+				}
 			}
 			rs.close();
 			fillADB(pdf, authors, corpus);
@@ -113,6 +144,31 @@ public class Database {
 			// found title in database
 			fillTDB(pdf, idPub, corpus);
 		}
+	}
+
+	private ArrayList<Author> createAllAuthors() throws SQLException {
+
+		ArrayList<Author> authors = new ArrayList<Author>();
+		Statement state = connect.createStatement();
+
+		// state.setFetchSize(100);
+		ResultSet resultSetCategory = state.executeQuery("SELECT * FROM  "
+				+ dbName + ".author");
+		while (resultSetCategory.next()) {
+
+			int id = resultSetCategory.getInt("idAuthor");
+			// System.out.println(id);
+			String name = resultSetCategory.getString("name");
+			// String nameNorm = Normalizer.normalize(name,
+			// Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+			Author aut = new Author(name, id);
+			// System.out.println(pdf.getPublicationID());
+			authors.add(aut);
+		}
+		resultSetCategory.close();
+		state.close();
+		return authors;
+
 	}
 
 	private void fillTDB(PDF pdf, int idPub, Corpus corpus) throws SQLException {
@@ -257,7 +313,7 @@ public class Database {
 					String title = rsT.getString("name");
 					String normtitle = rsT.getString("normtitle");
 
-					//first case not nec is in second
+					// first case not nec is in second
 					if (pdf.getGenericKeywords().get(count).getNormtitle()
 							.equals(normtitle)
 							|| (pdf.getGenericKeywords().get(count)
