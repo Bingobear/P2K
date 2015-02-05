@@ -13,6 +13,7 @@ public class PDF {
 	private int publicationID;
 	private String title;
 	private int pagecount;
+	private String filename;
 
 	public int getWordcount() {
 		return wordcount;
@@ -127,6 +128,14 @@ public class PDF {
 
 	public void setPagecount(int pagecount) {
 		this.pagecount = pagecount;
+	}
+
+	public String getFilename() {
+		return filename;
+	}
+
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 
 }
