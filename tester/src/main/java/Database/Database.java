@@ -18,7 +18,7 @@ import master.keyEx.models.WordOcc;
 //TODO HCICORPUS ->CORPUS (later)
 public class Database {
 	private Connection connect = null;
-	private String dbName = "hciCorpus_test";
+	private String dbName = "hciCorpus";
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
@@ -63,6 +63,7 @@ public class Database {
 		// }
 		// }
 		// rsT.close();
+		idPub=-1;
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
@@ -82,12 +83,28 @@ public class Database {
 				// String stop = "kacke";
 				// // name="Thombansen";
 				// }
+				String eval = pdf.getFirstPage();
+				//\\p{L}
+				 eval = eval.replaceAll("[^\\p{L}]"," ");
 				for (int count = 0; count < nameparts.size() - 1; count++) {
-					if (pdf.getFirstPage().contains(nameparts.get(count))) {
+					if(eval.matches(".*\\b"+nameparts.get(count)+"\\b.*")){
+				//	if (pdf.getFirstPage().contains(nameparts.get(count))) {
 						authors.add(id);
+						System.out.println(nameparts.get(count));
 						// System.out.println("FOUND Author - " + name
 						// + pdf.getFirstPage().substring(0, 10));
 					}
+				}
+				if(authors.isEmpty()){
+					for (int count = 0; count < nameparts.size() - 1; count++) {
+			
+						if (pdf.getFirstPage().contains(nameparts.get(count))) {
+							authors.add(id);
+							
+							// System.out.println("FOUND Author - " + name
+							// + pdf.getFirstPage().substring(0, 10));
+						}
+					}	
 				}
 
 			}

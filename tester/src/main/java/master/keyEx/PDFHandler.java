@@ -20,7 +20,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = true;;
+	static boolean debug_db = true;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -63,7 +63,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/HCI/";
+		String importData = "c:/RWTH/Data/test/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
@@ -125,7 +125,7 @@ public class PDFHandler {
 		String key = home + "/export/gen_key/";
 		String export = home + "/export/gen_svg/";
 		PDFExtractor extractor = new PDFExtractor();
-		String importtitle = "c:/RWTH/Data/titletable/pdftitles.csv";
+		String importtitle = "c:/RWTH/Data/titletable/pdftitleo.csv";
 		ArrayList<String> titles = readCSVTitle(importtitle);
 		for (final File fileEntry : folder.listFiles()) {
 			if (fileEntry.isFile()) {
@@ -192,7 +192,7 @@ public class PDFHandler {
 	private String getTitle(String fileName, ArrayList<String> titles) {
 		for (int ii = 0; ii < titles.size(); ii = ii + 2) {
 			if (titles.get(ii).equals(fileName)) {
-				System.out.println("FOUND");
+				System.out.println("FOUND:"+ titles.get(ii + 1));
 				return titles.get(ii + 1);
 			}
 		}
@@ -204,7 +204,7 @@ public class PDFHandler {
 		String csvFile = importtitle;
 		BufferedReader br = null;
 		String line = "";
-		String cvsSplitBy = ",";
+		String cvsSplitBy = ";";
 		ArrayList<String> titles = new ArrayList<String>();
 		String[] helper = null;
 
