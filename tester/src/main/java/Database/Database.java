@@ -60,6 +60,11 @@ public class Database {
 			int id = rsT.getInt("idPublication");
 			String title = rsT.getString("title");
 			title = title.toLowerCase();
+			if (titlepage.contains("approach to understand human factors")) {
+				if (title.contains("a game-based approach to understand human factors in supply chains and quality management")) {
+					int test = 0;
+				}
+			}
 			if (titlepage.contains(title)) {
 				idPub = id;
 				System.out.println("FOUND Title - " + title);
@@ -113,19 +118,17 @@ public class Database {
 
 						int pos = pdf.getFirstPage().indexOf(
 								nameparts.get(count));
-						if(nameparts.get(count).equals("Jeschke")){
-							int test =0 ;
-						}
+
 						if (!positions.isEmpty()) {
 							int length = positions.size();
 							for (int kk = 0; kk < length; kk++) {
-								
+
 								if ((positions.get(kk) > pos)) {
 									positions.add(kk, pos);
 									authors.add(kk, auth.getAuthorID());
 									author.add(kk, nameparts.get(count));
-									//letztes element
-								}else if(kk==length-1){
+									// letztes element
+								} else if (kk == length - 1) {
 									positions.add(pos);
 									authors.add(auth.getAuthorID());
 									author.add(nameparts.get(count));
@@ -181,13 +184,12 @@ public class Database {
 			int min = positions.get(0);
 			distance.add(0);
 			for (int ii = 1; ii < positions.size(); ii++) {
-				//normieren
-				int pos = positions.get(ii)-min;
-				int nextpos = positions.get(ii-1)-min;
+				// normieren
+				int pos = positions.get(ii) - min;
+				int nextpos = positions.get(ii - 1) - min;
 				distance.add(Math.abs(pos - nextpos));
 			}
 			// some name fragments - use average to find
-
 
 			System.out.println(min + " to " + max + " - " + positions.size()
 					+ " : " + positions.size() * 30);
@@ -198,15 +200,15 @@ public class Database {
 				}
 				range = range / distance.size();
 				// System.out.println(range);
-				//thesis upper/lower bound enough
+				// thesis upper/lower bound enough
 				for (int ii = 0; ii < positions.size(); ii++) {
 					if (distance.get(ii) > range) {
-						if(ii<positions.size()-1){
-							if(distance.get(ii+1)<range){
-								author.remove(ii-1);
-								authors.remove(ii-1);
-								positions.remove(ii-1);
-								distance.remove(ii-1);
+						if (ii < positions.size() - 1) {
+							if (distance.get(ii + 1) < range) {
+								author.remove(ii - 1);
+								authors.remove(ii - 1);
+								positions.remove(ii - 1);
+								distance.remove(ii - 1);
 								continue;
 							}
 						}
