@@ -55,12 +55,14 @@ public class Database {
 		String sqlT = "SELECT idPublication,title FROM " + dbName
 				+ ".Publication";
 		ResultSet rsT = stmt.executeQuery(sqlT);
+		String titlepage = pdf.getFirstPage().toLowerCase();
 		while (rsT.next()) {
 			int id = rsT.getInt("idPublication");
 			String title = rsT.getString("title");
-			if (pdf.getFirstPage().contains(title)) {
+			title = title.toLowerCase();
+			if (titlepage.contains(title)) {
 				idPub = id;
-				// System.out.println("FOUND Title - " + title);
+				System.out.println("FOUND Title - " + title);
 				break;
 			}
 		}
@@ -73,7 +75,10 @@ public class Database {
 			// STEP 5: Extract data from result set
 			ArrayList<String> author = new ArrayList<String>();
 			ArrayList<Integer> positions = new ArrayList<Integer>();
+			ArrayList<Integer> distance = new ArrayList<Integer>();
+
 			ArrayList<Author> authorsall = createAllAuthors();
+
 			for (Author auth : authorsall) {
 				// while (rs.next()) {
 				// // Retrieve by column name
@@ -101,14 +106,44 @@ public class Database {
 				// }
 				// }
 				// if(authors.isEmpty()){
+
 				for (int count = 0; count < nameparts.size() - 1; count++) {
 
 					if (pdf.getFirstPage().contains(nameparts.get(count))) {
 
-						authors.add(auth.getAuthorID());
-						positions.add(pdf.getFirstPage().indexOf(
-								nameparts.get(count)));
-						author.add(nameparts.get(count));
+						int pos = pdf.getFirstPage().indexOf(
+								nameparts.get(count));
+						if(nameparts.get(count).equals("Jeschke")){
+							int test =0 ;
+						}
+						if (!positions.isEmpty()) {
+							int length = positions.size();
+							for (int kk = 0; kk < length; kk++) {
+								
+								if ((positions.get(kk) > pos)) {
+									positions.add(kk, pos);
+									authors.add(kk, auth.getAuthorID());
+									author.add(kk, nameparts.get(count));
+									//letztes element
+								}else if(kk==length-1){
+									positions.add(pos);
+									authors.add(auth.getAuthorID());
+									author.add(nameparts.get(count));
+								}
+							}
+
+						} else {
+							authors.add(auth.getAuthorID());
+							positions.add(pos);
+							System.out
+									.println(nameparts.get(count) + ":" + pos);
+							author.add(nameparts.get(count));
+						}
+
+						/*
+						 * if (pos < min) { min = pos; } if (pos > max) { max =
+						 * pos; }
+						 */
 
 						// System.out.println("FOUND Author - " + name
 						// + pdf.getFirstPage().substring(0, 10));
@@ -117,32 +152,81 @@ public class Database {
 				// }
 
 			}
-			// Create subfunction
+
+			// Create subfunction overlapping names
 			HashSet<Integer> uniqueValues = new HashSet<Integer>(positions);
 			if (uniqueValues.size() < positions.size()) {
 				ArrayList<Integer> ids = new ArrayList<Integer>();
 				for (int ii = 0; ii < positions.size(); ii++) {
 					for (int jj = ii + 1; jj < positions.size(); jj++) {
 						if (positions.get(jj).equals(positions.get(ii))) {
+
 							if (author.get(jj).length() > author.get(ii)
 									.length()) {
 								author.remove(ii);
 								authors.remove(ii);
 								positions.remove(ii);
+								ii--;
 							} else {
 								author.remove(jj);
 								authors.remove(jj);
 								positions.remove(jj);
+								jj--;
 							}
 						}
 					}
 				}
 			}
+			int max = positions.get(positions.size() - 1);
+			int min = positions.get(0);
+			distance.add(0);
+			for (int ii = 1; ii < positions.size(); ii++) {
+				//normieren
+				int pos = positions.get(ii)-min;
+				int nextpos = positions.get(ii-1)-min;
+				distance.add(Math.abs(pos - nextpos));
+			}
+			// some name fragments - use average to find
+
+
+			System.out.println(min + " to " + max + " - " + positions.size()
+					+ " : " + positions.size() * 30);
+			if ((max - min) > positions.size() * 30) {
+				int range = 0;
+				for (int ii = 0; ii < distance.size(); ii++) {
+					range = range + distance.get(ii);
+				}
+				range = range / distance.size();
+				// System.out.println(range);
+				//thesis upper/lower bound enough
+				for (int ii = 0; ii < positions.size(); ii++) {
+					if (distance.get(ii) > range) {
+						if(ii<positions.size()-1){
+							if(distance.get(ii+1)<range){
+								author.remove(ii-1);
+								authors.remove(ii-1);
+								positions.remove(ii-1);
+								distance.remove(ii-1);
+								continue;
+							}
+						}
+						author.remove(ii);
+						authors.remove(ii);
+						positions.remove(ii);
+						distance.remove(ii);
+					}
+				}
+			}
+
 			rs.close();
-			fillADB(pdf, authors, corpus);
+			System.out.println("Found Authors: " + author + " | " + authors
+					+ " in pdf:" + pdf.getFilename());
+			// fillADB(pdf, authors, corpus);
 		} else {
 			// found title in database
-			fillTDB(pdf, idPub, corpus);
+			System.out.println("Found Paper: " + idPub + " in pdf:"
+					+ pdf.getFilename());
+			// fillTDB(pdf, idPub, corpus);
 		}
 	}
 
