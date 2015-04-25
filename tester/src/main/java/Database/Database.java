@@ -82,8 +82,9 @@ public class Database {
 			} else {
 				int dividor = length / partitionSize;
 				ArrayList<String> subs = new ArrayList<String>();
-				for (int ii = 0; ii < dividor; ii = ii + partitionSize) {
-					subs.add(title.substring(ii, ii + partitionSize));
+				//ka geht das ?
+				for (int ii = 0; ii < length-partitionSize; ii = ii + partitionSize) {
+					subs.add(title.substring(ii, ii + partitionSize-1));
 				}
 				if (length - dividor * partitionSize > partitionSize / 2) {
 					subs.add(title.substring(dividor * partitionSize, length));
