@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -56,22 +57,72 @@ public class Database {
 				+ ".Publication";
 		ResultSet rsT = stmt.executeQuery(sqlT);
 		String titlepage = pdf.getFirstPage().toLowerCase();
+		ArrayList<Integer> titleCand = new ArrayList<Integer>();
 		while (rsT.next()) {
 			int id = rsT.getInt("idPublication");
-			String title = rsT.getString("title");
-			title = title.toLowerCase();
-			if (titlepage.contains("approach to understand human factors")) {
-				if (title.contains("a game-based approach to understand human factors in supply chains and quality management")) {
-					int test = 0;
+			String original = rsT.getString("title");
+			String title = original.toLowerCase();
+			int partitionSize = 0;
+			int rest = 0;
+			int length = title.length();
+			if (length < 10) {
+			} else if (length < 20) {
+				partitionSize = 6;
+			} else if (length < 30) {
+				partitionSize = 10;
+			} else {
+				partitionSize = 16;
+			}
+			if (partitionSize == 0) {
+				if (titlepage.contains(title)) {
+					System.out.println("found shortTitle:" + title);
+					idPub = id;
+					break;
+				}
+			} else {
+				int dividor = length / partitionSize;
+				ArrayList<String> subs = new ArrayList<String>();
+				for (int ii = 0; ii < dividor; ii = ii + partitionSize) {
+					subs.add(title.substring(ii, ii + partitionSize));
+				}
+				if (length - dividor * partitionSize > partitionSize / 2) {
+					subs.add(title.substring(dividor * partitionSize, length));
+				}
+				for (int ii = 0; ii < subs.size(); ii++) {
+					if (titlepage.contains(subs.get(ii))) {
+						titleCand.add(id);
+						System.out.println("found title:" + subs.get(ii)
+								+ " = " + original + " = " + subs+" ///"+id);
+					}
 				}
 			}
-			if (titlepage.contains(title)) {
-				idPub = id;
-				System.out.println("FOUND Title - " + title);
-				break;
-			}
+			/*
+			 * if (titlepage.contains("approach to understand human factors")) {
+			 * if (title.contains(
+			 * "a game-based approach to understand human factors in supply chains and quality management"
+			 * )) { int test = 0; } } if (titlepage.contains(title)) { idPub =
+			 * id; System.out.println("FOUND Title - " + title); break; }
+			 */
 		}
 		rsT.close();
+
+		if (titleCand.size() > 1) {
+			int[] occ = new int[titleCand.size()];
+			Arrays.fill(occ, 1);
+			int max = 1;
+			for (int ii = 0; ii < titleCand.size(); ii++) {
+				for (int jj = ii + 1; jj < titleCand.size(); jj++) {
+					if (titleCand.get(ii) == titleCand.get(jj)) {
+						occ[ii]=occ[ii]+1;
+						if(occ[ii]>max){
+							max=occ[ii];
+							idPub=titleCand.get(ii);
+						}
+					}
+				}
+			}
+		}
+		System.out.println(idPub);
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
