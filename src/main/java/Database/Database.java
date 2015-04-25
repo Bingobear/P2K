@@ -63,7 +63,6 @@ public class Database {
 			String original = rsT.getString("title");
 			String title = original.toLowerCase();
 			int partitionSize = 0;
-			int rest = 0;
 			int length = title.length();
 			if (length < 10) {
 			} else if (length < 20) {
