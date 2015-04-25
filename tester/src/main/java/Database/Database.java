@@ -121,8 +121,9 @@ public class Database {
 					}
 				}
 			}
+			System.out.println(idPub+" - occ: "+max);
 		}
-		System.out.println(idPub);
+
 		ArrayList<Integer> authors = new ArrayList<Integer>();
 		if (idPub < 0) {
 			// not in BTH database
