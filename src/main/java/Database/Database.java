@@ -114,6 +114,7 @@ public class Database {
 				for (int jj = ii + 1; jj < titleCand.size(); jj++) {
 					if (titleCand.get(ii) == titleCand.get(jj)) {
 						occ[ii]=occ[ii]+1;
+						//missing scenario max occ by more than one
 						if(occ[ii]>max){
 							max=occ[ii];
 							idPub=titleCand.get(ii);
