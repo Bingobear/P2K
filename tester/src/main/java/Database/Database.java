@@ -1,5 +1,9 @@
 package Database;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.AutoCloseable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -56,7 +60,14 @@ public class Database {
 		String sqlT = "SELECT idPublication,title FROM " + dbName
 				+ ".Publication";
 		ResultSet rsT = stmt.executeQuery(sqlT);
-		String titlepage = pdf.getFirstPage().toLowerCase();
+		String titlepage="";
+		if(pdf.getTitle().isEmpty()){
+			titlepage = pdf.getFirstPage().toLowerCase();	
+		}else{
+			titlepage = pdf.getTitle().toLowerCase();
+		}
+	
+
 		ArrayList<Integer> titleCand = new ArrayList<Integer>();
 		while (rsT.next()) {
 			int id = rsT.getInt("idPublication");
@@ -110,6 +121,7 @@ public class Database {
 			int[] occ = new int[titleCand.size()];
 			Arrays.fill(occ, 1);
 			int max = 1;
+			boolean unique = false;
 			for (int ii = 0; ii < titleCand.size(); ii++) {
 				for (int jj = ii + 1; jj < titleCand.size(); jj++) {
 					if (titleCand.get(ii) == titleCand.get(jj)) {
@@ -118,9 +130,16 @@ public class Database {
 						if(occ[ii]>max){
 							max=occ[ii];
 							idPub=titleCand.get(ii);
+							unique=true;
+						}else if((occ[ii]==max)&&(occ[ii]>1)){
+							unique=false;
 						}
 					}
 				}
+			}
+			System.out.println(idPub+" - occ: "+max);
+			if(!unique){
+				idPub=-1;
 			}
 			System.out.println(idPub+" - occ: "+max);
 		}
@@ -212,7 +231,6 @@ public class Database {
 			// Create subfunction overlapping names
 			HashSet<Integer> uniqueValues = new HashSet<Integer>(positions);
 			if (uniqueValues.size() < positions.size()) {
-				ArrayList<Integer> ids = new ArrayList<Integer>();
 				for (int ii = 0; ii < positions.size(); ii++) {
 					for (int jj = ii + 1; jj < positions.size(); jj++) {
 						if (positions.get(jj).equals(positions.get(ii))) {
@@ -276,12 +294,25 @@ public class Database {
 			rs.close();
 			System.out.println("Found Authors: " + author + " | " + authors
 					+ " in pdf:" + pdf.getFilename());
-			// fillADB(pdf, authors, corpus);
+			 fillTDB(pdf,idPub , corpus,authors);
 		} else {
 			// found title in database
+			String sql = "SELECT title FROM " + dbName + ".Publication WHERE idPublication=" + idPub;
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()){
+				pdf.setTitle(rs.getString("title"));
+			}
+			rs.close();
+			 sql = "SELECT Author_idAuthor FROM " + dbName + ".Publication_has_Author WHERE Publication_idPublication=" + idPub;
+			 rs = stmt.executeQuery(sql);
+			while(rs.next()){
+				authors.add(rs.getInt("Author_idAuthor"));
+			}
+			rs.close();
+
 			System.out.println("Found Paper: " + idPub + " in pdf:"
-					+ pdf.getFilename());
-			// fillTDB(pdf, idPub, corpus);
+					+ pdf.getFilename()+" written by:"+authors);
+			 fillTDB(pdf,idPub , corpus,authors);
 		}
 	}
 
@@ -310,15 +341,20 @@ public class Database {
 
 	}
 
-	private void fillTDB(PDF pdf, int idPub, Corpus corpus) throws SQLException {
+	private void fillTDB(PDF pdf, int idPub, Corpus corpus,ArrayList<Integer> authors) throws SQLException {
 		long pdfID = -1;
 		long corpID = -1;
 		corpID = addCorpus(corpus);
 
 		if (pdf != null) {
+			if(idPub>0){
 			pdfID = addTPDF(corpID, idPub, pdf);
+			}else{
+				pdfID = addPDF(corpID, pdf);
+			}
 
 			if (pdfID > 0) {
+					addPDFhasAuth(authors, pdfID);
 				if (!pdf.getWordOccList().isEmpty()) {
 					ArrayList<Integer> defKeys = addCategory(pdf, pdfID);
 
@@ -522,7 +558,24 @@ public class Database {
 
 			} catch (Exception e) {
 				// System.out.println(pdfID);
-				e.printStackTrace();
+				String timeLog = "DB_conflict";
+				File logFile = new File(timeLog);
+
+				// This will output the full path where the file will be written to...
+				try {
+					System.out.println(logFile.getCanonicalPath());
+					BufferedWriter writer;
+					writer = new BufferedWriter(new FileWriter(logFile, true));
+					writer.write("File: " +pdfID+"; with cats:"+defKeys.get(jj));
+					writer.newLine();
+					writer.close();
+					e.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+
 			}
 
 		}
@@ -532,15 +585,23 @@ public class Database {
 	private long addTPDF(long corpID, int idPub, PDF pdf) throws SQLException {
 		int pdfID = -1;
 		preparedStatement = connect.prepareStatement("insert into  " + dbName
-				+ ".PDF values (default, ?,?, ?,?,?)"
+				+ ".PDF values (default,?, ?, ?,?,?,?,?)"
 				+ " ON DUPLICATE KEY update wordcount=?",
 				Statement.RETURN_GENERATED_KEYS);
+		
 		preparedStatement.setInt(1, (int) corpID);
 		preparedStatement.setInt(2, (int) idPub);
-		preparedStatement.setString(2, pdf.getFirstPage().substring(0, 200));
+		preparedStatement.setString(3, pdf.getTitle());
+		preparedStatement.setInt(4, pdf.getWordcount());
+		preparedStatement.setString(5, pdf.getLanguage());
+		preparedStatement.setInt(6, pdf.getPagecount());
+		// TODO COLUMN COUNT DOESNT MATCH VALUE COUNT AT ROW 1
+		preparedStatement.setString(7, pdf.getFilename());
+		preparedStatement.setInt(8, pdf.getWordcount());
+	/*	preparedStatement.setString(2, pdf.getFirstPage().substring(0, 200));
 		preparedStatement.setInt(3, pdf.getWordcount());
 		preparedStatement.setString(4, pdf.getLanguage());
-		preparedStatement.setInt(5, pdf.getWordcount());
+		preparedStatement.setInt(5, pdf.getWordcount());*/
 		preparedStatement.executeUpdate();
 
 		ResultSet rs = null;
