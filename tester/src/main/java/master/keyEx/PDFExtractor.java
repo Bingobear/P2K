@@ -47,7 +47,7 @@ public class PDFExtractor {
 	private String titlePage;
 	private int catnumb;
 	private int pagenumber;
-private int endK = 0;
+	private int endK = 0;
 	private String language;
 	private ArrayList<Category> keywords = new ArrayList<Category>();
 
@@ -616,8 +616,7 @@ private int endK = 0;
 					if (pdfExist(this.getTitlePage(), arrayList)) {
 						break;
 					}
-					
-					
+
 					parsedText = parsedText.toLowerCase();
 					String[] tokens = getTokenPM(parsedText);
 					// old variant
@@ -630,32 +629,37 @@ private int endK = 0;
 
 					// No keywords you are out
 					if (keywords.isEmpty()) {
-//						File dest = new File(
-//								"c:/RWTH/Data/KeywLog/noKeywords2_new/");
-//						// System.out
-//						// .println("PDFExtractor: No Keywords in pdf -> ignore");
-//						FileUtils.copyFileToDirectory(fileEntry, dest);
+						// File dest = new File(
+						// "c:/RWTH/Data/KeywLog/noKeywords2_new/");
+						// // System.out
+						// //
+						// .println("PDFExtractor: No Keywords in pdf -> ignore");
+						// FileUtils.copyFileToDirectory(fileEntry, dest);
 						// empty - could not directly extract keywords
 						break;
 					} else if ((keywords.size() < 4) || (keywords.size() > 8)) {
-						//addition so unnecessary text is in the search
-						this.titlePage.substring(0,endK);
-//						File dest = new File(
-//								"c:/RWTH/Data/KeywLog/wKeywords_new/");
-//						FileUtils.copyFileToDirectory(fileEntry, dest);
+						// addition so unnecessary text is in the search
+						if (this.titlePage.length() < endK) {
+							this.titlePage.substring(0, endK);
+						}
+						// File dest = new File(
+						// "c:/RWTH/Data/KeywLog/wKeywords_new/");
+						// FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 						// KEYDEBUG
-//						break;
+						// break;
 					}
 
 					else {
-						this.titlePage.substring(0,endK);
-//						File dest = new File(
-//								"c:/RWTH/Data/KeywLog/hasKeywords2_new/");
-//						FileUtils.copyFileToDirectory(fileEntry, dest);
+						if (this.titlePage.length() < endK) {
+							this.titlePage.substring(0, endK);
+						}
+						// File dest = new File(
+						// "c:/RWTH/Data/KeywLog/hasKeywords2_new/");
+						// FileUtils.copyFileToDirectory(fileEntry, dest);
 						this.setKeywords(keywords);
 						// KEYDEBUG
-//						break;
+						// break;
 					}
 				}
 
@@ -698,7 +702,7 @@ private int endK = 0;
 		ArrayList<Category> keywords = new ArrayList<Category>();
 		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(tokens));
 		int start = findKeyWStart(textPDF);
-		endK=start;
+		endK = start;
 		String seperator = "";
 		System.out.println("PDFEXTRACTOR.getKeywordsFromPDF");
 		if (start > 0) {
@@ -789,17 +793,17 @@ private int endK = 0;
 		int end = getEndBracketPos(arrayList);
 		String akro = "";
 		int start = 0;
-		if(arrayList.get(0).equals("(")){
+		if (arrayList.get(0).equals("(")) {
 			start++;
 		}
-		//TODO CHANGE ALL UGLY FORS TO THIS
-			for (int ii=start; ii < end; ii++) {
-				akro = akro + arrayList.get(ii)+ " ";
-			}
-			if(!(arrayList.get(end).equals(")"))){
-				akro = akro+arrayList.get(end);
-			}
-		
+		// TODO CHANGE ALL UGLY FORS TO THIS
+		for (int ii = start; ii < end; ii++) {
+			akro = akro + arrayList.get(ii) + " ";
+		}
+		if (!(arrayList.get(end).equals(")"))) {
+			akro = akro + arrayList.get(end);
+		}
+
 		akro = akro.replace("(", "");
 		akro = akro.replace(")", "");
 		akro.trim();
@@ -826,7 +830,7 @@ private int endK = 0;
 		BufferedWriter writer;
 		writer = new BufferedWriter(new FileWriter(logFile, true));
 		writer.write("Name: " + name + ", seperaotr: " + seperator
-				+ ", Stringextract: " + size+", lang:"+this.language);
+				+ ", Stringextract: " + size + ", lang:" + this.language);
 		writer.newLine();
 		for (int ii = 0; ii < keywords2.size(); ii++) {
 			writer.write(keywords2.get(ii).getTitle() + " + "
@@ -929,7 +933,7 @@ private int endK = 0;
 		// ami2011 - towards 1s20 - ACM, WHEN- beul_et_al._ahfe.pdf, editorial -
 		// iwc.iwt053.full.pdf
 		String[] stops = { "introduction", "motivation", "abstract", ".",
-				"acm", "towards", "when", "editorial","*" };
+				"acm", "towards", "when", "editorial", "*" };
 		for (int ii = 0; ii < stops.length; ii++) {
 			endCandidate = textPDF.indexOf(stops[ii]);
 			if (textPDF.contains(stops[ii])) {

@@ -61,13 +61,15 @@ public class Database {
 				+ ".Publication";
 		ResultSet rsT = stmt.executeQuery(sqlT);
 		String titlepage="";
+		String authorFake="";
 		if(pdf.getTitle().isEmpty()){
 			titlepage = pdf.getFirstPage().toLowerCase();	
 		}else{
-			titlepage = pdf.getTitle().toLowerCase();
+			authorFake= pdf.getTitle();
+			titlepage = pdf.getTitle().toLowerCase();		
 		}
 	
-
+		ArrayList<String> titles =new ArrayList<String>();
 		ArrayList<Integer> titleCand = new ArrayList<Integer>();
 		while (rsT.next()) {
 			int id = rsT.getInt("idPublication");
@@ -100,10 +102,16 @@ public class Database {
 					subs.add(title.substring(dividor * partitionSize, length));
 				}
 				for (int ii = 0; ii < subs.size(); ii++) {
+
 					if (titlepage.contains(subs.get(ii))) {
+						//delete when bth optimized
+
+				
+						titles.add(title);
 						titleCand.add(id);
 						System.out.println("found title:" + subs.get(ii)
 								+ " = " + original + " = " + subs+" ///"+id);
+					
 					}
 				}
 			}
@@ -121,17 +129,22 @@ public class Database {
 			int[] occ = new int[titleCand.size()];
 			Arrays.fill(occ, 1);
 			int max = 1;
+			int maxCan = -1;
+			ArrayList<Integer> open = new ArrayList<Integer>();
 			boolean unique = false;
 			for (int ii = 0; ii < titleCand.size(); ii++) {
 				for (int jj = ii + 1; jj < titleCand.size(); jj++) {
-					if (titleCand.get(ii) == titleCand.get(jj)) {
+					//==
+					if (titleCand.get(ii).equals(titleCand.get(jj))) {
 						occ[ii]=occ[ii]+1;
 						//missing scenario max occ by more than one
 						if(occ[ii]>max){
 							max=occ[ii];
 							idPub=titleCand.get(ii);
+							maxCan=titleCand.get(ii);
+							open.add(ii);
 							unique=true;
-						}else if((occ[ii]==max)&&(occ[ii]>1)){
+						}else if((occ[ii]==max)&&(occ[ii]>1)&&(titleCand.get(ii)!=maxCan)){
 							unique=false;
 						}
 					}
@@ -187,7 +200,12 @@ public class Database {
 				for (int count = 0; count < nameparts.size() - 1; count++) {
 
 					if (pdf.getFirstPage().contains(nameparts.get(count))) {
-
+						if(nameparts.get(count).equals("Li")){
+							int test = 0;
+						}
+						if(authorFake.contains(nameparts.get(count))){
+							continue;
+						}
 						int pos = pdf.getFirstPage().indexOf(
 								nameparts.get(count));
 
@@ -261,10 +279,14 @@ public class Database {
 				distance.add(Math.abs(pos - nextpos));
 			}
 			// some name fragments - use average to find
-
+			//faktor 100 ?
+			int factor = 100;
+			if(author.size()>=3){
+				factor = 50;
+			}
 			System.out.println(min + " to " + max + " - " + positions.size()
-					+ " : " + positions.size() * 30);
-			if ((max - min) > positions.size() * 30) {
+					+ " : " + positions.size() * factor);
+			if ((max - min) > positions.size() * factor) {
 				int range = 0;
 				for (int ii = 0; ii < distance.size(); ii++) {
 					range = range + distance.get(ii);
@@ -294,7 +316,7 @@ public class Database {
 			rs.close();
 			System.out.println("Found Authors: " + author + " | " + authors
 					+ " in pdf:" + pdf.getFilename());
-			// fillTDB(pdf,idPub , corpus,authors);
+			 fillTDB(pdf,idPub , corpus,authors);
 		} else {
 			// found title in database
 			String sql = "SELECT title FROM " + dbName + ".Publication WHERE idPublication=" + idPub;
@@ -312,7 +334,7 @@ public class Database {
 
 			System.out.println("Found Paper: " + idPub + " in pdf:"
 					+ pdf.getFilename()+" written by:"+authors);
-			// fillTDB(pdf,idPub , corpus,authors);
+			 fillTDB(pdf,idPub , corpus,authors);
 		}
 	}
 
