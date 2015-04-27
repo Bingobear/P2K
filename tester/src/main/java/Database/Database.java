@@ -294,7 +294,7 @@ public class Database {
 			rs.close();
 			System.out.println("Found Authors: " + author + " | " + authors
 					+ " in pdf:" + pdf.getFilename());
-			 fillTDB(pdf,idPub , corpus,authors);
+			// fillTDB(pdf,idPub , corpus,authors);
 		} else {
 			// found title in database
 			String sql = "SELECT title FROM " + dbName + ".Publication WHERE idPublication=" + idPub;
@@ -312,7 +312,7 @@ public class Database {
 
 			System.out.println("Found Paper: " + idPub + " in pdf:"
 					+ pdf.getFilename()+" written by:"+authors);
-			 fillTDB(pdf,idPub , corpus,authors);
+			// fillTDB(pdf,idPub , corpus,authors);
 		}
 	}
 
