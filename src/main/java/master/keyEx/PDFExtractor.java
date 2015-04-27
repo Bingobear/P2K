@@ -639,7 +639,7 @@ public class PDFExtractor {
 						break;
 					} else if ((keywords.size() < 4) || (keywords.size() > 8)) {
 						// addition so unnecessary text is in the search
-						if (this.titlePage.length() < endK) {
+						if (this.titlePage.length()> endK) {
 							this.titlePage.substring(0, endK);
 						}
 						// File dest = new File(
@@ -651,7 +651,7 @@ public class PDFExtractor {
 					}
 
 					else {
-						if (this.titlePage.length() < endK) {
+						if (this.titlePage.length() > endK) {
 							this.titlePage.substring(0, endK);
 						}
 						// File dest = new File(
