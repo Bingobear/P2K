@@ -47,7 +47,7 @@ public class PDFExtractor {
 	private String titlePage;
 	private int catnumb;
 	private int pagenumber;
-
+private int endK = 0;
 	private String language;
 	private ArrayList<Category> keywords = new ArrayList<Category>();
 
@@ -638,6 +638,8 @@ public class PDFExtractor {
 						// empty - could not directly extract keywords
 						break;
 					} else if ((keywords.size() < 4) || (keywords.size() > 8)) {
+						//addition so unnecessary text is in the search
+						this.titlePage.substring(0,endK);
 //						File dest = new File(
 //								"c:/RWTH/Data/KeywLog/wKeywords_new/");
 //						FileUtils.copyFileToDirectory(fileEntry, dest);
@@ -647,6 +649,7 @@ public class PDFExtractor {
 					}
 
 					else {
+						this.titlePage.substring(0,endK);
 //						File dest = new File(
 //								"c:/RWTH/Data/KeywLog/hasKeywords2_new/");
 //						FileUtils.copyFileToDirectory(fileEntry, dest);
@@ -695,6 +698,7 @@ public class PDFExtractor {
 		ArrayList<Category> keywords = new ArrayList<Category>();
 		ArrayList<String> textPDF = new ArrayList<String>(Arrays.asList(tokens));
 		int start = findKeyWStart(textPDF);
+		endK=start;
 		String seperator = "";
 		System.out.println("PDFEXTRACTOR.getKeywordsFromPDF");
 		if (start > 0) {
