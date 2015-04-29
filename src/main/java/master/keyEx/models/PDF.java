@@ -1,7 +1,7 @@
 package master.keyEx.models;
 
 import java.util.ArrayList;
-
+import Database.model.Author;
 public class PDF {
 	private ArrayList<WordOcc> wordOcc;
 	private String language;
@@ -14,6 +14,8 @@ public class PDF {
 	private String title;
 	private int pagecount;
 	private String filename;
+	private ArrayList<Author> authors = new ArrayList<Author>();
+
 
 	public int getWordcount() {
 		return wordcount;
@@ -137,5 +139,19 @@ public class PDF {
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
+
+	public ArrayList<Author> getAuthors() {
+		return authors;
+	}
+
+	public void setAuthors(ArrayList<Author> authors) {
+		this.authors = authors;
+	}
+	
+	public void addAuthors(Author author) {
+		this.authors.add(author);
+	}
+
+
 
 }

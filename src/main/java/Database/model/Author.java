@@ -11,6 +11,11 @@ public Author(){
 	
 }
 
+public Author(int id){
+	this.authorID = id;
+}
+
+
 public Author(String name2, int id){
 	this.name = name2;
 	this.authorID = id;
