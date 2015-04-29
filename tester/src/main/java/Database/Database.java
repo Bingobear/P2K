@@ -103,7 +103,7 @@ public class Database {
 		// setup the connection with the DB.
 		connect = DriverManager.getConnection("jdbc:mysql://localhost/"
 				+ dbName + "?" + "user=test&password=test");
-		Statement stmt = connect.createStatement();
+
 //		fileNC = pdf.getFilename();
 //		int idPub = -1;
 //		String sqlT = "SELECT idPublication,title FROM " + dbName
@@ -401,6 +401,8 @@ public class Database {
 	public ArrayList<Author> createAllAuthors() throws SQLException {
 
 		ArrayList<Author> authors = new ArrayList<Author>();
+		connect = DriverManager.getConnection("jdbc:mysql://localhost/"
+				+ dbName + "?" + "user=test&password=test");
 		Statement state = connect.createStatement();
 
 		// state.setFetchSize(100);

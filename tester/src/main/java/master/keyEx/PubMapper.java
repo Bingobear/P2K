@@ -35,8 +35,8 @@ public class PubMapper {
 			int pubID = getPub(pdfL.get(ii));
 			if (pubID > 0) {
 				Publication pub = null;
-				for(int jj=0;jj<pubs.size();jj++){
-					if(pubs.get(jj).getPubID()==pubID){
+				for (int jj = 0; jj < pubs.size(); jj++) {
+					if (pubs.get(jj).getPubID() == pubID) {
 						pub = pubs.get(jj);
 						break;
 					}
@@ -44,8 +44,9 @@ public class PubMapper {
 				pdfL.get(ii).setPublicationID(pub.getPubID());
 				pdfL.get(ii).setAuthors(pub.getAuthors());
 			} else {
+				pdfL.get(ii).setPublicationID(pubID);
 				pdfL.get(ii).setAuthors(getPDFAuthors(pdfL.get(ii)));
-				
+
 			}
 		}
 		corpus.setPdfList(pdfL);
@@ -85,7 +86,6 @@ public class PubMapper {
 				nameparts.add(retval);
 			}
 
-
 			for (int count = 0; count < nameparts.size() - 1; count++) {
 
 				if (pdf.getFirstPage().contains(nameparts.get(count))) {
@@ -95,8 +95,7 @@ public class PubMapper {
 					if (authorFake.contains(nameparts.get(count))) {
 						continue;
 					}
-					int pos = pdf.getFirstPage().indexOf(
-							nameparts.get(count));
+					int pos = pdf.getFirstPage().indexOf(nameparts.get(count));
 
 					if (!positions.isEmpty()) {
 						int length = positions.size();
@@ -117,14 +116,13 @@ public class PubMapper {
 					} else {
 						authors.add(auth.getAuthorID());
 						positions.add(pos);
-						System.out
-								.println(nameparts.get(count) + ":" + pos);
+						System.out.println(nameparts.get(count) + ":" + pos);
 						author.add(nameparts.get(count));
 					}
 
 					/*
-					 * if (pos < min) { min = pos; } if (pos > max) { max =
-					 * pos; }
+					 * if (pos < min) { min = pos; } if (pos > max) { max = pos;
+					 * }
 					 */
 
 					// System.out.println("FOUND Author - " + name
@@ -142,8 +140,7 @@ public class PubMapper {
 				for (int jj = ii + 1; jj < positions.size(); jj++) {
 					if (positions.get(jj).equals(positions.get(ii))) {
 
-						if (author.get(jj).length() > author.get(ii)
-								.length()) {
+						if (author.get(jj).length() > author.get(ii).length()) {
 							author.remove(ii);
 							authors.remove(ii);
 							positions.remove(ii);
@@ -167,45 +164,48 @@ public class PubMapper {
 			int nextpos = positions.get(ii - 1) - min;
 			distance.add(Math.abs(pos - nextpos));
 		}
-		// some name fragments - use average to find
-		// faktor 100 ?
-		int factor = 100;
-		if (author.size() >= 3) {
-			factor = 50;
-		}
-		System.out.println(min + " to " + max + " - " + positions.size()
-				+ " : " + positions.size() * factor);
-		if ((max - min) > positions.size() * factor) {
-			int range = 0;
-			for (int ii = 0; ii < distance.size(); ii++) {
-				range = range + distance.get(ii);
+		// problem pdf format
+		if (author.size() > 2) {
+			// some name fragments - use average to find
+			// faktor 100 ?
+			int factor = 100;
+			if (author.size() >= 3) {
+				factor = 50;
 			}
-			range = range / distance.size();
-			// System.out.println(range);
-			// thesis upper/lower bound enough
-			for (int ii = 0; ii < positions.size(); ii++) {
-				if (distance.get(ii) > range) {
-					if (ii < positions.size() - 1) {
-						if (distance.get(ii + 1) < range) {
-							author.remove(ii - 1);
-							authors.remove(ii - 1);
-							positions.remove(ii - 1);
-							distance.remove(ii - 1);
-							continue;
+			System.out.println(min + " to " + max + " - " + positions.size()
+					+ " : " + positions.size() * factor);
+			if ((max - min) > positions.size() * factor) {
+				int range = 0;
+				for (int ii = 0; ii < distance.size(); ii++) {
+					range = range + distance.get(ii);
+				}
+				range = range / distance.size();
+				// System.out.println(range);
+				// thesis upper/lower bound enough
+				for (int ii = 0; ii < positions.size(); ii++) {
+					if (distance.get(ii) > range) {
+						if (ii < positions.size() - 1) {
+							if (distance.get(ii + 1) < range) {
+								author.remove(ii - 1);
+								authors.remove(ii - 1);
+								positions.remove(ii - 1);
+								distance.remove(ii - 1);
+								continue;
+							}
 						}
+						author.remove(ii);
+						authors.remove(ii);
+						positions.remove(ii);
+						distance.remove(ii);
 					}
-					author.remove(ii);
-					authors.remove(ii);
-					positions.remove(ii);
-					distance.remove(ii);
 				}
 			}
 		}
-		
+
 		System.out.println("Found Authors: " + author + " | " + authors
 				+ " in pdf:" + pdf.getFilename());
-		for(int ii=0;ii<author.size();ii++){
-			authorRes.add(new Author(author.get(ii),authors.get(ii)));
+		for (int ii = 0; ii < author.size(); ii++) {
+			authorRes.add(new Author(author.get(ii), authors.get(ii)));
 		}
 		return authorRes;
 	}
@@ -300,7 +300,8 @@ public class PubMapper {
 			if (!unique) {
 				idPub = -1;
 			}
-			System.out.println(idPub + " - occ: " + max+" name:"+fileNC+" #pubs"+pubs.size());
+			System.out.println(idPub + " - occ: " + max + " name:" + fileNC
+					+ " #pubs" + pubs.size());
 		}
 		return idPub;
 	}
