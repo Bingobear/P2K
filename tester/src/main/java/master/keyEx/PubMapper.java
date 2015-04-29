@@ -155,17 +155,18 @@ public class PubMapper {
 				}
 			}
 		}
-		int max = positions.get(positions.size() - 1);
-		int min = positions.get(0);
-		distance.add(0);
-		for (int ii = 1; ii < positions.size(); ii++) {
-			// normieren
-			int pos = positions.get(ii) - min;
-			int nextpos = positions.get(ii - 1) - min;
-			distance.add(Math.abs(pos - nextpos));
-		}
-		// problem pdf format
 		if (author.size() > 2) {
+			int max = positions.get(positions.size() - 1);
+			int min = positions.get(0);
+			distance.add(0);
+			for (int ii = 1; ii < positions.size(); ii++) {
+				// normieren
+				int pos = positions.get(ii) - min;
+				int nextpos = positions.get(ii - 1) - min;
+				distance.add(Math.abs(pos - nextpos));
+			}
+			// problem pdf format
+
 			// some name fragments - use average to find
 			// faktor 100 ?
 			int factor = 100;
@@ -212,8 +213,8 @@ public class PubMapper {
 
 	private static int getPub(PDF pdf) {
 		String fileNC = pdf.getFilename();
-		//stupid name bug -> resolve with duplicate kick
-		if(fileNC.equals("smarthealth_workshop_summary.pdf")){
+		// stupid name bug -> resolve with duplicate kick
+		if (fileNC.equals("smarthealth_workshop_summary.pdf")) {
 			return -1;
 		}
 		int idPub = -1;
