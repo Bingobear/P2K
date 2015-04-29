@@ -212,6 +212,10 @@ public class PubMapper {
 
 	private static int getPub(PDF pdf) {
 		String fileNC = pdf.getFilename();
+		//stupid name bug -> resolve with duplicate kick
+		if(fileNC.equals("smarthealth_workshop_summary.pdf")){
+			return -1;
+		}
 		int idPub = -1;
 		String titlepage = "";
 		if (pdf.getTitle().isEmpty()) {
