@@ -2,7 +2,7 @@ package Database.model;
 
 import java.util.ArrayList;
 
-public class Publication {
+public class PublicationDB {
 
 	private String title;
 	private String shortTitle;
@@ -18,7 +18,7 @@ public class Publication {
 	private RecordInfo record;
 	private int pubID;
 	
-	public Publication(){
+	public PublicationDB(){
 		authors = new ArrayList<Author>();
 	}
 	

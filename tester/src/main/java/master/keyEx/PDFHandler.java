@@ -21,7 +21,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = true;
+	static boolean debug_db = false;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -44,6 +44,7 @@ public class PDFHandler {
 				e.printStackTrace();
 			}
 		}
+		corpus = PubMapper.enrichCorpus(corpus);
 		if (debug_db) {
 
 			if (corpus != null) {
