@@ -137,6 +137,9 @@ public class PDFExtractor {
 					}
 				}
 				if (!currkey.matches("\\d+")) {
+					if(currkey.length()>150){
+						currkey=currkey.substring(0, 149);
+					}
 					Category category = new Category(currkey);
 					keywords.add(category);
 				}
