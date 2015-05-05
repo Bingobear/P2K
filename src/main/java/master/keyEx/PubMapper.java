@@ -135,21 +135,30 @@ public class PubMapper {
 
 		// Create subfunction overlapping names
 		HashSet<Integer> uniqueValues = new HashSet<Integer>(positions);
+
 		if (uniqueValues.size() < positions.size()) {
 			for (int ii = 0; ii < positions.size(); ii++) {
 				for (int jj = ii + 1; jj < positions.size(); jj++) {
+					System.out.println(ii+" - "+jj+"<"+ positions.size());
 					if (positions.get(jj).equals(positions.get(ii))) {
 
 						if (author.get(jj).length() > author.get(ii).length()) {
 							author.remove(ii);
 							authors.remove(ii);
 							positions.remove(ii);
+							
 							ii--;
+							if(ii<0){
+								ii=0;
+							}
 						} else {
 							author.remove(jj);
 							authors.remove(jj);
 							positions.remove(jj);
 							jj--;
+							if(jj<0){
+								jj=0;
+							}
 						}
 					}
 				}
@@ -233,6 +242,9 @@ public class PubMapper {
 			String title = original.toLowerCase();
 			int partitionSize = 0;
 			int length = title.length();
+			if(length<3){
+				continue;
+			}
 			if (length < 10) {
 			} else if (length < 20) {
 				partitionSize = 6;
