@@ -137,8 +137,8 @@ public class PDFExtractor {
 					}
 				}
 				if (!currkey.matches("\\d+")) {
-					if(currkey.length()>150){
-						currkey=currkey.substring(0, 149);
+					if (currkey.length() > 150) {
+						currkey = currkey.substring(0, 149);
 					}
 					Category category = new Category(currkey);
 					keywords.add(category);
@@ -642,8 +642,8 @@ public class PDFExtractor {
 						break;
 					} else if ((keywords.size() < 4) || (keywords.size() > 8)) {
 						// addition so unnecessary text is in the search
-						if (this.titlePage.length()> endK) {
-							//this.titlePage=	this.titlePage.substring(0, endK);
+						if (this.titlePage.length() > endK) {
+							this.titlePage = this.titlePage.substring(0, endK-1);
 						}
 						// File dest = new File(
 						// "c:/RWTH/Data/KeywLog/wKeywords_new/");
@@ -655,7 +655,7 @@ public class PDFExtractor {
 
 					else {
 						if (this.titlePage.length() > endK) {
-						//this.titlePage=	this.titlePage.substring(0, endK);
+							this.titlePage = this.titlePage.substring(0, endK-1);
 						}
 						// File dest = new File(
 						// "c:/RWTH/Data/KeywLog/hasKeywords2_new/");
@@ -690,9 +690,16 @@ public class PDFExtractor {
 
 	// TO DETE DOUBLE PDFS
 	private boolean pdfExist(String titlepage, ArrayList<PDF> pdfList) {
+		int sublength=20;
 		for (PDF compare : pdfList) {
-			if (compare.getFirstPage().substring(0, 20)
-					.equals(titlepage.substring(0, 20))) {
+			if(titlepage.length()<20){
+				sublength=titlepage.length()-1;
+			}
+			if(compare.getFirstPage().length()<sublength){
+				sublength=compare.getFirstPage().length()-1;
+			}
+			if (compare.getFirstPage().substring(0, sublength)
+					.equals(titlepage.substring(0, sublength))) {
 				System.out.println("WORKS");
 				return true;
 			}
