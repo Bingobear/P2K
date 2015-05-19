@@ -276,8 +276,8 @@ public class Corpus {
 			// .println("______________________________________________________________");
 		}
 	}
-
-	// TODO consider occurence when rating - and norm value
+//here has to be changed
+	// TODO consider occurence when rating - and norm value -> calc tf value for category
 	private PDF calculateRelPDF(PDF current, int counter, CategoryCatalog catcat) {
 		for (WordOcc pdfword : current.getWordOccList()) {
 			for (WordOcc word : catcat.getKeywordList()) {

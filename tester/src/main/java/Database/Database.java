@@ -590,6 +590,7 @@ public class Database {
 					}
 				}
 				rsT.close();
+				//test here what happens -> categories has to have duplicates
 				if (idDef < 0) {
 					preparedStatement = connect.prepareStatement(
 							"insert into  " + dbName
