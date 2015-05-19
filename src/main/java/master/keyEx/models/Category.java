@@ -8,6 +8,7 @@ private double relevance;
 private String normtitle;
 private String akronom;
 private String associatedGCAT;
+private int normAdd=0;
 	public String getTitle() {
 	return title;
 }
@@ -85,6 +86,20 @@ public void setTitle(String title) {
 	}
 	public void setAssociatedGCAT(String associatedGCAT) {
 		this.associatedGCAT = associatedGCAT;
+	}
+	public int getNormAdd() {
+		return normAdd;
+	}
+
+	public void incNormAdd(){
+		this.normAdd = this.normAdd+1;
+	}
+	public void setNormAdd(int normAdd) {
+		this.normAdd = normAdd;
+	}
+	
+	public void normalizeRelevance(){
+		this.relevance = this.relevance/this.normAdd;
 	}
 
 }

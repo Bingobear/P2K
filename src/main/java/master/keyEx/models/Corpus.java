@@ -346,8 +346,13 @@ public class Corpus {
 							this.pdfList.get(ii).getGenericKeywords()
 									.get(counter)
 									.incRelevance(word.getCatTFIDF());
+							//try to normalize -> avoid problem
+							this.pdfList.get(ii).getGenericKeywords()
+							.get(counter).incNormAdd();
 						}
 					}
+					this.pdfList.get(ii).getGenericKeywords()
+					.get(counter).getRelevance();
 				}
 			}
 			// TODO QUESTION IS 0 RELEVANCE A GOOD VALUE ? -> CURRENT VERSION:
