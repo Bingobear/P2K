@@ -21,7 +21,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = false;
+	static boolean debug_db = true;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -65,7 +65,7 @@ public class PDFHandler {
 		// File hack = new File(".");
 		// String home = hack.getAbsolutePath();
 		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/HCI/";
+		String importData = "c:/RWTH/Data/cluster/Archive/";
 		// String importData = url.getPath();
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();

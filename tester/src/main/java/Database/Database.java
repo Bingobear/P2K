@@ -26,7 +26,7 @@ import master.keyEx.models.WordOcc;
 //TODO HCICORPUS ->CORPUS (later)
 public class Database {
 	private Connection connect = null;
-	private String dbName = "corpus";// hcicorpus
+	private String dbName = "corpus";// corpus hcicorpus
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
@@ -574,11 +574,12 @@ public class Database {
 						+ ".Category";
 				Statement stmt = connect.createStatement();
 				ResultSet rsT = stmt.executeQuery(sqlT);
-				while (rsT.next()) {
+				//old code -> failure
+				/*while (rsT.next()) {
 					int id = rsT.getInt("idCategory");
 					String title = rsT.getString("name");
 					String normtitle = rsT.getString("normtitle");
-
+					
 					// first case not nec is in second
 					if (pdf.getGenericKeywords().get(count).getNormtitle()
 							.equals(normtitle)
@@ -588,7 +589,7 @@ public class Database {
 						// System.out.println("FOUND Category - " + title);
 						break;
 					}
-				}
+				}*/
 				rsT.close();
 				//test here what happens -> categories has to have duplicates
 				if (idDef < 0) {
