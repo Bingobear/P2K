@@ -13,6 +13,8 @@ import java.net.URL;
 import java.text.Normalizer;
 import java.util.ArrayList;
 
+import org.apache.commons.io.FileUtils;
+
 import master.keyEx.models.*;
 import Database.DBInterface;
 import Database.Database;
@@ -21,7 +23,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class PDFHandler {
 	static boolean debug_extractor = true;
-	static boolean debug_db = true;
+	static boolean debug_db = false;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -171,7 +173,13 @@ public class PDFHandler {
 						corpus.incDocN(language);
 						corpus.setPdfList(pdfList);
 						corpus.associateWordswithCategory(pdf);
-
+						/*File source = fileEntry.getAbsoluteFile();
+						File dest = new File("c:/Users/S. Bruns/Dropbox/Masterarbeit/JS/bootstrap-3.3.1/MA - Slider/pdf/Cluster/"+fileEntry.getName());
+						try {
+						    FileUtils.copyFile(source, dest);
+						} catch (IOException e) {
+						    e.printStackTrace();
+						}*/
 						if (debug_img) {
 							System.out.println("File= "
 									+ folder.getAbsolutePath() + "\\"
