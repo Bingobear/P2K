@@ -23,10 +23,10 @@ import master.keyEx.models.PDF;
 import master.keyEx.models.Publication;
 import master.keyEx.models.WordOcc;
 
-//TODO HCICORPUS ->CORPUS (later)
+
 public class Database {
 	private Connection connect = null;
-	private String dbName = "corpus";// corpus hcicorpus
+	private String dbName = "corpus";// corpus or hcicorpus
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
@@ -39,6 +39,11 @@ public class Database {
 		close(connect);
 	}
 
+	/**Retrieves all publications from SQL Database
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public ArrayList<Publication> getAllPub() throws ClassNotFoundException,
 			SQLException {
 		ArrayList<Publication> publications = new ArrayList<Publication>();
@@ -99,6 +104,12 @@ public class Database {
 		}
 	}
 
+	/**Adds whole corpus to SQL DB
+	 * @param pdf
+	 * @param corpus
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
 	public void fillDB(PDF pdf, Corpus corpus) throws SQLException,
 			ClassNotFoundException {
 		// this will load the MySQL driver, each DB has its own driver
@@ -107,301 +118,17 @@ public class Database {
 		connect = DriverManager.getConnection("jdbc:mysql://localhost/"
 				+ dbName + "?" + "user=test&password=test");
 
-		// fileNC = pdf.getFilename();
-		// int idPub = -1;
-		// String sqlT = "SELECT idPublication,title FROM " + dbName
-		// + ".Publication";
-		// ResultSet rsT = stmt.executeQuery(sqlT);
-		// String titlepage = "";
-		// String authorFake = "";
-		// if (pdf.getTitle().isEmpty()) {
-		// titlepage = pdf.getFirstPage().toLowerCase();
-		// } else {
-		// authorFake = pdf.getTitle();
-		// titlepage = pdf.getTitle().toLowerCase();
-		// }
-		//
-		// ArrayList<String> titles = new ArrayList<String>();
-		// ArrayList<Integer> titleCand = new ArrayList<Integer>();
-		// while (rsT.next()) {
-		// int id = rsT.getInt("idPublication");
-		// String original = rsT.getString("title");
-		// String title = original.toLowerCase();
-		// int partitionSize = 0;
-		// int length = title.length();
-		// if (length < 10) {
-		// } else if (length < 20) {
-		// partitionSize = 6;
-		// } else if (length < 30) {
-		// partitionSize = 10;
-		// } else {
-		// partitionSize = 16;
-		// }
-		// if (partitionSize == 0) {
-		// if (titlepage.contains(title)) {
-		// System.out.println("found shortTitle:" + title);
-		// idPub = id;
-		// break;
-		// }
-		// } else {
-		// int dividor = length / partitionSize;
-		// ArrayList<String> subs = new ArrayList<String>();
-		// // ka geht das ?
-		// for (int ii = 0; ii < length - partitionSize; ii = ii
-		// + partitionSize) {
-		// subs.add(title.substring(ii, ii + partitionSize));
-		// }
-		// if (length - dividor * partitionSize > partitionSize / 2) {
-		// subs.add(title.substring(dividor * partitionSize, length));
-		// }
-		// for (int ii = 0; ii < subs.size(); ii++) {
-		//
-		// if (titlepage.contains(subs.get(ii))) {
-		// // delete when bth optimized
-		//
-		// titles.add(title);
-		// titleCand.add(id);
-		// System.out
-		// .println("found title:" + subs.get(ii) + " = "
-		// + original + " = " + subs + " ///" + id);
-		//
-		// }
-		// }
-		// }
-		// /*
-		// * if (titlepage.contains("approach to understand human factors")) {
-		// * if (title.contains(
-		// *
-		// "a game-based approach to understand human factors in supply chains and quality management"
-		// * )) { int test = 0; } } if (titlepage.contains(title)) { idPub =
-		// * id; System.out.println("FOUND Title - " + title); break; }
-		// */
-		// }
-		// rsT.close();
-		//
-		// if (titleCand.size() > 1) {
-		// int[] occ = new int[titleCand.size()];
-		// Arrays.fill(occ, 1);
-		// int max = 1;
-		// int maxCan = -1;
-		// ArrayList<Integer> open = new ArrayList<Integer>();
-		// boolean unique = false;
-		// for (int ii = 0; ii < titleCand.size(); ii++) {
-		// for (int jj = ii + 1; jj < titleCand.size(); jj++) {
-		// // ==
-		// if (titleCand.get(ii).equals(titleCand.get(jj))) {
-		// occ[ii] = occ[ii] + 1;
-		// // missing scenario max occ by more than one
-		// if (occ[ii] > max) {
-		// max = occ[ii];
-		// idPub = titleCand.get(ii);
-		// maxCan = titleCand.get(ii);
-		// open.add(ii);
-		// unique = true;
-		// } else if ((occ[ii] == max) && (occ[ii] > 1)
-		// && (titleCand.get(ii) != maxCan)) {
-		// unique = false;
-		// }
-		// }
-		// }
-		// }
-		// System.out.println(idPub + " - occ: " + max);
-		// if (!unique) {
-		// idPub = -1;
-		// }
-		// System.out.println(idPub + " - occ: " + max);
-		// }
-		//
-		// ArrayList<Integer> authors = new ArrayList<Integer>();
-		// if (idPub < 0) {
-		// // not in BTH database
-		// String sql = "SELECT idAuthor,name FROM " + dbName + ".Author";
-		// ResultSet rs = stmt.executeQuery(sql);
-		// // STEP 5: Extract data from result set
-		// ArrayList<String> author = new ArrayList<String>();
-		// ArrayList<Integer> positions = new ArrayList<Integer>();
-		// ArrayList<Integer> distance = new ArrayList<Integer>();
-		//
-		// ArrayList<Author> authorsall = createAllAuthors();
-		//
-		// for (Author auth : authorsall) {
-		// // while (rs.next()) {
-		// // // Retrieve by column name
-		// // int id = rs.getInt("idAuthor");
-		// // String name = rs.getString("name");
-		// ArrayList<String> nameparts = new ArrayList<String>();
-		// for (String retval : auth.getName().split(",")) {
-		// nameparts.add(retval);
-		// }
-		// // if(name.equals("Thombansen, Ulrich")){
-		// // String stop = "kacke";
-		// // // name="Thombansen";
-		// // }
-		// // String eval = pdf.getFirstPage();
-		// // //\\p{L}
-		// // eval = eval.replaceAll("[^\\p{L}]"," ");
-		// //
-		// // for (int count = 0; count < nameparts.size()-1; count++) {
-		// // if(eval.matches(".*\\b"+nameparts.get(count)+"\\b.*")){
-		// // // if (pdf.getFirstPage().contains(nameparts.get(count))) {
-		// // authors.add(auth.getAuthorID());
-		// // System.out.println(nameparts.get(count));
-		// // // System.out.println("FOUND Author - " + name
-		// // // + pdf.getFirstPage().substring(0, 10));
-		// // }
-		// // }
-		// // if(authors.isEmpty()){
-		//
-		// for (int count = 0; count < nameparts.size() - 1; count++) {
-		//
-		// if (pdf.getFirstPage().contains(nameparts.get(count))) {
-		// if (nameparts.get(count).equals("Li")) {
-		// int test = 0;
-		// }
-		// if (authorFake.contains(nameparts.get(count))) {
-		// continue;
-		// }
-		// int pos = pdf.getFirstPage().indexOf(
-		// nameparts.get(count));
-		//
-		// if (!positions.isEmpty()) {
-		// int length = positions.size();
-		// for (int kk = 0; kk < length; kk++) {
-		//
-		// if ((positions.get(kk) > pos)) {
-		// positions.add(kk, pos);
-		// authors.add(kk, auth.getAuthorID());
-		// author.add(kk, nameparts.get(count));
-		// // letztes element
-		// } else if (kk == length - 1) {
-		// positions.add(pos);
-		// authors.add(auth.getAuthorID());
-		// author.add(nameparts.get(count));
-		// }
-		// }
-		//
-		// } else {
-		// authors.add(auth.getAuthorID());
-		// positions.add(pos);
-		// System.out
-		// .println(nameparts.get(count) + ":" + pos);
-		// author.add(nameparts.get(count));
-		// }
-		//
-		// /*
-		// * if (pos < min) { min = pos; } if (pos > max) { max =
-		// * pos; }
-		// */
-		//
-		// // System.out.println("FOUND Author - " + name
-		// // + pdf.getFirstPage().substring(0, 10));
-		// }
-		// }
-		// // }
-		//
-		// }
-		//
-		// // Create subfunction overlapping names
-		// HashSet<Integer> uniqueValues = new HashSet<Integer>(positions);
-		// if (uniqueValues.size() < positions.size()) {
-		// for (int ii = 0; ii < positions.size(); ii++) {
-		// for (int jj = ii + 1; jj < positions.size(); jj++) {
-		// if (positions.get(jj).equals(positions.get(ii))) {
-		//
-		// if (author.get(jj).length() > author.get(ii)
-		// .length()) {
-		// author.remove(ii);
-		// authors.remove(ii);
-		// positions.remove(ii);
-		// ii--;
-		// } else {
-		// author.remove(jj);
-		// authors.remove(jj);
-		// positions.remove(jj);
-		// jj--;
-		// }
-		// }
-		// }
-		// }
-		// }
-		// int max = positions.get(positions.size() - 1);
-		// int min = positions.get(0);
-		// distance.add(0);
-		// for (int ii = 1; ii < positions.size(); ii++) {
-		// // normieren
-		// int pos = positions.get(ii) - min;
-		// int nextpos = positions.get(ii - 1) - min;
-		// distance.add(Math.abs(pos - nextpos));
-		// }
-		// // some name fragments - use average to find
-		// // faktor 100 ?
-		// int factor = 100;
-		// if (author.size() >= 3) {
-		// factor = 50;
-		// }
-		// System.out.println(min + " to " + max + " - " + positions.size()
-		// + " : " + positions.size() * factor);
-		// if ((max - min) > positions.size() * factor) {
-		// int range = 0;
-		// for (int ii = 0; ii < distance.size(); ii++) {
-		// range = range + distance.get(ii);
-		// }
-		// range = range / distance.size();
-		// // System.out.println(range);
-		// // thesis upper/lower bound enough
-		// for (int ii = 0; ii < positions.size(); ii++) {
-		// if (distance.get(ii) > range) {
-		// if (ii < positions.size() - 1) {
-		// if (distance.get(ii + 1) < range) {
-		// author.remove(ii - 1);
-		// authors.remove(ii - 1);
-		// positions.remove(ii - 1);
-		// distance.remove(ii - 1);
-		// continue;
-		// }
-		// }
-		// author.remove(ii);
-		// authors.remove(ii);
-		// positions.remove(ii);
-		// distance.remove(ii);
-		// }
-		// }
-		// }
-		//
-		// rs.close();
-		// System.out.println("Found Authors: " + author + " | " + authors
-		// + " in pdf:" + pdf.getFilename());
-		// fillTDB(pdf,idPub , corpus,authors);
-		// } else {
-		// // found title in database
-		// String sql = "SELECT title FROM " + dbName
-		// + ".Publication WHERE idPublication=" + idPub;
-		// ResultSet rs = stmt.executeQuery(sql);
-		// while (rs.next()) {
-		// pdf.setTitle(rs.getString("title"));
-		// }
-		// rs.close();
-		// sql = "SELECT Author_idAuthor FROM "
-		// + dbName
-		// + ".Publication_has_Author WHERE Publication_idPublication="
-		// + idPub;
-		// rs = stmt.executeQuery(sql);
-		// while (rs.next()) {
-		// authors.add(rs.getInt("Author_idAuthor"));
-		// }
-		// rs.close();
-		//
-		// System.out.println("Found Paper: " + idPub + " in pdf:"
-		// + pdf.getFilename() + " written by:" + authors);
-		// fillTDB(pdf,idPub , corpus,authors);
-		// }
-		ArrayList<Integer> authors = new ArrayList<Integer>();
+				ArrayList<Integer> authors = new ArrayList<Integer>();
 		for (int ii = 0; ii < pdf.getAuthors().size(); ii++) {
 			authors.add(pdf.getAuthors().get(ii).getAuthorID());
 		}
 		fillTDB(pdf, pdf.getPublicationID(), corpus, authors);
 	}
 
+	/**Adds all authors to SQL DB
+	 * @return
+	 * @throws SQLException
+	 */
 	public ArrayList<Author> createAllAuthors() throws SQLException {
 
 		ArrayList<Author> authors = new ArrayList<Author>();
@@ -429,6 +156,13 @@ public class Database {
 
 	}
 
+	/**Adds PDF to SQL DB
+	 * @param pdf
+	 * @param idPub
+	 * @param corpus
+	 * @param authors
+	 * @throws SQLException
+	 */
 	private void fillTDB(PDF pdf, int idPub, Corpus corpus,
 			ArrayList<Integer> authors) throws SQLException {
 		long pdfID = -1;
@@ -461,39 +195,13 @@ public class Database {
 
 	}
 
-	private void fillADB(PDF pdf, ArrayList<Integer> authors, Corpus corpus)
-			throws SQLException {
-		long pdfID = 0;
-		long corpID = 0;
-		corpID = addCorpus(corpus);
-
-		if (pdf != null) {
-			pdfID = addPDF(corpID, pdf);
-
-			if (pdfID > 0) {
-				// TODO Author duplicates care
-				addPDFhasAuth(authors, pdfID);
-
-				if (!pdf.getWordOccList().isEmpty()) {
-					// TODO CHANGE UNIQUE CATEGORIES
-					// ArrayList<Long> keyIDs = new ArrayList<Long>();
-					ArrayList<Integer> defKeys = addCategory(pdf, pdfID);
-
-					ArrayList<WordOcc> words = pdf.getWordOccList();
-					ArrayList<Integer> genKeys = addKeywords(words, corpID,
-							pdfID);
-
-					addCathasKeys(defKeys, genKeys, pdfID);
-
-				}
-			}
-		}
-
-	}
-
-	// TODO for some reason not all cats are added
-	// TODO different solution to duplicates ! testing if connection already
-	// exists
+	
+	/**Links keywords(extracted words) with categories 
+	 * @param defKeys
+	 * @param genKeys
+	 * @param pdfID
+	 * @throws SQLException
+	 */
 	private void addCathasKeys(ArrayList<Integer> defKeys,
 			ArrayList<Integer> genKeys, long pdfID) throws SQLException {
 		for (int ii = 0; ii < defKeys.size(); ii++) {
@@ -527,7 +235,13 @@ public class Database {
 
 	}
 
-	// ALSO GIVE CAT IDF AND SO ON
+	/**ADD Keywords(extracted words) to SQL DB
+	 * @param words
+	 * @param corpID
+	 * @param pdfID
+	 * @return
+	 * @throws SQLException
+	 */
 	private ArrayList<Integer> addKeywords(ArrayList<WordOcc> words,
 			long corpID, long pdfID) throws SQLException {
 		ArrayList<Integer> genKeys = new ArrayList<Integer>();
@@ -563,7 +277,12 @@ public class Database {
 		return genKeys;
 	}
 
-	// TODO EXTEND CATEGORY AND RELEVANCE in main code and DB
+	/**Add pdf's categories to DB
+	 * @param pdf
+	 * @param pdfID
+	 * @return
+	 * @throws SQLException
+	 */
 	private ArrayList<Integer> addCategory(PDF pdf, long pdfID)
 			throws SQLException {
 		ArrayList<Integer> defKeys = new ArrayList<Integer>();
@@ -574,24 +293,8 @@ public class Database {
 						+ ".Category";
 				Statement stmt = connect.createStatement();
 				ResultSet rsT = stmt.executeQuery(sqlT);
-				//old code -> failure
-				/*while (rsT.next()) {
-					int id = rsT.getInt("idCategory");
-					String title = rsT.getString("name");
-					String normtitle = rsT.getString("normtitle");
-					
-					// first case not nec is in second
-					if (pdf.getGenericKeywords().get(count).getNormtitle()
-							.equals(normtitle)
-							|| (pdf.getGenericKeywords().get(count)
-									.getAssociatedGCAT().equals(normtitle))) {
-						idDef = id;
-						// System.out.println("FOUND Category - " + title);
-						break;
-					}
-				}*/
+
 				rsT.close();
-				//test here what happens -> categories has to have duplicates
 				if (idDef < 0) {
 					preparedStatement = connect.prepareStatement(
 							"insert into  " + dbName
@@ -621,11 +324,6 @@ public class Database {
 						}
 						rs.close();
 					} finally {
-						// ... cleanup that will execute whether or
-						// not
-						// an
-						// error
-						// occurred ...
 					}
 				} else {
 					defKeys.add(idDef);
@@ -636,10 +334,14 @@ public class Database {
 		return defKeys;
 	}
 
+	/**Links PDF with Category in DB
+	 * @param defKeys
+	 * @param pdfID
+	 * @throws SQLException
+	 */
 	private void addPDFCat(ArrayList<Integer> defKeys, long pdfID)
 			throws SQLException {
 		for (int jj = 0; jj < defKeys.size(); jj++) {
-			// on Duplicate ?
 			preparedStatement = connect.prepareStatement("insert into  "
 					+ dbName + ".PDF_has_Category values (?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
@@ -698,6 +400,13 @@ public class Database {
 	}
 
 	// here on duplicate ignore and mark file
+	/**ADD pdf to DB (pdf has pub info)
+	 * @param corpID
+	 * @param idPub
+	 * @param pdf
+	 * @return
+	 * @throws SQLException
+	 */
 	private long addTPDF(long corpID, int idPub, PDF pdf) throws SQLException {
 		int pdfID = -1;
 		preparedStatement = connect.prepareStatement("insert into  " + dbName
@@ -737,6 +446,11 @@ public class Database {
 		return pdfID;
 	}
 
+	/**Links pdf with its authors in DB
+	 * @param authors
+	 * @param pdfID
+	 * @throws SQLException
+	 */
 	private void addPDFhasAuth(ArrayList<Integer> authors, long pdfID)
 			throws SQLException {
 
@@ -760,7 +474,12 @@ public class Database {
 
 	}
 
-	// add here test so no duplicates
+	/**Adds PDF to DB
+	 * @param corpID
+	 * @param pdf
+	 * @return
+	 * @throws SQLException
+	 */
 	private long addPDF(long corpID, PDF pdf) throws SQLException {
 		int pdfID = -1;
 		preparedStatement = connect.prepareStatement("insert into " + dbName
@@ -793,6 +512,11 @@ public class Database {
 		return pdfID;
 	}
 
+	/**Add Corpus to DB
+	 * @param corpus
+	 * @return
+	 * @throws SQLException
+	 */
 	private long addCorpus(Corpus corpus) throws SQLException {
 		int corpID = -1;
 		if (corpus != null) {
@@ -832,8 +556,11 @@ public class Database {
 		return corpID;
 	}
 
-	// TODO SAVE GLOBAL RELEVANCE ?
-	// TODO DUPLICATE PDF
+	/**Add global categories to DB (unique cats)
+	 * @param corpus
+	 * @param corpID
+	 * @throws SQLException
+	 */
 	private void addGlobalCategory(Corpus corpus, int corpID)
 			throws SQLException {
 		// NOT NECESSARY
@@ -899,12 +626,12 @@ public class Database {
 
 	}
 
-	// addCatKeywords()
-	// TODO Auto-generated method stub
-
-	// geht das so ?=
-	// ALSO GIVE IDF TF AND SO ON ?
-	private void addCatKeywords(int id, ArrayList<WordOcc> keywordList)
+		/**Add Category Keywords (keywords associated with a category)
+		 * @param id
+		 * @param keywordList
+		 * @throws SQLException
+		 */
+		private void addCatKeywords(int id, ArrayList<WordOcc> keywordList)
 			throws SQLException {
 
 		for (int ii = 0; ii < keywordList.size(); ii++) {

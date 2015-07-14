@@ -3,8 +3,17 @@ package master.keyEx;
 import org.tartarus.snowball.ext.englishStemmer;
 import org.tartarus.snowball.ext.germanStemmer;
 
+/** Stemmer Class - generates stemmed version of a given array
+ * @author Simon
+ *
+ */
 public class Stemmer {
 
+	/**generates stemmed version of a given array
+	 * @param tokens
+	 * @param lang (ger-german,en-english)
+	 * @return stemmed array
+	 */
 	public String[] stem(String[] tokens, String lang) {
 		String[] stemtokens = new String[tokens.length];
 		if (lang.contains("en")) {

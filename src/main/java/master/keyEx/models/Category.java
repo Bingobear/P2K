@@ -1,5 +1,9 @@
 package master.keyEx.models;
 
+/**Category class (pdf keywords)
+ * @author Simon
+ *
+ */
 public class Category {
 private String title;
 private int wOcc;

@@ -21,7 +21,12 @@ import Database.Database;
 
 import com.cybozu.labs.langdetect.LangDetectException;
 
+/** Main Interface to initiate Textmining (pdf extractor)
+ * @author Simon
+ *
+ */
 public class PDFHandler {
+	//debug modes
 	static boolean debug_extractor = true;
 	static boolean debug_db = false;
 	static boolean debug_img = false;
@@ -31,6 +36,9 @@ public class PDFHandler {
 
 	}
 
+	/**Initiates corpus text mining - ranking
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		// BasicConfigurator.configure();
 		Corpus corpus = null;
@@ -62,65 +70,37 @@ public class PDFHandler {
 		}
 	}
 
+	/** Main text mining method return parsed/calculated corpus (containing all pdfs) 
+	 * @return corpus
+	 * @throws LangDetectException
+	 * @throws IOException
+	 */
 	private Corpus parsePDFtoKey() throws LangDetectException, IOException {
 
-		// File hack = new File(".");
-		// String home = hack.getAbsolutePath();
-		// String importData ="c:/RWTH/Data/Publikationen Cluster/test/";
-		String importData = "c:/RWTH/Data/cluster/Archive/";
-		// String importData = url.getPath();
+		String importData = "c:/RWTH/Data/test/";
 		File folder = new File(importData);
 		Corpus corpus = new Corpus();
 		ArrayList<PDF> pdfList = new ArrayList<PDF>();
 		boolean first = true;
 		corpus = createCorpus(folder, corpus, pdfList, first);
 		corpus.calculateIdf();
-		// First calculate Keyword TFIDF (Relevance)
 		corpus.setPdfList(corpus.calculateTD_IDF(corpus.getPdfList()));
-		// SAVE FILTER LEVEL
-		// Filter pdf keylist with min level 0.0001
-		// corpus.setPdfList(corpus.filterPDFTDIDF(corpus.getPdfList(),
-		// 0.0001));
-		// Calculate CatTFIDF with filtered keywords
-		corpus.calculateCatTFIDF();
-		corpus.filterCatTFIDF(0.00001);
-		corpus.calculateRel();
-		// System.out.println("PDFHandler");
-		// for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
-		// ArrayList<WordOcc> words = corpus.getPdfList().get(ii)
-		// .getWordOccList();
-		// System.out
-		// .println(corpus.getPdfList().get(ii).getTitle()
-		// + "______________________________________________________________");
-		// for (int jj = 0; jj < words.size(); jj++) {
-		// System.out.println(words.get(jj).getWord().getWord()
-		// + " -  TF: " + words.get(jj).getTf() + " IDF: "
-		// + words.get(jj).getIdf() + "TFIDF: "
-		// + words.get(jj).getTfidf() + " wordocc: "
-		// + words.get(jj).getOcc());
-		// }
 
-		// }
-		// System.out
-		// .println("______________________________________________________________");
-		// System.out.println("PDFHandler");
-		// for (int ii = 0; ii < corpus.getPdfList().size(); ii++) {
-		// System.out
-		// .println("----------------------------------------------------------------");
-		// System.out.println(corpus.getPdfList().get(ii).getTitle());
-		// for (int jj = 0; jj < corpus.getPdfList().get(ii)
-		// .getGenericKeywords().size(); jj++) {
-		// System.out.println(corpus.getPdfList().get(ii)
-		// .getGenericKeywords().get(jj).getTitle()
-		// + " has Relevance: "
-		// + corpus.getPdfList().get(ii).getGenericKeywords()
-		// .get(jj).getRelevance());
-		// }
-		// }
+		corpus.initializeTFICFCalc();
+		corpus.filterTFICF(0.00001);
+		corpus.calculateAllPDFCatRel();
 		return corpus;
 
 	}
 
+	/** Creates basic corpus -> text mining (word extraction,keyword,pdfs)
+	 * @param folder
+	 * @param corpus
+	 * @param pdfList
+	 * @param first
+	 * @return corpus
+	 * @throws LangDetectException
+	 */
 	private Corpus createCorpus(File folder, Corpus corpus,
 			ArrayList<PDF> pdfList, boolean first) throws LangDetectException {
 		File hack = new File(".");
@@ -155,16 +135,15 @@ public class PDFHandler {
 
 					ArrayList<WordOcc> occ = extractor.keyOcc(words);
 
-					// TODO add publication id!
 					PDF pdf = new PDF(occ, extractor.getLang(),
 							extractor.getWordcount(), extractor.getTitlePage());
 					pdf.setGenericKeywords(extractor.getKeywords());
 
 					pdf.setCatnumb(extractor.getCatnumb());
-					// VERY RUDEMENTARY TITLE EXTRACTION VIA FILE
+					// RUDEMENTARY TITLE EXTRACTION VIA FILE
 					pdf.setTitle(getTitle(fileEntry.getName(), titles));
 
-					// No keywords tough love
+					// No keywords -> not valid pdf
 					if (!pdf.getGenericKeywords().isEmpty()) {
 						pdf.setFilename(fileEntry.getName());
 						pdfList.add(pdf);
@@ -173,13 +152,6 @@ public class PDFHandler {
 						corpus.incDocN(language);
 						corpus.setPdfList(pdfList);
 						corpus.associateWordswithCategory(pdf);
-						/*File source = fileEntry.getAbsoluteFile();
-						File dest = new File("c:/Users/S. Bruns/Dropbox/Masterarbeit/JS/bootstrap-3.3.1/MA - Slider/pdf/Cluster/"+fileEntry.getName());
-						try {
-						    FileUtils.copyFile(source, dest);
-						} catch (IOException e) {
-						    e.printStackTrace();
-						}*/
 						if (debug_img) {
 							System.out.println("File= "
 									+ folder.getAbsolutePath() + "\\"
@@ -211,6 +183,10 @@ public class PDFHandler {
 
 	}
 
+	/**retrieve titles from external csv title file
+	 * @param importtitle
+	 * @return
+	 */
 	private ArrayList<String> readCSVTitle(String importtitle) {
 		String csvFile = importtitle;
 		BufferedReader br = null;
@@ -251,6 +227,14 @@ public class PDFHandler {
 		return titles;
 	}
 
+	/**Creates a wordcloud out of a given text
+	 * @param fileEntry -> pdf
+	 * @param occ -> word occurences and word itself
+	 * @param key 
+	 * @param img
+	 * @param export
+	 * @param home
+	 */
 	private void createImgText(File fileEntry, ArrayList<WordOcc> occ,
 			String key, String img, String export, String home) {
 

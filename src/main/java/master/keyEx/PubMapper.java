@@ -12,6 +12,12 @@ import master.keyEx.models.Corpus;
 import master.keyEx.models.PDF;
 import master.keyEx.models.Publication;
 
+/**
+ * Maps all pdf to corresponding publication, if possible (library entry)
+ * 
+ * @author Simon
+ *
+ */
 public class PubMapper {
 	private static ArrayList<Publication> pubs = new ArrayList<Publication>();
 
@@ -19,6 +25,12 @@ public class PubMapper {
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * Enriches corpus information with library information (meta)
+	 * 
+	 * @param corpus
+	 * @return
+	 */
 	public static Corpus enrichCorpus(Corpus corpus) {
 		Database db = new Database();
 		try {
@@ -53,6 +65,12 @@ public class PubMapper {
 		return corpus;
 	}
 
+	/**
+	 * Extract Authors from given pdf -> 1. library matching 2. manually
+	 * 
+	 * @param pdf
+	 * @return
+	 */
 	private static ArrayList<Author> getPDFAuthors(PDF pdf) {
 		ArrayList<Author> authorRes = new ArrayList<Author>();
 		String titlepage = "";
@@ -105,7 +123,6 @@ public class PubMapper {
 								positions.add(kk, pos);
 								authors.add(kk, auth.getAuthorID());
 								author.add(kk, nameparts.get(count));
-								// letztes element
 							} else if (kk == length - 1) {
 								positions.add(pos);
 								authors.add(auth.getAuthorID());
@@ -120,20 +137,11 @@ public class PubMapper {
 						author.add(nameparts.get(count));
 					}
 
-					/*
-					 * if (pos < min) { min = pos; } if (pos > max) { max = pos;
-					 * }
-					 */
-
-					// System.out.println("FOUND Author - " + name
-					// + pdf.getFirstPage().substring(0, 10));
 				}
 			}
-			// }
 
 		}
 
-		// Create subfunction overlapping names
 		HashSet<Integer> uniqueValues = new HashSet<Integer>(positions);
 
 		if (uniqueValues.size() < positions.size()) {
@@ -145,18 +153,18 @@ public class PubMapper {
 							author.remove(ii);
 							authors.remove(ii);
 							positions.remove(ii);
-							
+
 							ii--;
-							if(ii<0){
-								ii=0;
+							if (ii < 0) {
+								ii = 0;
 							}
 						} else {
 							author.remove(jj);
 							authors.remove(jj);
 							positions.remove(jj);
 							jj--;
-							if(jj<0){
-								jj=0;
+							if (jj < 0) {
+								jj = 0;
 							}
 						}
 					}
@@ -173,10 +181,6 @@ public class PubMapper {
 				int nextpos = positions.get(ii - 1) - min;
 				distance.add(Math.abs(pos - nextpos));
 			}
-			// problem pdf format
-
-			// some name fragments - use average to find
-			// faktor 100 ?
 			int factor = 100;
 			if (author.size() >= 3) {
 				factor = 50;
@@ -189,8 +193,6 @@ public class PubMapper {
 					range = range + distance.get(ii);
 				}
 				range = range / distance.size();
-				// System.out.println(range);
-				// thesis upper/lower bound enough
 				for (int ii = 0; ii < positions.size(); ii++) {
 					if (distance.get(ii) > range) {
 						if (ii < positions.size() - 1) {
@@ -219,12 +221,15 @@ public class PubMapper {
 		return authorRes;
 	}
 
+	/**
+	 * Maps pdf with publication by checking if pub titles are part of pdf title
+	 * page
+	 * 
+	 * @param pdf
+	 * @return
+	 */
 	private static int getPub(PDF pdf) {
 		String fileNC = pdf.getFilename();
-		// stupid name bug -> resolve with duplicate kick
-		if (fileNC.equals("smarthealth_workshop_summary.pdf")) {
-			return -1;
-		}
 		int idPub = -1;
 		String titlepage = "";
 		if (pdf.getTitle().isEmpty()) {
@@ -241,7 +246,7 @@ public class PubMapper {
 			String title = original.toLowerCase();
 			int partitionSize = 0;
 			int length = title.length();
-			if(length<3){
+			if (length < 3) {
 				continue;
 			}
 			if (length < 10) {

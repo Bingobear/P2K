@@ -12,6 +12,10 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+/**Creates a wordCloud for a given String - (not important for TIGRS)
+ * @author Simon
+ *
+ */
 public class Text2Image {
 
 	public void generateImage(String text, String path) {

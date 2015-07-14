@@ -6,13 +6,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Corpus class Interface to perform ranking algorithm (tfidf) and (tficf)
+ * 
+ * @author Simon
+ *
+ */
 public class Corpus {
 
 	private int docNEng = 0;
 	private int docNGer = 0;
 	private ArrayList<PDF> pdfList = new ArrayList<PDF>();
-	// Merge Both
-	// private ArrayList<Category> globalCategory = new ArrayList<Category>();
 	private ArrayList<CategoryCatalog> globalCategoryCatalog = new ArrayList<CategoryCatalog>();
 
 	public ArrayList<CategoryCatalog> getGlobalCategoryCatalog() {
@@ -24,7 +28,6 @@ public class Corpus {
 		this.globalCategoryCatalog = globalCategoryCatalog;
 	}
 
-	// NOT SURE IF ITS RIGHT
 	public void calculateIdf() {
 		ArrayList<WordOcc> words = null;
 		// new
@@ -64,10 +67,8 @@ public class Corpus {
 						(double) word.getKeyinPDF()));
 			}
 		}
-		// this.idf = Math.log10(docN/pdfList);
 	}
 
-	// TODO DONE LANGUAGE ADDING
 	public int getDocN(String language) {
 		if (language.equals("de")) {
 			return docNGer;
@@ -109,22 +110,27 @@ public class Corpus {
 	public ArrayList<PDF> calculateTD_IDF(ArrayList<PDF> pdfList) {
 		for (int ii = 0; ii < pdfList.size(); ii++) {
 			pdfList.get(ii).calculateTF_IDF();
-			// System.out.println(ii);
-			// ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
-			// for (int jj = 0; jj < words.size(); jj++) {
-			// System.out.println(words.get(jj).getWord().getWord()
-			// + "- TFIDF: " + words.get(jj).getTfidf() + " IDF: "
-			// + words.get(jj).getIdf() + " TF: "
-			// + words.get(jj).getTf() + " wordocc: "
-			// + words.get(jj).getOcc());
-			// }
-			// System.out
-			// .println("______________________________________________________________");
-		}
+			/*
+			 * ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList(); for
+			 * (int jj = 0; jj < words.size(); jj++) {
+			 * System.out.println(words.get(jj).getWord().getWord() +
+			 * "- TFIDF: " + words.get(jj).getTfidf() + " IDF: " +
+			 * words.get(jj).getIdf() + " TF: " + words.get(jj).getTf() +
+			 * " wordocc: " + words.get(jj).getOcc()); } System.out .println(
+			 * "______________________________________________________________"
+			 * );
+			 */}
 		return pdfList;
 
 	}
 
+	/**
+	 * Removes words from each pdf which tfidf is not above the defined level
+	 * 
+	 * @param pdfList
+	 * @param level
+	 * @return
+	 */
 	public ArrayList<PDF> filterPDFTDIDF(ArrayList<PDF> pdfList2, double level) {
 		for (int ii = 0; ii < pdfList.size(); ii++) {
 			ArrayList<WordOcc> words = pdfList.get(ii).getWordOccList();
@@ -142,37 +148,35 @@ public class Corpus {
 		return pdfList;
 	}
 
-	// TODO CALCULATE CATEGORY SCORING
-	// Possibly use only words with specific tdif
+	/**
+	 * Associates pdfwords with category (preparation for tficf)
+	 * 
+	 * @param pdf
+	 */
 	public void associateWordswithCategory(PDF pdf) {
 		boolean found = false;
 		for (Category cat : pdf.getGenericKeywords()) {
 			for (int counter = 0; counter < this.globalCategoryCatalog.size(); counter++) {
 				String wordCat = cat.getNormtitle();
-				String wordGlobal =this.globalCategoryCatalog.get(counter).getCategory()
-						.getNormtitle();
-				//naive approach
-//				if (wordCat.equals(wordGlobal)) {
-//					found = true;
-//					addCategoryWords(counter, pdf.getWordOccList());
-//					break;
-//				}
+				String wordGlobal = this.globalCategoryCatalog.get(counter)
+						.getCategory().getNormtitle();
 				int ld = AlgorithmUtil.LevenshteinDistance(wordCat, wordGlobal);
 				double sim = 0;
-				if(wordCat.length()>wordGlobal.length()){
+				if (wordCat.length() > wordGlobal.length()) {
 					sim = AlgorithmUtil.calculateWordSim(wordCat, ld);
-				}else{
+				} else {
 					sim = AlgorithmUtil.calculateWordSim(wordGlobal, ld);
 				}
-				if(sim<=0.2){
+				if (sim <= 0.2) {
 					found = true;
 					try {
-						writelog(wordCat,wordGlobal,pdf.getTitle());
+						writelog(wordCat, wordGlobal, pdf.getTitle());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					cat.setAssociatedGCAT(this.getGlobalCategoryCatalog().get(counter).getCategory().getNormtitle());
+					cat.setAssociatedGCAT(this.getGlobalCategoryCatalog()
+							.get(counter).getCategory().getNormtitle());
 					addCategoryWords(counter, pdf.getWordOccList());
 					break;
 				}
@@ -186,7 +190,9 @@ public class Corpus {
 			}
 		}
 	}
-	private void writelog(String wordCat, String wordGlobal, String string) throws IOException {
+
+	private void writelog(String wordCat, String wordGlobal, String string)
+			throws IOException {
 		String timeLog = "MatchesLogFile";
 		File logFile = new File(timeLog);
 
@@ -195,7 +201,8 @@ public class Corpus {
 
 		BufferedWriter writer;
 		writer = new BufferedWriter(new FileWriter(logFile, true));
-		writer.write(string+" has matches "+wordCat+" with gCat"+wordGlobal);
+		writer.write(string + " has matches " + wordCat + " with gCat"
+				+ wordGlobal);
 		writer.newLine();
 		writer.write("_________________________________________________________");
 		writer.newLine();
@@ -203,7 +210,12 @@ public class Corpus {
 
 	}
 
-	// TODO CONSIDER DUPLICATE PAPER
+	/**
+	 * Calculates occurences of a word within each category (preparation TFICF)
+	 * 
+	 * @param position
+	 * @param wordOccList
+	 */
 	private void addCategoryWords(int position, ArrayList<WordOcc> wordOccList) {
 		ArrayList<WordOcc> keys = this.globalCategoryCatalog.get(position)
 				.getKeywordList();
@@ -213,11 +225,8 @@ public class Corpus {
 			for (WordOcc gkey : keys) {
 				if (word.getWord().getWord().equals(gkey.getWord().getWord())) {
 					found = true;
-					// gkey.setOcc(gkey.getOcc() + word.getOcc());
-					// needs to be relative to word number
 					gkey.setOcc(gkey.getOcc() + word.getOcc());
 					catocc = catocc + gkey.getOcc();
-					// System.out.println("Good WORD");
 					break;
 				}
 			}
@@ -225,7 +234,6 @@ public class Corpus {
 				if (word == null) {
 					int test = 0;
 				}
-				// WordOcc words = new WordOcc(word);
 				this.globalCategoryCatalog.get(position).getKeywordList()
 						.add(word);
 				catocc = catocc + word.getOcc();
@@ -237,7 +245,12 @@ public class Corpus {
 
 	}
 
-	public void calculateCatTFIDF() {
+	/**
+	 * Calculates TFIDF for every words in each pdfs prepares its values (count
+	 * occ of words in cat)
+	 * 
+	 */
+	public void initializeTFICFCalc() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
 			PDF current = this.pdfList.get(ii);
 			for (int counter = 0; counter < current.getGenericKeywords().size(); counter++) {
@@ -247,38 +260,49 @@ public class Corpus {
 							.getTitle()
 							.equals(current.getGenericKeywords().get(counter)
 									.getTitle())) {
-						current = calculateRelPDF(current, counter, catcat);
+						current = calculateCatTF(current, counter, catcat);
 					}
 				}
 			}
 			this.pdfList.set(ii, current);
 		}
-		calculateCatIdf();
-		calculateCatTDIF();
+		calculateICF();
+		calculateTFICF();
 	}
 
-	private void calculateCatTDIF() {
+	/**
+	 * Calculates TFICF for every word for each category
+	 * 
+	 */
+	private void calculateTFICF() {
 		for (int ii = 0; ii < this.globalCategoryCatalog.size(); ii++) {
 			this.globalCategoryCatalog.get(ii).calculateTF_IDF();
-			// System.out.println(ii);
-			// ArrayList<WordOcc> words = this.globalCategoryCatalog.get(ii)
-			// .getKeywordList();
-			// for (int jj = 0; jj < words.size(); jj++) {
-			// if (words.get(jj).getCatTFIDF() > 0) {
-			// System.out.println("CATEGORY:"
-			// + this.globalCategoryCatalog.get(ii).getCategory()
-			// .getTitle() + " "
-			// + words.get(jj).getCatTFIDF() + ":"
-			// + words.get(jj).getWord().getWord());
-			// }
-			// }
-			// System.out
-			// .println("______________________________________________________________");
+//			 System.out.println(ii);
+//			 ArrayList<WordOcc> words = this.globalCategoryCatalog.get(ii)
+//			 .getKeywordList();
+//			 for (int jj = 0; jj < words.size(); jj++) {
+//			 if (words.get(jj).getCatTFIDF() > 0) {
+//			 System.out.println("CATEGORY:"
+//			 + this.globalCategoryCatalog.get(ii).getCategory()
+//			 .getTitle() + " "
+//			 + words.get(jj).getCatTFIDF() + ":"
+//			 + words.get(jj).getWord().getWord());
+//			 }
+//			 }
+//			 System.out
+//			 .println("______________________________________________________________");
 		}
 	}
-//here has to be changed
-	// TODO consider occurence when rating - and norm value -> calc tf value for category
-	private PDF calculateRelPDF(PDF current, int counter, CategoryCatalog catcat) {
+
+	/**
+	 * Calculates catTF for each word in the given pdf
+	 * 
+	 * @param current
+	 * @param counter
+	 * @param catcat
+	 * @return
+	 */
+	private PDF calculateCatTF(PDF current, int counter, CategoryCatalog catcat) {
 		for (WordOcc pdfword : current.getWordOccList()) {
 			for (WordOcc word : catcat.getKeywordList()) {
 				if (pdfword.getWord().getWord()
@@ -292,13 +316,16 @@ public class Corpus {
 		return current;
 	}
 
-	public void calculateCatIdf() {
+	/**
+	 * Calculates the icf part of tf-icf
+	 * 
+	 */
+	public void calculateICF() {
 		ArrayList<WordOcc> words = null;
 		ArrayList<WordOcc> wordes = null;
 		for (CategoryCatalog doc : this.globalCategoryCatalog) {
 			words = doc.getKeywordList();
 			for (WordOcc word : words) {
-				// NO NEGATIVE VALUES
 				if (word.getKeyinCat() == 0) {
 					for (CategoryCatalog currdoc : this.globalCategoryCatalog) {
 						wordes = currdoc.getKeywordList();
@@ -309,14 +336,10 @@ public class Corpus {
 
 								word.incKeyinCat();
 
-								// System.out.println("Corpus:"+currdoc.getCategory().getTitle()
-								// + "->" + word.getWord().getWord());
-
 								break;
 							}
 						}
 					}
-					// TODO SOLVE IN NORMAL FASCHION
 					word.setCatRet(true);
 				}
 			}
@@ -330,11 +353,14 @@ public class Corpus {
 						(double) word.getKeyinCat()));
 			}
 		}
-		// this.idf = Math.log10(docN/pdfList);
 	}
 
-	// preparation to calculate cat -> normalized result
-	public void calculateRel() {
+	/**
+	 * Calculate keyword relevance for every PDF of the corpus (adding TFICF
+	 * values of matching keywords from associated categories)
+	 * 
+	 */
+	public void calculateAllPDFCatRel() {
 		for (int ii = 0; ii < this.pdfList.size(); ii++) {
 			ArrayList<Category> pdfcat = this.pdfList.get(ii)
 					.getGenericKeywords();
@@ -346,17 +372,15 @@ public class Corpus {
 							this.pdfList.get(ii).getGenericKeywords()
 									.get(counter)
 									.incRelevance(word.getCatTFIDF());
-							//try to normalize -> avoid problem
+							// try to normalize -> avoid problem
 							this.pdfList.get(ii).getGenericKeywords()
-							.get(counter).incNormAdd();
+									.get(counter).incNormAdd();
 						}
 					}
-					this.pdfList.get(ii).getGenericKeywords()
-					.get(counter).getRelevance();
+					this.pdfList.get(ii).getGenericKeywords().get(counter)
+							.getRelevance();
 				}
 			}
-			// TODO QUESTION IS 0 RELEVANCE A GOOD VALUE ? -> CURRENT VERSION:
-			// BETTER USE LOWER BRACKET NOT OPEN
 			for (int counter = 0; counter < pdfcat.size(); counter++) {
 				if (pdfcat.get(counter).getRelevance() == 0) {
 					pdfcat.get(counter).setRelevance(0.00001);
@@ -366,7 +390,12 @@ public class Corpus {
 
 	}
 
-	public void filterCatTFIDF(double level) {
+	/**
+	 * All TFICF values have to be above the defined leve, else remove word
+	 * 
+	 * @param level
+	 */
+	public void filterTFICF(double level) {
 		for (int ii = 0; ii < globalCategoryCatalog.size(); ii++) {
 			ArrayList<WordOcc> words = globalCategoryCatalog.get(ii)
 					.getKeywordList();

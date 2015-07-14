@@ -1,29 +1,43 @@
 package master.keyEx.models;
 
+/**A collection of useful Algorithms
+ * @author Simon
+ *
+ */
 public class AlgorithmUtil {
 
 	public AlgorithmUtil() {
 		// TODO Auto-generated constructor stub
 	}
+	/**
+	 * @param tPDFocc - occurrence of term t in pdf
+	 * @param totalterms
+	 * @return
+	 */
 	public static double calcTF(double tPDFocc,double totalterms){
 		return tPDFocc/totalterms;
 	}
 	
+	/**
+	 * @param docN
+	 * @param docNt number of doc having the term t
+	 * @return
+	 */
 	public static double calcIDF(double docN,double docNt){
-		if(Math.log10((double)docN/(double)docNt)<0){
-			String test = "test";
-		}
+
 		return Math.log10((double)docN/(double)docNt);
 	}
 	
 	public static double calcTFIDF(double tf,double idf){
-		if(tf*idf<0){
-			String test = "test";
-		}
 		return tf*idf;
 	}
 	
 	//SOURCE WIKIPEDIA
+	/**Calc. Levenshteindistance in int
+	 * @param wordA
+	 * @param wordB
+	 * @return
+	 */
 	public static int LevenshteinDistance (String wordA, String wordB) {                          
 	    int len0 = wordA.length() + 1;                                                     
 	    int len1 = wordB.length() + 1;                                                     
@@ -64,6 +78,11 @@ public class AlgorithmUtil {
 	    return cost[len0 - 1];                                                          
 	}
 	
+	/**Calc. word similarity of word A and word B
+	 * @param word (longer word of the two)
+	 * @param diff (levenstein distance)
+	 * @return similarity
+	 */
 	public static double calculateWordSim(String word,double diff){
 		return diff/word.length();
 	}
