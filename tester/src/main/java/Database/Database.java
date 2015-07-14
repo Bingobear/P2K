@@ -26,7 +26,7 @@ import master.keyEx.models.WordOcc;
 
 public class Database {
 	private Connection connect = null;
-	private String dbName = "corpus";// corpus or hcicorpus
+	private String dbName = "hcicorpus";// corpus or hcicorpus
 	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
