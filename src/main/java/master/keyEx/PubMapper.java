@@ -266,7 +266,6 @@ public class PubMapper {
 			} else {
 				int dividor = length / partitionSize;
 				ArrayList<String> subs = new ArrayList<String>();
-				// ka geht das ?
 				for (int ii = 0; ii < length - partitionSize; ii = ii
 						+ partitionSize) {
 					subs.add(title.substring(ii, ii + partitionSize));
