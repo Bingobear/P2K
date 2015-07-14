@@ -7,6 +7,10 @@ import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
 
 
+/**Language Interface - Detects a given Strings language
+ * @author Simon
+ *
+ */
 public class LangDetect {
 
 	public String detect(String parsedText, boolean first)
