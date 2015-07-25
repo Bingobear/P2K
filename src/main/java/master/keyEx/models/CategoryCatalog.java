@@ -3,7 +3,7 @@ package master.keyEx.models;
 import java.util.ArrayList;
 
 /** Category Catalog (consist of the category and all its associated words)
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class CategoryCatalog {

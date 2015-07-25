@@ -2,6 +2,12 @@ package Database.model;
 
 import java.util.ArrayList;
 
+
+/**Publication model class (DB)
+ * @author Simon Bruns
+ *
+ */
+
 public class PublicationDB {
 
 	private String title;

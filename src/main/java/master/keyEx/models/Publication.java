@@ -4,6 +4,13 @@ import Database.model.Author;
 
 import java.util.ArrayList;
 
+/**
+ * Publication model class
+ * 
+ * @author Simon Bruns
+ *
+ */
+
 public class Publication {
 private int pubID;
 private String title;

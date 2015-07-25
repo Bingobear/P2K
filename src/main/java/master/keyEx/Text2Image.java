@@ -13,7 +13,7 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 /**Creates a wordCloud for a given String - (not important for TIGRS)
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class Text2Image {

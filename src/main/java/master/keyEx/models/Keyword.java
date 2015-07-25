@@ -1,5 +1,12 @@
 package master.keyEx.models;
 
+/**
+ * Keyword model class
+ * 
+ * @author Simon Bruns
+ *
+ */
+
 public class Keyword {
 	private int score;
 	private String word;

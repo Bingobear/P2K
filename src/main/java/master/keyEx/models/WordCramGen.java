@@ -9,7 +9,7 @@ import java.net.URL;
 /**
  * WordCram Processing works, however very slow
  * 
- * @author sbruns
+ * @author Simon Bruns
  * 
  */
 public class WordCramGen extends PApplet {

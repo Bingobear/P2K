@@ -2,6 +2,10 @@ package Database.model;
 
 import java.util.ArrayList;
 
+/**Location model class (DB)
+ * @author Simon Bruns
+ *
+ */
 public class Location {
 private ArrayList<String> physicalLoc;
 private String url;

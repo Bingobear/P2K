@@ -15,7 +15,7 @@ import master.keyEx.models.Publication;
 /**
  * Maps all pdf to corresponding publication, if possible (library entry)
  * 
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class PubMapper {

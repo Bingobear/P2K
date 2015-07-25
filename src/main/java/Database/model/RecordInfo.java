@@ -1,5 +1,11 @@
 package Database.model;
 
+
+/**RecordInfo model class (DB)
+ * @author Simon Bruns
+ *
+ */
+
 public class RecordInfo {
 private String idRecordBTH;
 private String createRDate;
