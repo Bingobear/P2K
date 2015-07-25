@@ -6,6 +6,10 @@ private String adress;
 private int pos;
 private int authorID;
 
+/**Author Model Class (DB)
+ * @author Simon Bruns
+ *
+ */
 
 public Author(){
 	

@@ -24,6 +24,10 @@ import master.keyEx.models.Publication;
 import master.keyEx.models.WordOcc;
 
 
+/**Database Hub to forward data (extracted corpus, publication, ... information) to DB
+ * @author Simon Bruns
+ *
+ */
 public class Database {
 	private Connection connect = null;
 	private String dbName = "hcicorpus";// corpus or hcicorpus

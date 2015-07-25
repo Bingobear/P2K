@@ -7,7 +7,7 @@ import master.keyEx.models.PDF;
 
 
 /**Interface to fill Database with extracted corpus, publication, ... information
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class DBInterface {

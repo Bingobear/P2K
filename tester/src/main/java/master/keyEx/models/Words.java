@@ -2,6 +2,13 @@ package master.keyEx.models;
 
 import java.util.ArrayList;
 
+/**
+ * Words model class
+ * 
+ * @author Simon Bruns
+ *
+ */
+
 public class Words {
 	private String word;
 	private String stem;

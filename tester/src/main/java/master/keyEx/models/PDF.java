@@ -1,5 +1,12 @@
 package master.keyEx.models;
 
+/**
+ * PDF model class
+ * 
+ * @author Simon Bruns
+ *
+ */
+
 import java.util.ArrayList;
 import Database.model.Author;
 public class PDF {
@@ -7,7 +14,7 @@ public class PDF {
 	private String language;
 	private int wordcount;
 	private ArrayList<Category> genericKeywords;
-	//TODDO cat -> scoring optimized
+
 	private int catnumb;
 	private String firstPage;
 	private int publicationID;

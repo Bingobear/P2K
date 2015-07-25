@@ -1,7 +1,7 @@
 package master.keyEx.models;
 
 /**A collection of useful Algorithms
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class AlgorithmUtil {

@@ -38,7 +38,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 /**
  * Main Text Mining Class
  * 
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class PDFExtractor {

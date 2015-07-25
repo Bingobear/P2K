@@ -22,7 +22,7 @@ import Database.Database;
 import com.cybozu.labs.langdetect.LangDetectException;
 
 /** Main Interface to initiate Textmining (pdf extractor)
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class PDFHandler {

@@ -1,7 +1,7 @@
 package master.keyEx.models;
 
 /**Category class (pdf keywords)
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class Category {

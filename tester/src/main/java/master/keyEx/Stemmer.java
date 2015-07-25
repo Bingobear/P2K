@@ -4,7 +4,7 @@ import org.tartarus.snowball.ext.englishStemmer;
 import org.tartarus.snowball.ext.germanStemmer;
 
 /** Stemmer Class - generates stemmed version of a given array
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class Stemmer {

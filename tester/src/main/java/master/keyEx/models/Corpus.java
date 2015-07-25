@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Corpus class Interface to perform ranking algorithm (tfidf) and (tficf)
  * 
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class Corpus {

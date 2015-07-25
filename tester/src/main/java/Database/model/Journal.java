@@ -1,5 +1,9 @@
 package Database.model;
 
+/**Journal model class (DB)
+ * @author Simon Bruns
+ *
+ */
 public class Journal {
 private String title;
 public Journal(){

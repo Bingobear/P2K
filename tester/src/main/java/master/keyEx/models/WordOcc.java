@@ -2,6 +2,13 @@ package master.keyEx.models;
 
 import master.keyEx.models.Words;
 
+/**
+ * Wordocc model class
+ * 
+ * @author Simon Bruns
+ *
+ */
+
 public class WordOcc {
 	private Words word;
 	private int occ;

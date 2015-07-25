@@ -8,7 +8,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 
 /**Language Interface - Detects a given Strings language
- * @author Simon
+ * @author Simon Bruns
  *
  */
 public class LangDetect {
