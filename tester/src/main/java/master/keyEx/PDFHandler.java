@@ -21,14 +21,16 @@ import Database.Database;
 
 import com.cybozu.labs.langdetect.LangDetectException;
 
-/** Main Interface to initiate Textmining (pdf extractor)
+/**
+ * Main Interface to initiate Textmining (pdf extractor)
+ * 
  * @author Simon Bruns
  *
  */
 public class PDFHandler {
-	//debug modes
+	// debug modes
 	static boolean debug_extractor = true;
-	static boolean debug_db = false;
+	static boolean debug_db = true;
 	static boolean debug_img = false;
 	static String title = "";
 
@@ -36,7 +38,9 @@ public class PDFHandler {
 
 	}
 
-	/**Initiates corpus text mining - ranking
+	/**
+	 * Initiates corpus text mining - ranking
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -70,7 +74,10 @@ public class PDFHandler {
 		}
 	}
 
-	/** Main text mining method return parsed/calculated corpus (containing all pdfs) 
+	/**
+	 * Main text mining method return parsed/calculated corpus (containing all
+	 * pdfs)
+	 * 
 	 * @return corpus
 	 * @throws LangDetectException
 	 * @throws IOException
@@ -93,7 +100,9 @@ public class PDFHandler {
 
 	}
 
-	/** Creates basic corpus -> text mining (word extraction,keyword,pdfs)
+	/**
+	 * Creates basic corpus -> text mining (word extraction,keyword,pdfs)
+	 * 
 	 * @param folder
 	 * @param corpus
 	 * @param pdfList
@@ -105,11 +114,16 @@ public class PDFHandler {
 			ArrayList<PDF> pdfList, boolean first) throws LangDetectException {
 		File hack = new File(".");
 		String home = hack.getAbsolutePath();
+		// not relevant for TIGRS
 		String img = home + "/export/gen_img/";
 		String key = home + "/export/gen_key/";
 		String export = home + "/export/gen_svg/";
+		// -----------------------------------------------
+		// Not necessary, but for the cases when no corresponding publication is
+		// available
+		String importtitle = home + "/importData/pdftitleo.csv";
 		PDFExtractor extractor = new PDFExtractor();
-		String importtitle = "c:/RWTH/Data/titletable/pdftitleo.csv";
+		// String importtitle = "c:/RWTH/Data/titletable/pdftitleo.csv";
 		ArrayList<String> titles = readCSVTitle(importtitle);
 		for (final File fileEntry : folder.listFiles()) {
 			if (fileEntry.isFile()) {
@@ -170,6 +184,15 @@ public class PDFHandler {
 		return corpus;
 	}
 
+	/**
+	 * Maps the file names with the reference titles (csv). Work around for pdfs
+	 * that have no corresponding pdf
+	 * 
+	 * @param fileName (fileEntry.getName())
+	 * @param titles
+	 * @return
+	 */
+
 	private String getTitle(String fileName, ArrayList<String> titles) {
 		for (int ii = 0; ii < titles.size(); ii = ii + 2) {
 			if (titles.get(ii).equals(fileName)) {
@@ -183,7 +206,9 @@ public class PDFHandler {
 
 	}
 
-	/**retrieve titles from external csv title file
+	/**
+	 * retrieve titles from external csv title file
+	 * 
 	 * @param importtitle
 	 * @return
 	 */
@@ -227,10 +252,14 @@ public class PDFHandler {
 		return titles;
 	}
 
-	/**Creates a wordcloud out of a given text
-	 * @param fileEntry -> pdf
-	 * @param occ -> word occurences and word itself
-	 * @param key 
+	/**
+	 * Creates a wordcloud out of a given text
+	 * 
+	 * @param fileEntry
+	 *            -> pdf
+	 * @param occ
+	 *            -> word occurences and word itself
+	 * @param key
 	 * @param img
 	 * @param export
 	 * @param home
