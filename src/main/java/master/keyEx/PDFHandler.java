@@ -122,6 +122,7 @@ public class PDFHandler {
 		// Not necessary, but for the cases when no corresponding publication is
 		// available
 		String importtitle = home + "/importData/pdftitleo.csv";
+		System.out.println(importtitle);
 		PDFExtractor extractor = new PDFExtractor();
 		// String importtitle = "c:/RWTH/Data/titletable/pdftitleo.csv";
 		ArrayList<String> titles = readCSVTitle(importtitle);
@@ -186,9 +187,10 @@ public class PDFHandler {
 
 	/**
 	 * Maps the file names with the reference titles (csv). Work around for pdfs
-	 * that have no corresponding pdf
+	 * that have no corresponding publication within the library information
 	 * 
-	 * @param fileName (fileEntry.getName())
+	 * @param fileName
+	 *            (fileEntry.getName())
 	 * @param titles
 	 * @return
 	 */
@@ -207,7 +209,8 @@ public class PDFHandler {
 	}
 
 	/**
-	 * retrieve titles from external csv title file
+	 * retrieve titles from external csv title file. 
+	 * External mapping exists for unknown pdfs (titles) to the library file.
 	 * 
 	 * @param importtitle
 	 * @return
@@ -228,6 +231,7 @@ public class PDFHandler {
 				// use comma as separator
 
 				helper = line.split(cvsSplitBy);
+				System.out.println(helper);
 				for (int counter = 0; counter < helper.length; counter++) {
 					titles.add(helper[counter]);
 				}
